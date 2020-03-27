@@ -1,4 +1,4 @@
-package cn.zjh567;
+package pkit.gui.tests;
 
 import javafx.application.Application;
 import javafx.stage.Modality;

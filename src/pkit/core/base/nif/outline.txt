@@ -1,0 +1,39 @@
+property
+1. snap length 1
+2. promiscuous mode 1
+3. rfmon mode 1
+4. timeout millis 1
+5. buffer size 1
+6. timestamp precision 1
+7. direction 1
+8. immediateMode 1
+9. filter
+10. send packet number
+11. receive packet number
+12. MAC address
+13. subnet mask code
+14. IPv4 address
+15. IPv6 address
+16. NIF name
+17. NIF id
+18. NIF description
+19. NIF easy name
+20. bandwidth
+21. gateway
+22. send byte summery
+23. receive byte summery
+24. capture packet number
+25. loss packet number
+26. loss rate
+27. work time
+28. live time
+29. etc...
+
+method
+set...
+get...
+
+
+
+
+

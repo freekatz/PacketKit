@@ -1,0 +1,38 @@
+基于 xcap 的属性写出 packet 的接口，基本上就可以了
+然后根据以下数据包决定支持的协议类型
+
+AbstractPacket, ArpPacket, BsdLoopbackPacket,
+CompressedPacket, DnsPacket, Dot11ManagementPacket,
+Dot11ProbeRequestPacket, Dot11Selector, Dot1qVlanTagPacket,
+EncryptedPacket, EthernetPacket, FragmentedPacket,
+GtpSelector, GtpV1Packet, HdlcPppPacket, IcmpV4CommonPacket,
+IcmpV4DestinationUnreachablePacket, IcmpV4EchoPacket,
+IcmpV4EchoReplyPacket, IcmpV4InformationReplyPacket,
+IcmpV4InformationRequestPacket, IcmpV4ParameterProblemPacket,
+IcmpV4RedirectPacket, IcmpV4SourceQuenchPacket, IcmpV4TimeExceededPacket,
+IcmpV4TimestampPacket, IcmpV4TimestampReplyPacket, IcmpV6CommonPacket,
+IcmpV6DestinationUnreachablePacket, IcmpV6EchoReplyPacket,
+IcmpV6EchoRequestPacket, IcmpV6HomeAgentAddressDiscoveryReplyPacket,
+IcmpV6HomeAgentAddressDiscoveryRequestPacket, IcmpV6MobilePrefixAdvertisementPacket,
+IcmpV6MobilePrefixSolicitationPacket, IcmpV6NeighborAdvertisementPacket,
+IcmpV6NeighborSolicitationPacket, IcmpV6PacketTooBigPacket,
+IcmpV6ParameterProblemPacket, IcmpV6RedirectPacket, IcmpV6RouterAdvertisementPacket,
+IcmpV6RouterSolicitationPacket, IcmpV6TimeExceededPacket, IllegalPacket,
+IpSelector, IpV4Packet, IpV6ExtDestinationOptionsPacket, IpV6ExtFragmentPacket,
+IpV6ExtHopByHopOptionsPacket, IpV6ExtOptionsPacket, IpV6ExtRoutingPacket,
+IpV6ExtUnknownPacket, IpV6Packet, LinuxSllPacket, LlcPacket, PcapPacket, PppPacket,
+PppSelector, RadiotapPacket, SctpPacket, SnapPacket, Ssh2BinaryPacket,
+Ssh2DebugPacket, Ssh2DisconnectPacket, Ssh2IgnorePacket, Ssh2KexDhInitPacket,
+Ssh2KexDhReplyPacket, Ssh2KexInitPacket, Ssh2NewKeysPacket, Ssh2ServiceAcceptPacket,
+Ssh2ServiceRequestPacket, Ssh2UnimplementedPacket, Ssh2VersionExchangePacket,
+SshPacket, TcpPacket, UdpPacket, UnknownPacket
+
+
+
+
+
+
+
+
+
+

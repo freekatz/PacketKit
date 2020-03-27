@@ -1,4 +1,4 @@
-package cn.zjh567;
+package pkit.gui.tests;
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
@@ -15,7 +15,7 @@ public class StageSingle extends Application {
 
         primaryStage.setTitle("Index");
 
-        Image image = new Image("file:src/test/res/logo.png");
+        Image image = new Image("file:E:\\GitHub\\PKit\\pkit-gui\\src\\test\\res\\logo.png");
         // set title icon
         primaryStage.getIcons().add(image);
 

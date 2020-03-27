@@ -1,5 +1,8 @@
 # test src
-# test/
+tests/
+
+# outline
+outline.*
 
 # Intellij IDEA project
 .idea/
