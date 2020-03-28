@@ -1,4 +1,4 @@
 package pkit.core.base.packet;
 
-public class PacketManager {
+public class PacketGroupManager {
 }

@@ -29,11 +29,25 @@ property
 28. live time
 29. etc...
 
-method
+method:
 set...
 get...
 
+operator:
+start
+restart
+stop
+load config
+reload config
+export config
+edit config
+capture
+send
+resend
+forward
 
+
+使用网卡 id 和数据包组 id 联系起来
 
 
 
