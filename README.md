@@ -13,7 +13,7 @@
   </p></p>
 
 
-[![Build Status](README.assets/badgerbadgerbadger.svg)](https://travis-ci.org/badges/badgerbadgerbadger) [![Dependency Status](README.assets/badgerbadgerbadger.svg)](https://gemnasium.com/badges/badgerbadgerbadger) [![Coverage Status](../md-tmpl/README.assets/badgerbadgerbadger.svg)](https://coveralls.io/r/badges/badgerbadgerbadger) 
+[![License](res/README.assets/_license-mit-blue.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
