@@ -37,7 +37,7 @@ Some text
 
 #### 结构
 
-![image-20200329164426620](README.assets/image-20200329164426620.png)
+![image-20200329164426620](res/README.assets/proj-struct.png)
 
 
 
