@@ -1,111 +1,21 @@
-基于 xcap 的属性写出 packet 的接口，基本上就可以了
-然后根据以下数据包决定支持的协议类型
-
-AbstractPacket, ArpPacket, BsdLoopbackPacket,
-CompressedPacket, DnsPacket, Dot11ManagementPacket,
-Dot11ProbeRequestPacket, Dot11Selector, Dot1qVlanTagPacket,
-EncryptedPacket, EthernetPacket, FragmentedPacket,
-GtpSelector, GtpV1Packet, HdlcPppPacket, IcmpV4CommonPacket,
-IcmpV4DestinationUnreachablePacket, IcmpV4EchoPacket,
-IcmpV4EchoReplyPacket, IcmpV4InformationReplyPacket,
-IcmpV4InformationRequestPacket, IcmpV4ParameterProblemPacket,
-IcmpV4RedirectPacket, IcmpV4SourceQuenchPacket, IcmpV4TimeExceededPacket,
-IcmpV4TimestampPacket, IcmpV4TimestampReplyPacket, IcmpV6CommonPacket,
-IcmpV6DestinationUnreachablePacket, IcmpV6EchoReplyPacket,
-IcmpV6EchoRequestPacket, IcmpV6HomeAgentAddressDiscoveryReplyPacket,
-IcmpV6HomeAgentAddressDiscoveryRequestPacket, IcmpV6MobilePrefixAdvertisementPacket,
-IcmpV6MobilePrefixSolicitationPacket, IcmpV6NeighborAdvertisementPacket,
-IcmpV6NeighborSolicitationPacket, IcmpV6PacketTooBigPacket,
-IcmpV6ParameterProblemPacket, IcmpV6RedirectPacket, IcmpV6RouterAdvertisementPacket,
-IcmpV6RouterSolicitationPacket, IcmpV6TimeExceededPacket, IllegalPacket,
-IpSelector, IpV4Packet, IpV6ExtDestinationOptionsPacket, IpV6ExtFragmentPacket,
-IpV6ExtHopByHopOptionsPacket, IpV6ExtOptionsPacket, IpV6ExtRoutingPacket,
-IpV6ExtUnknownPacket, IpV6Packet, LinuxSllPacket, LlcPacket, PcapPacket, PppPacket,
-PppSelector, RadiotapPacket, SctpPacket, SnapPacket, Ssh2BinaryPacket,
-Ssh2DebugPacket, Ssh2DisconnectPacket, Ssh2IgnorePacket, Ssh2KexDhInitPacket,
-Ssh2KexDhReplyPacket, Ssh2KexInitPacket, Ssh2NewKeysPacket, Ssh2ServiceAcceptPacket,
-Ssh2ServiceRequestPacket, Ssh2UnimplementedPacket, Ssh2VersionExchangePacket,
-SshPacket, TcpPacket, UdpPacket, UnknownPacket
-
-
-Packet
-暂时不支持更多，简单的模板和常用包构造
-info:
-id
-capture length
-real length
-load length
-timestamp
-src local
-dest local
-abstract
-
-link:
-dest mac
-src mac
-link type
-FCS
-protocol type
-
-
-net:
-version
-header length
-total length
-flags
-nid
-fragment
-ttl
-src ip
-dest ip
-protocol type
-check sum
-options
-
-trans:
-src port
-dest port
-sequence count
-acknowledge count
-data offset
-reserved
-window size
-urgent ptr
-flags
-options
-check sum
-
-app:
-etc
-
-data:
-length
-is auto blank
-
+1. 包捕获，直接利用 p4 解析数据，唯一的需求就是动态适应
+2. 包构造，先确定第一批次支持的包类型，直接写出模板，保存模板到内存，模板部分字段支持更改，即可
+3. 至于包的额外信息，额外信息通过 map 联系数据包，最后交由包组管理
+4. 包修改及重放保存先不管
+包直接映射到组内，组也直接映射到网卡
+包捕获后的处理，主要是协议类型未知是个难题
+包构造的存储需要用到对象存储加载技术
 packet -> group -> interface
-自定义类型尽量定义为枚举类型
-支持的数据包单独定义为多个->直接一步到位，将数据包定义完整
 
-Group
-info:
-id
-interface id
-name
-timestamp
-packet number
-group type: send, capture
+包组提供生成其它类型组的方法，如将此组中的 tcp 包提取出生成另一个 组
+因此，数据包与组的关系是多对多的
+而组与接口的关系为多对一
 
-operator:
-save
-export
-show
-remove
-
-static operator
+parser 作用是解析 p4 的数据，如 ip 头部，
+这样的话，捕获之后的信息可直接按照 p4 的组织方式存入数据库，即动态字段部分直接存为字符串
 
 
-
-
+└ ─ ─
 
 
 

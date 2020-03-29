@@ -1,2 +1,62 @@
-# PKit
-Packet Kit: 一个强大的跨平台底层数据包工具箱，支持捕获、过滤、拦截、修改、发送、统计、分析及安全描述
+
+<p align="center">
+  <a href="https://github.com/1uvu/pkit" target="_blank">
+    <img src="./res/logo.png" alt="Packet Kit Logo" width=72 height=72>
+  </a>
+  <h3 align="center">PKit(Packet Kit)</h3>
+  <p align="center">
+    一个强大的跨平台底层数据包工具箱
+    <br>
+    <a href="https://github.com/1uvu/pkit/issues/new?template=bug.md">Report bug</a>
+    ·
+    <a href="https://github.com/1uvu/pkit/issues/new?template=feature.md&labels=feature">Request feature</a>
+  </p></p>
+
+
+[![Build Status](README.assets/badgerbadgerbadger.svg)](https://travis-ci.org/badges/badgerbadgerbadger) [![Dependency Status](README.assets/badgerbadgerbadger.svg)](https://gemnasium.com/badges/badgerbadgerbadger) [![Coverage Status](../md-tmpl/README.assets/badgerbadgerbadger.svg)](https://coveralls.io/r/badges/badgerbadgerbadger) 
+
+---
+
+## 目录
+
+- [快速开始](#快速开始)
+- [项目介绍](#项目介绍)
+- [待办清单](#待办清单)
+- [致谢](#致谢)
+- [版权许可](#版权许可)
+
+## 快速开始
+
+Some text
+
+- Instruction 1
+- Instruction 2
+- Instruction 3
+
+## 项目介绍
+
+#### 结构
+
+![image-20200329164426620](README.assets/image-20200329164426620.png)
+
+
+
+## 待办清单
+
+- [x] Finished
+  - [x] 网卡接口（interface）
+  - [x] 数据组接口（group）
+  - [x] 接口、包、组关系设计
+- [ ] To do
+  - [ ] 数据包协议类型自适应
+  - [ ] 接口、包、组的关系实现
+
+## 致谢
+
+Some Text
+
+## 版权许可
+
+Some Text
+
+Enjoy :metal:

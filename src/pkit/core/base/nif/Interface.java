@@ -21,15 +21,14 @@ public interface Interface {
     int SnapshotLength = 65536;
     int Count = -1;
     PcapNetworkInterface.PromiscuousMode PromiscuousMode = PcapNetworkInterface.PromiscuousMode.NONPROMISCUOUS;
-    boolean RfmonMode = false;
-    boolean OfflineMode = false;
+    InterfaceMode.RfmonMode RfmonMode = InterfaceMode.RfmonMode.NoRfmonMode;
+    InterfaceMode.OfflineMode OfflineMode = InterfaceMode.OfflineMode.OnlineMode;
     int TimeoutMillis = 0;
     int BufferSize = 2 * 1024 * 1024;
     PcapHandle.TimestampPrecision TimestampPrecision = PcapHandle.TimestampPrecision.NANO;
     PcapHandle.PcapDirection Direction = PcapHandle.PcapDirection.INOUT;
-    boolean ImmediateMode = false;
+    InterfaceMode.ImmediateMode ImmediateMode = InterfaceMode.ImmediateMode.DelayMode;
     String Filter = null;
-
 
     // statistic reference
     // use trigger auto update
@@ -43,30 +42,52 @@ public interface Interface {
     double Bandwidth = 0;
     int WorkTime = 0;
     int LiveTime = 0;
-    double UseingRate = 0;
+    double UsingRate = 0;
 
+
+    void setId(String id);
+    void setName(String name);
+    void setEasyName(String easyName);
+    void setDescription(String description);
+    void setMacAddress(String MACAddress);
+    void setIPv4Address(String IPv4Address);
+    void setIPv6Address(String IPv6Address);
+    void setSubnetMask(String subnetMask);
+    void setGateway(String gateway);
 
     void setSnapshotLength(int snapshotLength);
     void setCount(int count);
-    void setPromiscuousMode(PcapNetworkInterface.PromiscuousMode promiscuousMode);
-    void setRfmonMode(boolean rfmonMode);
-    void setOfflineMode(boolean offlineMode);
+    void setPromiscuousMode(PcapNetworkInterface.PromiscuousMode mode);
+    void setRfmonMode(InterfaceMode.RfmonMode mode);
+    void setOfflineMode(InterfaceMode.OfflineMode mode);
     void setTimeoutMillis(int timeoutMillis);
     void setBufferSize(int bufferSize);
     void setTimestampPrecision(PcapHandle.TimestampPrecision timestampPrecision);
     void setDirection(PcapHandle.PcapDirection direction);
-    void setImmediateMode(boolean immediateMode);
+    void setImmediateMode(InterfaceMode.ImmediateMode mode);
     void setFilter(String filter);
 
+    void setSendPacketNumber(int sendPacketNumber);
+    void setReceivePacketNumber(int receivePacketNumber);
+    void setCapturePacketNumber(int capturePacketNumber);
+    void setLossPacketNumber(int lossPacketNumber);
+    void setPacketLossRate(double packetLossRate);
+    void setSendByteNumber(int sendByteNumber);
+    void setReceiveByteNumber(int receiveByteNumber);
+    void setBandwidth(int bandwidth);
+    void setWorkTime(int workTime);
+    void setLiveTime(int liveTime);
+    void setUsingRate(double usingRate);
+
+    String getId();
+    String getName();
+    String getEasyName();
+    String getDescription();
     String getMacAddress();
     String getIPv4Address();
     String getIPv6Address();
     String getSubnetMask();
     String getGateway();
-    String getId();
-    String getName();
-    String getEasyName();
-    String getDescription();
 
     int getSendPacketNumber();
     int getReceivePacketNumber();
@@ -78,6 +99,18 @@ public interface Interface {
     double getBandwidth();
     int getWorkTime();
     int getLiveTime();
-    double getUseingRate();
+    double getUsingRate();
+
+    // 返回值未确定
+    void start();
+    void restart();
+    void stop();
+    void load();
+    void reload();
+    void edit();
+    void capture();
+    void send();
+    void resend();
+    void forward();
 
 }

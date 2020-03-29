@@ -6,6 +6,7 @@ tests/
 .idea/
 out/
 lib/
+*.iml
 
 # 
 wheel/
