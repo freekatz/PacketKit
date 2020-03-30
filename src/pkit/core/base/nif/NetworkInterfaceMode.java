@@ -1,6 +1,6 @@
 package pkit.core.base.nif;
 
-public class InterfaceMode {
+public class NetworkInterfaceMode {
     public static enum RfmonMode {
         RfmonMode(1),
         NoRfmonMode(0);

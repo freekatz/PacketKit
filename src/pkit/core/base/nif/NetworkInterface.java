@@ -3,7 +3,7 @@ package pkit.core.base.nif;
 import org.pcap4j.core.PcapHandle;
 import org.pcap4j.core.PcapNetworkInterface;
 
-public interface Interface {
+public interface NetworkInterface {
 
     // information reference
     // update when construction
@@ -21,13 +21,13 @@ public interface Interface {
     int SnapshotLength = 65536;
     int Count = -1;
     PcapNetworkInterface.PromiscuousMode PromiscuousMode = PcapNetworkInterface.PromiscuousMode.NONPROMISCUOUS;
-    InterfaceMode.RfmonMode RfmonMode = InterfaceMode.RfmonMode.NoRfmonMode;
-    InterfaceMode.OfflineMode OfflineMode = InterfaceMode.OfflineMode.OnlineMode;
+    NetworkInterfaceMode.RfmonMode RfmonMode = NetworkInterfaceMode.RfmonMode.NoRfmonMode;
+    NetworkInterfaceMode.OfflineMode OfflineMode = NetworkInterfaceMode.OfflineMode.OnlineMode;
     int TimeoutMillis = 0;
     int BufferSize = 2 * 1024 * 1024;
     PcapHandle.TimestampPrecision TimestampPrecision = PcapHandle.TimestampPrecision.NANO;
     PcapHandle.PcapDirection Direction = PcapHandle.PcapDirection.INOUT;
-    InterfaceMode.ImmediateMode ImmediateMode = InterfaceMode.ImmediateMode.DelayMode;
+    NetworkInterfaceMode.ImmediateMode ImmediateMode = NetworkInterfaceMode.ImmediateMode.DelayMode;
     String Filter = null;
 
     // statistic reference
@@ -58,13 +58,13 @@ public interface Interface {
     void setSnapshotLength(int snapshotLength);
     void setCount(int count);
     void setPromiscuousMode(PcapNetworkInterface.PromiscuousMode mode);
-    void setRfmonMode(InterfaceMode.RfmonMode mode);
-    void setOfflineMode(InterfaceMode.OfflineMode mode);
+    void setRfmonMode(NetworkInterfaceMode.RfmonMode mode);
+    void setOfflineMode(NetworkInterfaceMode.OfflineMode mode);
     void setTimeoutMillis(int timeoutMillis);
     void setBufferSize(int bufferSize);
     void setTimestampPrecision(PcapHandle.TimestampPrecision timestampPrecision);
     void setDirection(PcapHandle.PcapDirection direction);
-    void setImmediateMode(InterfaceMode.ImmediateMode mode);
+    void setImmediateMode(NetworkInterfaceMode.ImmediateMode mode);
     void setFilter(String filter);
 
     void setSendPacketNumber(int sendPacketNumber);

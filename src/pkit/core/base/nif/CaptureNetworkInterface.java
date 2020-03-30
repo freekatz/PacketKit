@@ -3,9 +3,9 @@ package pkit.core.base.nif;
 import org.pcap4j.core.PcapHandle;
 import org.pcap4j.core.PcapNetworkInterface;
 
-public class CaptureInterface implements Interface {
+public class CaptureNetworkInterface implements NetworkInterface {
 
-    CaptureInterface() {
+    CaptureNetworkInterface() {
 
     }
 
@@ -70,12 +70,12 @@ public class CaptureInterface implements Interface {
     }
 
     @Override
-    public void setRfmonMode(InterfaceMode.RfmonMode mode) {
+    public void setRfmonMode(NetworkInterfaceMode.RfmonMode mode) {
 
     }
 
     @Override
-    public void setOfflineMode(InterfaceMode.OfflineMode mode) {
+    public void setOfflineMode(NetworkInterfaceMode.OfflineMode mode) {
 
     }
 
@@ -100,7 +100,7 @@ public class CaptureInterface implements Interface {
     }
 
     @Override
-    public void setImmediateMode(InterfaceMode.ImmediateMode mode) {
+    public void setImmediateMode(NetworkInterfaceMode.ImmediateMode mode) {
 
     }
 

@@ -1,0 +1,71 @@
+
+3. 至于包的额外信息，额外信息通过 map 联系数据包，最后交由包组管理
+4. 包修改及重放保存先不管
+包直接映射到组内，组也直接映射到网卡
+包捕获后的处理，主要是协议类型未知是个难题
+包构造的存储需要用到对象存储加载技术
+packet -> group -> interface
+
+包组提供生成其它类型组的方法，如将此组中的 tcp 包提取出生成另一个 组
+因此，数据包与组的关系是多对多的
+而组与接口的关系为多对一
+（以上关系成图）
+
+└ ─ ─
+一、捕获：Interface
+思路
+1 捕获默认全部捕获
+2 将捕获的包放在缓冲区中->存储于磁盘上的临时文件
+3 根据过滤器过滤已捕获的包，基于 p4 的 BpfProgram 实现
+4 每次重新开始捕获需要选择对以前已捕获包的处理（保存等等）
+5 可同时开启多个捕获作业（todo）
+
+二、解析：PacketGroup+PacketOperator
+思路
+1 连续判断是否包括下层数据包，基于 p4 的 utils.Packets
+2 批量获取某些地址信息，基于 p4 的 utils.ByteArrays
+3 计算各种校验和，基于 p4 的 utils.ByteArrays
+4 批量对 Byte 的操作都可以看一下 utils.ByteArrays
+时机
+1 只解析当前过滤得到的数据包
+2 因此当前过滤器得到的数据包应该拷贝成一个副本，放在内存之中
+3 更新过滤器时，从磁盘缓冲区读取完整 pcap 文件（.pks）得到新的过滤结果
+（以上思路画出数据流图）
+内容
+1 包的额外信息，额外信息通过 map 联系数据包，最后交由包组管理
+2 包的全部可解析信息
+如何
+1 对每个数据包通过 forEach，利用 Packets 的方法判断都有哪些层的协议
+2 p4 目前只支持，因此暂时支持这些，可以很简单的实现，如：
+一定包含链路层，则先判断是否包括网络层，不包括则可能为：PPP、BSD 这些
+包含网络层，则判断是否包含传输层，不包含则可能为 ARP、ICMP 这些
+包含传输层、则判断 TCP 还是 UDP，判断应用层端口是哪些常用端口（暂时，因为应用层协议支持的少）
+Ethernet, Linux SLL, raw IP, PPP (RFC1661, RFC1662), BSD (Mac OS X) loopback encapsulation, and Radiotap
+IEEE 802.11
+Probe Request
+LLC and SNAP
+IEEE802.1Q
+ARP
+IPv4 (RFC791 and RFC1349) and IPv6 (RFC2460)
+ICMPv4 (RFC792) and ICMPv6 (RFC4443, RFC4861, and RFC6275)
+TCP (RFC793, RFC2018, and draft-ietf-tcpm-1323bis-21), UDP, and SCTP (only common header)
+GTPv1 (only GTP-U and GTP-C header)
+DNS (RFC1035, RFC3596, and RFC6844)
+3 自己可暂时实现额外的协议（todo）
+
+三、构造 PacketOperator
+1 提供丰富的模板，保存 packet 对象为二进制文件（.pk）
+2 读入 packet 可修改某些必要的字段
+3 手动构造包要用到判断是否包括下层数据包，基于 p4 的 utils.Packets
+4 为每种支持的包编写特定的 fxml 布局
+
+四、修改 PacketOperator
+类似于构造
+
+五、发送 Interface
+
+六、
+
+
+
+
