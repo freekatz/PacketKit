@@ -44,7 +44,7 @@ public final class CaptureNetworkInterface implements NetworkInterface{
 
     // statistic reference
     // use trigger auto update
-    public int sendPacketNumber = 0;
+    public int sendPacketNumber = 0; // 这个字段不需要在发送接口中定义，因为捕获接口可以捕获到本机发送的包，无需再次统计
     public int receivePacketNumber = 0;
     public int capturePacketNumber = 0;
     public int lossPacketNumber = 0;
@@ -125,9 +125,7 @@ public final class CaptureNetworkInterface implements NetworkInterface{
         PacketListener listener;
         switch (mode){
             case LoopMode:
-                 listener = pcapPacket -> {
-                    System.out.println(pcapPacket);
-                };
+                 listener = System.out::println;
                 this.handle.loop(5, listener);
                 break;
             case HeavyLoopMode:
@@ -136,7 +134,7 @@ public final class CaptureNetworkInterface implements NetworkInterface{
                             System.out.println("start a heavy task");
                             try {
                                 Thread.sleep(5000);
-                            } catch (InterruptedException e) {
+                            } catch (InterruptedException ignored) {
 
                             }
                             System.out.println("done");
