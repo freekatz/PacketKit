@@ -33,4 +33,18 @@ public class NetworkInterfaceMode {
         public int getValue() { return this.value; }
     }
 
+    public static enum CaptureMode {
+        GetNextPacketExMode(1),
+        GetNextPacketMode(0),
+        LoopMode(2),
+        HeavyLoopMode(3);
+        // etc...
+
+        private final int value;
+
+        private CaptureMode(int value) { this.value = value; }
+
+        public int getValue() { return this.value; }
+    }
+
 }

@@ -1,316 +1,224 @@
 package pkit.core.base.nif;
 
-import org.pcap4j.core.PcapHandle;
-import org.pcap4j.core.PcapNetworkInterface;
+import org.pcap4j.core.*;
+import org.pcap4j.util.LinkLayerAddress;
 
-public class CaptureNetworkInterface implements NetworkInterface {
+import java.io.EOFException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeoutException;
 
-    CaptureNetworkInterface() {
+public final class CaptureNetworkInterface implements NetworkInterface{
 
-    }
+    private PcapHandle.Builder builder = null;
+    private PcapHandle handle = null;
 
-    @Override
-    public void setId(String id) {
+    // information reference, static
+    // update when construction
+    private final int id; // 自编
+    private final String name;
+    private final String easyName = "easyName"; // 需要一个函数来获取
+    private final String description;
+    private final ArrayList<LinkLayerAddress> MacAddresses;
+    private final List<PcapAddress> IPAddresses;
+    private final boolean local; // 是否是本地接口
+    private final boolean loopback; // 是否是回环网卡
+    private final boolean running; // 是否运行
+    private final boolean up; // 是否打开
 
-    }
+    // operator reference
+    boolean activate = false; // 是否激活(编程属性而非网卡实体属性), 当一个网卡的处理类被新建时设为 true
+    int snapshotLength = 65536;
+    int count = -1;
+    PcapNetworkInterface.PromiscuousMode promiscuousMode = PcapNetworkInterface.PromiscuousMode.NONPROMISCUOUS;
+    NetworkInterfaceMode.RfmonMode rfmonMode = NetworkInterfaceMode.RfmonMode.NoRfmonMode;
+    NetworkInterfaceMode.OfflineMode offlineMode = NetworkInterfaceMode.OfflineMode.OnlineMode;
+    int timeoutMillis = 0;
+    int bufferSize = 2 * 1024 * 1024; // 2MB 缓冲大小
+    PcapHandle.TimestampPrecision timestampPrecision = PcapHandle.TimestampPrecision.NANO;
+    PcapHandle.PcapDirection direction = PcapHandle.PcapDirection.INOUT;
+    NetworkInterfaceMode.ImmediateMode immediateMode = NetworkInterfaceMode.ImmediateMode.DelayMode;
+    String filter = null;
 
-    @Override
-    public void setName(String name) {
+    // statistic reference
+    // use trigger auto update
+    public int sendPacketNumber = 0;
+    public int receivePacketNumber = 0;
+    public int capturePacketNumber = 0;
+    public int lossPacketNumber = 0;
+    public double packetLossRate = 0;
+    public int sendByteNumber = 0;
+    public int receiveByteNumber = 0;
+    public double bandwidth = 0;
+    public int workTime = 0;
+    public int liveTime = 0;
+    public double usingRate = 0;
 
-    }
-
-    @Override
-    public void setEasyName(String easyName) {
-
-    }
-
-    @Override
-    public void setDescription(String description) {
-
-    }
-
-    @Override
-    public void setMacAddress(String MACAddress) {
-
-    }
-
-    @Override
-    public void setIPv4Address(String IPv4Address) {
-
-    }
-
-    @Override
-    public void setIPv6Address(String IPv6Address) {
-
-    }
-
-    @Override
-    public void setSubnetMask(String subnetMask) {
-
-    }
-
-    @Override
-    public void setGateway(String gateway) {
-
-    }
-
-    @Override
-    public void setSnapshotLength(int snapshotLength) {
-
-    }
-
-    @Override
-    public void setCount(int count) {
-
-    }
-
-    @Override
-    public void setPromiscuousMode(PcapNetworkInterface.PromiscuousMode mode) {
-
-    }
-
-    @Override
-    public void setRfmonMode(NetworkInterfaceMode.RfmonMode mode) {
+    private CaptureNetworkInterface(PcapNetworkInterface nif) {
+        this.id = nif.hashCode();
+        this.name = nif.getName();
+//        this.easyName = this.getEasyName();
+        this.description = nif.getDescription();
+        this.MacAddresses = nif.getLinkLayerAddresses();
+        this.IPAddresses = nif.getAddresses();
+        this.local = nif.isLocal();
+        this.loopback = nif.isLoopBack();
+        this.running = nif.isRunning();
+        this.up = nif.isUp();
 
     }
 
     @Override
-    public void setOfflineMode(NetworkInterfaceMode.OfflineMode mode) {
-
+    public void Activate() {
+        this.activate = true;
+        this.builder = new PcapHandle.Builder(this.name);
     }
 
     @Override
-    public void setTimeoutMillis(int timeoutMillis) {
-
+    public void Reactivate() {
+        if (!this.activate)
+            this.activate = true;
+        if (this.builder != null)
+            this.builder = null;
+        this.builder = new PcapHandle.Builder(this.name);
     }
 
     @Override
-    public void setBufferSize(int bufferSize) {
-
+    public void Load() throws PcapNativeException {
+        // 此处代码较多, 待完善
+        if (this.activate) {
+            this.handle = this.builder.build();
+        }
     }
 
     @Override
-    public void setTimestampPrecision(PcapHandle.TimestampPrecision timestampPrecision) {
-
+    public void Reload() throws PcapNativeException {
+        // 此处代码较多, 待完善
+        this.handle = this.builder.build();
     }
 
     @Override
-    public void setDirection(PcapHandle.PcapDirection direction) {
-
+    public void Edit() throws PcapNativeException {
+        // 此处代码较多, 待完善
+        this.handle = this.builder.build();
     }
 
     @Override
-    public void setImmediateMode(NetworkInterfaceMode.ImmediateMode mode) {
-
+    public void Start() throws PcapNativeException, NotOpenException {
+        if (this.handle != null)
+            this.handle.setFilter(this.filter, BpfProgram.BpfCompileMode.OPTIMIZE);
+        // 此处代码较多, 待完善
     }
 
     @Override
-    public void setFilter(String filter) {
-
+    public void Stop() {
+        assert handle != null;
+        handle.close();
+        // 此处代码较多, 待完善
     }
 
-    @Override
-    public void setSendPacketNumber(int sendPacketNumber) {
 
+    void Capture(NetworkInterfaceMode.CaptureMode mode) throws PcapNativeException, InterruptedException, NotOpenException, EOFException, TimeoutException {
+        // 以下代码这是示例
+        PacketListener listener;
+        switch (mode){
+            case LoopMode:
+                 listener = pcapPacket -> {
+                    System.out.println(pcapPacket);
+                };
+                this.handle.loop(5, listener);
+                break;
+            case HeavyLoopMode:
+                listener =
+                        packet -> {
+                            System.out.println("start a heavy task");
+                            try {
+                                Thread.sleep(5000);
+                            } catch (InterruptedException e) {
+
+                            }
+                            System.out.println("done");
+                        };
+
+                try {
+                    ExecutorService pool = Executors.newCachedThreadPool();
+                    // 我们只需向 loop 函数传入 pool 即可, p4 作者已经将线程池的实现封装好
+                    handle.loop(5, listener, pool); // This is better than handle.loop(5, listener);
+                    pool.shutdown();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            case GetNextPacketMode:
+                this.handle.getNextPacket();
+            case GetNextPacketExMode:
+                this.handle.getNextPacketEx();
+        }
     }
 
-    @Override
-    public void setReceivePacketNumber(int receivePacketNumber) {
-
+    public int getId(){
+        return this.id;
     }
-
-    @Override
-    public void setCapturePacketNumber(int capturePacketNumber) {
-
+    public String getName(){
+        return this.name;
     }
-
-    @Override
-    public void setLossPacketNumber(int lossPacketNumber) {
-
+    public String getEasyName(){
+        return this.easyName;
     }
-
-    @Override
-    public void setPacketLossRate(double packetLossRate) {
-
+    public String getDescription(){
+        return this.description;
     }
-
-    @Override
-    public void setSendByteNumber(int sendByteNumber) {
-
+    public ArrayList<LinkLayerAddress> getMacAddresses(){
+        return this.MacAddresses;
     }
-
-    @Override
-    public void setReceiveByteNumber(int receiveByteNumber) {
-
+    public List<PcapAddress> getIPAddresses(){
+        return this.IPAddresses;
     }
-
-    @Override
-    public void setBandwidth(int bandwidth) {
-
+    public boolean isLocal(){
+        return this.local;
     }
-
-    @Override
-    public void setWorkTime(int workTime) {
-
+    public boolean isLoopBack(){
+        return this.loopback;
     }
-
-    @Override
-    public void setLiveTime(int liveTime) {
-
+    public boolean isRunning(){
+        return this.running;
     }
-
-    @Override
-    public void setUsingRate(double usingRate) {
-
+    public boolean isUp(){
+        return this.up;
     }
-
-    @Override
-    public String getId() {
-        return null;
+    public int getSendPacketNumber(){
+        return this.sendPacketNumber;
     }
-
-    @Override
-    public String getName() {
-        return null;
+    public int getReceivePacketNumber(){
+        return this.receivePacketNumber;
     }
-
-    @Override
-    public String getEasyName() {
-        return null;
+    public int getCapturePacketNumber(){
+        return this.capturePacketNumber;
     }
-
-    @Override
-    public String getDescription() {
-        return null;
+    public int getLossPacketNumber(){
+        return this.lossPacketNumber;
     }
-
-    @Override
-    public String getMacAddress() {
-        return null;
+    public double getPacketLossRate(){
+        return this.packetLossRate;
     }
-
-    @Override
-    public String getIPv4Address() {
-        return null;
+    public int getSendByteNumber(){
+        return this.sendByteNumber;
     }
-
-    @Override
-    public String getIPv6Address() {
-        return null;
+    public int getReceiveByteNumber(){
+        return this.receiveByteNumber;
     }
-
-    @Override
-    public String getSubnetMask() {
-        return null;
+    public double getBandwidth(){
+        return this.bandwidth;
     }
-
-    @Override
-    public String getGateway() {
-        return null;
+    public int getWorkTime(){
+        return this.workTime;
     }
-
-    @Override
-    public int getSendPacketNumber() {
-        return 0;
+    public int getLiveTime(){
+        return this.liveTime;
     }
-
-    @Override
-    public int getReceivePacketNumber() {
-        return 0;
-    }
-
-    @Override
-    public int getCapturePacketNumber() {
-        return 0;
-    }
-
-    @Override
-    public int getLossPacketNumber() {
-        return 0;
-    }
-
-    @Override
-    public double getPacketLossRate() {
-        return 0;
-    }
-
-    @Override
-    public int getSendByteNumber() {
-        return 0;
-    }
-
-    @Override
-    public int getReceiveByteNumber() {
-        return 0;
-    }
-
-    @Override
-    public double getBandwidth() {
-        return 0;
-    }
-
-    @Override
-    public int getWorkTime() {
-        return 0;
-    }
-
-    @Override
-    public int getLiveTime() {
-        return 0;
-    }
-
-    @Override
-    public double getUsingRate() {
-        return 0;
-    }
-
-    @Override
-    public void start() {
-
-    }
-
-    @Override
-    public void restart() {
-
-    }
-
-    @Override
-    public void stop() {
-
-    }
-
-    @Override
-    public void load() {
-
-    }
-
-    @Override
-    public void reload() {
-
-    }
-
-    @Override
-    public void edit() {
-
-    }
-
-    @Override
-    public void capture() {
-
-    }
-
-    @Override
-    public void send() {
-
-    }
-
-    @Override
-    public void resend() {
-
-    }
-
-    @Override
-    public void forward() {
-
+    public double getUsingRate(){
+        return this.usingRate;
     }
 }

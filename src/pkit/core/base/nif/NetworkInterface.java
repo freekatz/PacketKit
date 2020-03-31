@@ -1,116 +1,56 @@
 package pkit.core.base.nif;
 
+import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapHandle;
+import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.PcapNetworkInterface;
+
+import java.util.List;
 
 public interface NetworkInterface {
 
-    // information reference
-    // update when construction
-    String Id = null;
-    String Name = null;
-    String EasyName = null;
-    String Description = null;
-    String MacAddress = null;
-    String IPv4Address = null;
-    String IPv6Address = null;
-    String SubnetMask = null;
-    String Gateway = null;
 
-    // operator reference
-    int SnapshotLength = 65536;
-    int Count = -1;
-    PcapNetworkInterface.PromiscuousMode PromiscuousMode = PcapNetworkInterface.PromiscuousMode.NONPROMISCUOUS;
-    NetworkInterfaceMode.RfmonMode RfmonMode = NetworkInterfaceMode.RfmonMode.NoRfmonMode;
-    NetworkInterfaceMode.OfflineMode OfflineMode = NetworkInterfaceMode.OfflineMode.OnlineMode;
-    int TimeoutMillis = 0;
-    int BufferSize = 2 * 1024 * 1024;
-    PcapHandle.TimestampPrecision TimestampPrecision = PcapHandle.TimestampPrecision.NANO;
-    PcapHandle.PcapDirection Direction = PcapHandle.PcapDirection.INOUT;
-    NetworkInterfaceMode.ImmediateMode ImmediateMode = NetworkInterfaceMode.ImmediateMode.DelayMode;
-    String Filter = null;
+    // 此接口描述了一个网卡的生命周期
 
-    // statistic reference
-    // use trigger auto update
-    int SendPacketNumber = 0;
-    int ReceivePacketNumber = 0;
-    int CapturePacketNumber = 0;
-    int LossPacketNumber = 0;
-    double PacketLossRate = 0;
-    int SendByteNumber = 0;
-    int ReceiveByteNumber = 0;
-    double Bandwidth = 0;
-    int WorkTime = 0;
-    int LiveTime = 0;
-    double UsingRate = 0;
-
-
-    void setId(String id);
-    void setName(String name);
-    void setEasyName(String easyName);
-    void setDescription(String description);
-    void setMacAddress(String MACAddress);
-    void setIPv4Address(String IPv4Address);
-    void setIPv6Address(String IPv6Address);
-    void setSubnetMask(String subnetMask);
-    void setGateway(String gateway);
-
-    void setSnapshotLength(int snapshotLength);
-    void setCount(int count);
-    void setPromiscuousMode(PcapNetworkInterface.PromiscuousMode mode);
-    void setRfmonMode(NetworkInterfaceMode.RfmonMode mode);
-    void setOfflineMode(NetworkInterfaceMode.OfflineMode mode);
-    void setTimeoutMillis(int timeoutMillis);
-    void setBufferSize(int bufferSize);
-    void setTimestampPrecision(PcapHandle.TimestampPrecision timestampPrecision);
-    void setDirection(PcapHandle.PcapDirection direction);
-    void setImmediateMode(NetworkInterfaceMode.ImmediateMode mode);
-    void setFilter(String filter);
-
-    void setSendPacketNumber(int sendPacketNumber);
-    void setReceivePacketNumber(int receivePacketNumber);
-    void setCapturePacketNumber(int capturePacketNumber);
-    void setLossPacketNumber(int lossPacketNumber);
-    void setPacketLossRate(double packetLossRate);
-    void setSendByteNumber(int sendByteNumber);
-    void setReceiveByteNumber(int receiveByteNumber);
-    void setBandwidth(int bandwidth);
-    void setWorkTime(int workTime);
-    void setLiveTime(int liveTime);
-    void setUsingRate(double usingRate);
-
-    String getId();
-    String getName();
-    String getEasyName();
-    String getDescription();
-    String getMacAddress();
-    String getIPv4Address();
-    String getIPv6Address();
-    String getSubnetMask();
-    String getGateway();
-
-    int getSendPacketNumber();
-    int getReceivePacketNumber();
-    int getCapturePacketNumber();
-    int getLossPacketNumber();
-    double getPacketLossRate();
-    int getSendByteNumber();
-    int getReceiveByteNumber();
-    double getBandwidth();
-    int getWorkTime();
-    int getLiveTime();
-    double getUsingRate();
-
-    // 返回值未确定
-    void start();
-    void restart();
-    void stop();
-    void load();
-    void reload();
-    void edit();
-    void capture();
-    void send();
-    void resend();
-    void forward();
+    /*
+    激活此网卡, 激活状态下网卡才可以加载配置,
+    结果是新建了一个 PcapHandle.Builder 对象
+     */
+    void Activate();
+    /*
+    重新激活此网卡
+     */
+    void Reactivate();
+    /*
+    从磁盘配置文件中加载用户网卡配置, 加载完毕之后网卡才可启动,
+    结果是新建了一个 PcapHandle 对象, Load 一般只会运行一次
+    此时网卡已经具备进行捕获发送等操作的能力
+     */
+    void Load() throws PcapNativeException;
+    /*
+    重新加载配置, 适用于修改且保存配置需要重新加载到网卡的情况,
+    比如更新了过滤器, 如还想将本次更新的配置保存, 那么就需要使用 Reload
+     */
+    void Reload() throws PcapNativeException;
+    /*
+    修改此网卡的配置, 与上面 Load 和 Reload 不同之处在于,
+    Edit 不通过磁盘文件为中介, 即需要加载的配置不在磁盘, 而在内存,
+    适用于临时修改且不保存配置需要重新加载到网卡的情况,
+    比如临时更新了过滤器, 如不想将本次更新的配置保存, 那么就需要使用 Edit
+     */
+    void Edit() throws PcapNativeException;
+    /*
+    启动一个网卡作业, 启动状态下用于实时确定, 更新及控制当前的操作逻辑,
+    比如可能对同一批次的数据包进行多次过滤, 那么就会多次修改过滤器,
+    则在调用 Reload 或 Edit 之后, Start 就会根据配置调用 Capture,
+    然后根据 Capture 捕获的数据包进行后续步骤, 如控制抓包模式等等
+    可以这样认为: 一次 Start 就是一次操作过程, Start 就是捕获功能的基础控制流程
+    更高级的控制流程会在 service 包中定义实现
+     */
+    void Start() throws PcapNativeException, NotOpenException;
+    /*
+    停止一个网卡作业, 即结束一个操作过程, 对结果进行收尾工作, 如控制数据包的去向等等
+     */
+    void Stop();
 
 }
