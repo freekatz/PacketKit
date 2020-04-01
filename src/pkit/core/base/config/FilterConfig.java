@@ -1,18 +1,19 @@
-package pkit.core.service.config;
+package pkit.core.base.config;
 
 import java.util.Date;
 
 public class FilterConfig implements Config{
-    private int id;
+    private int id; // 程序中设置的，保存到文件，永久不变
     private String name;
     private String filter;
     private String comment;
-    private Date date;
+    private Date timestamp;
 
 
     @Override
     public void Initial() {
-
+        this.timestamp = new Date();
+        this.filter = "";
     }
 
     public void setId(int id) {
@@ -31,8 +32,8 @@ public class FilterConfig implements Config{
         this.comment = comment;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
     }
 
     public int getId() {
@@ -51,7 +52,7 @@ public class FilterConfig implements Config{
         return this.comment;
     }
 
-    public Date getDate() {
-        return date;
+    public Date getTimestamp() {
+        return this.timestamp;
     }
 }

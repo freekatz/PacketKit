@@ -1,0 +1,1 @@
+{"id":1,"name":"nif config","comment":"this is the nif config","timestamp":"2020-04-01 21:16:00","snapshotLength":65536,"count":-1,"timeoutMillis":0,"bufferSize":2097152,"promiscuousMode":"NONPROMISCUOUS","rfmonMode":"NoRfmonMode","offlineMode":"OnlineMode","timestampPrecision":"NANO","direction":"INOUT","immediateMode":"DelayMode"}

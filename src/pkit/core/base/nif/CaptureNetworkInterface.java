@@ -2,8 +2,8 @@ package pkit.core.base.nif;
 
 import org.pcap4j.core.*;
 import org.pcap4j.util.LinkLayerAddress;
-import pkit.core.service.config.FilterConfig;
-import pkit.core.service.config.NetworkInterfaceConfig;
+import pkit.core.base.config.FilterConfig;
+import pkit.core.base.config.NetworkInterfaceConfig;
 
 import java.io.EOFException;
 import java.util.ArrayList;

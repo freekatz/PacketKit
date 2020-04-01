@@ -1,4 +1,4 @@
-package pkit.core.service.config;
+package pkit.core.base.config;
 
 public interface Config {
 
