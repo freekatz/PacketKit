@@ -12,8 +12,8 @@ import java.util.concurrent.TimeoutException;
 
 public final class CaptureNetworkInterface implements NetworkInterface{
 
-    private PcapHandle.Builder builder = null;
-    private PcapHandle handle = null;
+    private PcapHandle.Builder builder;
+    private PcapHandle handle;
 
     // information reference, static
     // update when construction
@@ -29,18 +29,18 @@ public final class CaptureNetworkInterface implements NetworkInterface{
     private final boolean up; // 是否打开
 
     // operator reference
-    boolean activate = false; // 是否激活(编程属性而非网卡实体属性), 当一个网卡的处理类被新建时设为 true
-    int snapshotLength = 65536;
-    int count = -1;
-    PcapNetworkInterface.PromiscuousMode promiscuousMode = PcapNetworkInterface.PromiscuousMode.NONPROMISCUOUS;
-    NetworkInterfaceMode.RfmonMode rfmonMode = NetworkInterfaceMode.RfmonMode.NoRfmonMode;
-    NetworkInterfaceMode.OfflineMode offlineMode = NetworkInterfaceMode.OfflineMode.OnlineMode;
-    int timeoutMillis = 0;
-    int bufferSize = 2 * 1024 * 1024; // 2MB 缓冲大小
-    PcapHandle.TimestampPrecision timestampPrecision = PcapHandle.TimestampPrecision.NANO;
-    PcapHandle.PcapDirection direction = PcapHandle.PcapDirection.INOUT;
-    NetworkInterfaceMode.ImmediateMode immediateMode = NetworkInterfaceMode.ImmediateMode.DelayMode;
-    String filter = null;
+    public boolean activate; // 是否激活(编程属性而非网卡实体属性), 当一个网卡的处理类被新建时设为 true
+    public int snapshotLength;
+    public int count;
+    public int timeoutMillis;
+    public int bufferSize; // 2MB 缓冲大小
+    public PcapNetworkInterface.PromiscuousMode promiscuousMode;
+    public NetworkInterfaceMode.RfmonMode rfmonMode;
+    public NetworkInterfaceMode.OfflineMode offlineMode;
+    public PcapHandle.TimestampPrecision timestampPrecision;
+    public PcapHandle.PcapDirection direction;
+    public NetworkInterfaceMode.ImmediateMode immediateMode ;
+    public String filter;
 
     // statistic reference
     // use trigger auto update
@@ -67,6 +67,40 @@ public final class CaptureNetworkInterface implements NetworkInterface{
         this.loopback = nif.isLoopBack();
         this.running = nif.isRunning();
         this.up = nif.isUp();
+
+    }
+
+    @Override
+    public void Initial() {
+        this.handle = null;
+        this.builder = null;
+
+        this.activate = false; // 是否激活(编程属性而非网卡实体属性), 当一个网卡的处理类被新建时设为 true
+        this.snapshotLength = 65536;
+        this.count = -1;
+        this.timeoutMillis = 0;
+        this.bufferSize = 2 * 1024 * 1024; // 2MB 缓冲大小
+        this.promiscuousMode = PcapNetworkInterface.PromiscuousMode.NONPROMISCUOUS;
+        this.rfmonMode = NetworkInterfaceMode.RfmonMode.NoRfmonMode;
+        this.offlineMode = NetworkInterfaceMode.OfflineMode.OnlineMode;
+        this.timestampPrecision = PcapHandle.TimestampPrecision.NANO;
+        this.direction = PcapHandle.PcapDirection.INOUT;
+        this.immediateMode = NetworkInterfaceMode.ImmediateMode.DelayMode;
+        this.filter = null;
+
+        // statistic reference
+        // use trigger auto update
+        this.sendPacketNumber = 0; // 这个字段也需要在发送接口中定义，因为捕获接口可以捕获到本机发送的包，但是假如只发送不捕获就不可以了
+        this.receivePacketNumber = 0;
+        this.capturePacketNumber = 0;
+        this.lossPacketNumber = 0;
+        this.packetLossRate = 0;
+        this.sendByteNumber = 0;
+        this.receiveByteNumber = 0;
+        this.bandwidth = 0;
+        this.workTime = 0;
+        this.liveTime = 0;
+        this.usingRate = 0;
 
     }
 
@@ -100,7 +134,7 @@ public final class CaptureNetworkInterface implements NetworkInterface{
     }
 
     @Override
-    public void Edit() throws PcapNativeException {
+    public void Modify() throws PcapNativeException {
         // 此处代码较多, 待完善
         this.handle = this.builder.build();
     }
@@ -113,8 +147,24 @@ public final class CaptureNetworkInterface implements NetworkInterface{
     }
 
     @Override
-    public void Stop() {
+    public void Restart() {
+
+    }
+
+    @Override
+    public void Pause() {
+
+    }
+
+    @Override
+    public void Resume() {
+
+    }
+
+    @Override
+    public void Stop() throws NotOpenException {
         assert handle != null;
+        handle.breakLoop();
         handle.close();
         // 此处代码较多, 待完善
     }

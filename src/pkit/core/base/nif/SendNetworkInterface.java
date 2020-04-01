@@ -61,6 +61,11 @@ public class SendNetworkInterface implements NetworkInterface {
     }
 
     @Override
+    public void Initial() {
+
+    }
+
+    @Override
     public void Activate() {
 
     }
@@ -81,12 +86,27 @@ public class SendNetworkInterface implements NetworkInterface {
     }
 
     @Override
-    public void Edit() {
+    public void Modify() {
 
     }
 
     @Override
     public void Start() {
+
+    }
+
+    @Override
+    public void Restart() {
+
+    }
+
+    @Override
+    public void Pause() {
+
+    }
+
+    @Override
+    public void Resume() {
 
     }
 
