@@ -12,7 +12,7 @@ packet -> group -> interface
 （以上关系成图）
 
 └ ─ ─
-一、捕获：Interface
+一、捕获 Interface
 思路
 1 捕获默认全部捕获
 2 将捕获的包放在缓冲区中->存储于磁盘上的临时文件
@@ -20,7 +20,7 @@ packet -> group -> interface
 4 每次重新开始捕获需要选择对以前已捕获包的处理（保存等等）
 5 可同时开启多个捕获作业（todo）
 
-二、解析：PacketGroup+PacketOperator
+二、解析 PacketGroup+PacketOperator
 思路
 1 连续判断是否包括下层数据包，基于 p4 的 utils.Packets
 2 批量获取某些地址信息，基于 p4 的 utils.ByteArrays
@@ -64,7 +64,9 @@ DNS (RFC1035, RFC3596, and RFC6844)
 
 五、发送 Interface
 
-六、
+六、配置 Config
+对象与 Json 互转
+
 
 
 

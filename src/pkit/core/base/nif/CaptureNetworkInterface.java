@@ -2,6 +2,8 @@ package pkit.core.base.nif;
 
 import org.pcap4j.core.*;
 import org.pcap4j.util.LinkLayerAddress;
+import pkit.core.service.config.FilterConfig;
+import pkit.core.service.config.NetworkInterfaceConfig;
 
 import java.io.EOFException;
 import java.util.ArrayList;
@@ -29,18 +31,9 @@ public final class CaptureNetworkInterface implements NetworkInterface{
     private final boolean up; // 是否打开
 
     // operator reference
-    public boolean activate; // 是否激活(编程属性而非网卡实体属性), 当一个网卡的处理类被新建时设为 true
-    public int snapshotLength;
-    public int count;
-    public int timeoutMillis;
-    public int bufferSize; // 2MB 缓冲大小
-    public PcapNetworkInterface.PromiscuousMode promiscuousMode;
-    public NetworkInterfaceMode.RfmonMode rfmonMode;
-    public NetworkInterfaceMode.OfflineMode offlineMode;
-    public PcapHandle.TimestampPrecision timestampPrecision;
-    public PcapHandle.PcapDirection direction;
-    public NetworkInterfaceMode.ImmediateMode immediateMode ;
-    public String filter;
+    private boolean activate; // 是否激活(编程属性而非网卡实体属性), 当一个网卡的处理类被新建时设为 true
+    private NetworkInterfaceConfig networkInterfaceConfig;
+    private FilterConfig filterConfig;
 
     // statistic reference
     // use trigger auto update
@@ -76,17 +69,8 @@ public final class CaptureNetworkInterface implements NetworkInterface{
         this.builder = null;
 
         this.activate = false; // 是否激活(编程属性而非网卡实体属性), 当一个网卡的处理类被新建时设为 true
-        this.snapshotLength = 65536;
-        this.count = -1;
-        this.timeoutMillis = 0;
-        this.bufferSize = 2 * 1024 * 1024; // 2MB 缓冲大小
-        this.promiscuousMode = PcapNetworkInterface.PromiscuousMode.NONPROMISCUOUS;
-        this.rfmonMode = NetworkInterfaceMode.RfmonMode.NoRfmonMode;
-        this.offlineMode = NetworkInterfaceMode.OfflineMode.OnlineMode;
-        this.timestampPrecision = PcapHandle.TimestampPrecision.NANO;
-        this.direction = PcapHandle.PcapDirection.INOUT;
-        this.immediateMode = NetworkInterfaceMode.ImmediateMode.DelayMode;
-        this.filter = null;
+        this.networkInterfaceConfig.Initial();
+        this.filterConfig.Initial();
 
         // statistic reference
         // use trigger auto update
@@ -142,7 +126,7 @@ public final class CaptureNetworkInterface implements NetworkInterface{
     @Override
     public void Start() throws PcapNativeException, NotOpenException {
         if (this.handle != null)
-            this.handle.setFilter(this.filter, BpfProgram.BpfCompileMode.OPTIMIZE);
+            this.handle.setFilter(this.filterConfig.getFilter(), BpfProgram.BpfCompileMode.OPTIMIZE);
         // 此处代码较多, 待完善
     }
 
@@ -206,6 +190,19 @@ public final class CaptureNetworkInterface implements NetworkInterface{
         }
     }
 
+    public void setConfig(NetworkInterfaceConfig networkInterfaceConfig) {
+        this.networkInterfaceConfig = networkInterfaceConfig;
+    }
+    public void setFilterConfig(FilterConfig filterConfig) {
+        this.filterConfig = filterConfig;
+    }
+
+    public NetworkInterfaceConfig getConfig() {
+        return this.networkInterfaceConfig;
+    }
+    public FilterConfig getFilterConfig() {
+        return this.filterConfig;
+    }
     public int getId(){
         return this.id;
     }
@@ -236,6 +233,7 @@ public final class CaptureNetworkInterface implements NetworkInterface{
     public boolean isUp(){
         return this.up;
     }
+
     public int getSendPacketNumber(){
         return this.sendPacketNumber;
     }
