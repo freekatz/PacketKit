@@ -1,9 +1,8 @@
 package pkit.core.base.nif;
 
-import org.pcap4j.core.PcapAddress;
-import org.pcap4j.core.PcapHandle;
-import org.pcap4j.core.PcapNetworkInterface;
+import org.pcap4j.core.*;
 import org.pcap4j.util.LinkLayerAddress;
+import pkit.core.base.config.Config;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +33,10 @@ public class SendNetworkInterface implements NetworkInterface {
     int retryCount = 1; // 重试次数，发送失败时使用
     // etc...
 
+    public int sendPacketNumber = 0;  // 发送数据包总数, 单独统计, 与捕获网卡的字段相独立
+    public int failPacketNumber = 0;  // 发送失败数据包总数
+
+
     SendNetworkInterface(PcapNetworkInterface nif) {
         this.id = nif.hashCode();
         this.name = nif.getName();
@@ -60,6 +63,7 @@ public class SendNetworkInterface implements NetworkInterface {
 
     }
 
+
     @Override
     public void Initial() {
 
@@ -71,32 +75,27 @@ public class SendNetworkInterface implements NetworkInterface {
     }
 
     @Override
-    public void Reactivate() {
+    public void Load(Config networkInterfaceConfig, Config filterConfig) throws PcapNativeException, NotOpenException {
 
     }
 
     @Override
-    public void Load() {
+    public void Load(Config filterConfig) throws PcapNativeException, NotOpenException {
 
     }
 
     @Override
-    public void Reload() {
+    public void Modify(Config networkInterfaceConfig, Config filterConfig) throws PcapNativeException, NotOpenException {
 
     }
 
     @Override
-    public void Modify() {
+    public void Modify(Config filterConfig) throws PcapNativeException, NotOpenException {
 
     }
 
     @Override
     public void Start() {
-
-    }
-
-    @Override
-    public void Restart() {
 
     }
 
@@ -111,7 +110,7 @@ public class SendNetworkInterface implements NetworkInterface {
     }
 
     @Override
-    public void Stop() {
+    public void Stop() throws NotOpenException {
 
     }
 
@@ -145,4 +144,5 @@ public class SendNetworkInterface implements NetworkInterface {
     public boolean isUp(){
         return this.up;
     }
+
 }

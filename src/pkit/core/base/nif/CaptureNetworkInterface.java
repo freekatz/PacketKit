@@ -2,6 +2,7 @@ package pkit.core.base.nif;
 
 import org.pcap4j.core.*;
 import org.pcap4j.util.LinkLayerAddress;
+import pkit.core.base.config.Config;
 import pkit.core.base.config.FilterConfig;
 import pkit.core.base.config.NetworkInterfaceConfig;
 
@@ -13,46 +14,55 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
 public final class CaptureNetworkInterface implements NetworkInterface{
-
-    private PcapHandle.Builder builder;
-    private PcapHandle handle;
+    private PcapHandle.Builder defaultBuilder;
+    private PcapHandle defaultHandle; // 默认 handle, 默认捕获全部数据包, 只加载部分配置
+    private PcapHandle.Builder builder;  // 网卡构建对象, 通过 builder 设置网卡操作相关的字段
+    private PcapHandle handle;  // 网卡操作对象, 通过 handle 执行网卡的操作, 永远捕获缓冲区中的数据包
 
     // information reference, static
     // update when construction
-    private final int id; // 自编
-    private final String name;
-    private final String easyName = "easyName"; // 需要一个函数来获取
-    private final String description;
-    private final ArrayList<LinkLayerAddress> MacAddresses;
-    private final List<PcapAddress> IPAddresses;
+    private final int id;  // id 作为网卡的唯一不变的标识
+    private final String name;  // 网卡名字, 形如 Device/...
+    private final String easyName = "easyName";  // 网卡的别名, 如 WLAN 等
+    private final String description;  // 网卡描述信息
+    private final ArrayList<LinkLayerAddress> MacAddresses;  // 网卡物理地址数组
+    private final List<PcapAddress> IPAddresses;  // 网卡 IP 地址列表, 包括 IPv4 和 IPv6, 且可能有多个
     private final boolean local; // 是否是本地接口
     private final boolean loopback; // 是否是回环网卡
-    private final boolean running; // 是否运行
-    private final boolean up; // 是否打开
+    private final boolean running; // 是否运行, 这里的运行指的是在操作系统中的运行状态, 而不是程序中
+    private final boolean up; // 是否打开, 同上
 
     // operator reference
-    private boolean activate; // 是否激活(编程属性而非网卡实体属性), 当一个网卡的处理类被新建时设为 true
     private NetworkInterfaceConfig networkInterfaceConfig;
     private FilterConfig filterConfig;
+    private NetworkInterfaceMode.OfflineMode offlineMode;  // 用于控制抓包模式, 读取 pcap 文件还是实时
+
+
+    // live circle
+    private boolean activate;  // 是否激活
+    private boolean load;  // 是否加载了配置
+    private boolean start;  // 是否正在运行作业
+    private boolean stop;  // 是否运行完毕
 
     // statistic reference
     // use trigger auto update
-    public int sendPacketNumber = 0; // 这个字段不需要在发送接口中定义，因为捕获接口可以捕获到本机发送的包，无需再次统计
-    public int receivePacketNumber = 0;
-    public int capturePacketNumber = 0;
-    public int lossPacketNumber = 0;
-    public double packetLossRate = 0;
-    public int sendByteNumber = 0;
-    public int receiveByteNumber = 0;
-    public double bandwidth = 0;
-    public int workTime = 0;
-    public int liveTime = 0;
-    public double usingRate = 0;
+    // todo: 考虑将下面的内容放置到其它的类中进行统一管理
+    public int sendPacketNumber = 0;  // 发送数据包总数, 指的是源 MAC 为本网卡的数据包
+    public int receivePacketNumber = 0;  // 收到数据包总数, 指的是目的 MAC 为本网卡的数据包
+    public int capturePacketNumber = 0;  // 捕获数据包总数, 在非嗅探模式下等于上面两字段的和
+    public int lossPacketNumber = 0;  // 丢失数据包总数, 指的是由于缓冲区大小不足, 数据包有错等原因丢弃的数据包
+    public double packetLossRate = 0;  // 丢包率, 上面两字段相除的百分比
+    public int sendByteNumber = 0;  // 即上行带宽大小
+    public int receiveByteNumber = 0;  // 即下行带宽大小
+    public double bandwidth = 0;  // 上面两字段之和
+    public int workTime = 0;  // 网卡工作时长, 指的是在程序中处于激活状态下的时长
+    public int liveTime = 0;  // 网卡活跃时长, 指的是在程序中处于启动状态下的时长
+    public double usingRate = 0;  // 使用率, 上面两字段相除的百分比
 
     private CaptureNetworkInterface(PcapNetworkInterface nif) {
-        this.id = nif.hashCode();
+        this.id = nif.hashCode(); // todo: 将这里修改为 hashCode()/n, n 为网卡总数, 将所有网卡依次存到一个 Hash 表中
         this.name = nif.getName();
-//        this.easyName = this.getEasyName();
+//        this.easyName = this.getEasyName();  // todo: 获取 easyName
         this.description = nif.getDescription();
         this.MacAddresses = nif.getLinkLayerAddresses();
         this.IPAddresses = nif.getAddresses();
@@ -61,20 +71,21 @@ public final class CaptureNetworkInterface implements NetworkInterface{
         this.running = nif.isRunning();
         this.up = nif.isUp();
 
+
     }
 
     @Override
-    public void Initial() {
-        this.handle = null;
-        this.builder = null;
-
-        this.activate = false; // 是否激活(编程属性而非网卡实体属性), 当一个网卡的处理类被新建时设为 true
+    public void Initial() throws PcapNativeException, NotOpenException {
+        this.activate = false;
+        this.load = false;
+        this.start = false;
+        this.stop = false;
+        this.networkInterfaceConfig = new NetworkInterfaceConfig();
+        this.filterConfig = new FilterConfig();
         this.networkInterfaceConfig.Initial();
         this.filterConfig.Initial();
 
-        // statistic reference
-        // use trigger auto update
-        this.sendPacketNumber = 0; // 这个字段也需要在发送接口中定义，因为捕获接口可以捕获到本机发送的包，但是假如只发送不捕获就不可以了
+        this.sendPacketNumber = 0;
         this.receivePacketNumber = 0;
         this.capturePacketNumber = 0;
         this.lossPacketNumber = 0;
@@ -86,70 +97,151 @@ public final class CaptureNetworkInterface implements NetworkInterface{
         this.liveTime = 0;
         this.usingRate = 0;
 
+        this.defaultBuilder = new PcapHandle.Builder(this.name);
+        this.defaultHandle = this.Load(this.defaultBuilder);
+        this.handle = null;
+        this.builder = null;
+
     }
 
     @Override
-    public void Activate() {
+    public void Activate() throws PcapNativeException {
         this.activate = true;
+        this.load = false;
+        this.start = false;
+        this.stop = false;
         this.builder = new PcapHandle.Builder(this.name);
+        /*
+        todo 缓冲区准备: tmp/id_date_size.tps
+         */
+        /*
+        todo 临时文件准备: tmp/id_date.tp
+         */
+        /*
+        todo 日志文件准备: log/id_date.log
+         */
     }
 
     @Override
-    public void Reactivate() {
-        if (!this.activate)
-            this.activate = true;
-        if (this.builder != null)
-            this.builder = null;
-        this.builder = new PcapHandle.Builder(this.name);
+    public PcapHandle Load(PcapHandle.Builder builder) throws PcapNativeException, NotOpenException {
+        networkInterfaceConfig = new NetworkInterfaceConfig();
+        filterConfig = new FilterConfig();
+
+        networkInterfaceConfig.Initial();
+        filterConfig.Initial();
+
+        builder.snaplen(networkInterfaceConfig.getSnapshotLength())
+                .timeoutMillis(networkInterfaceConfig.getTimeoutMillis())
+                .bufferSize(networkInterfaceConfig.getBufferSize())
+                .promiscuousMode(networkInterfaceConfig.getPromiscuousMode())
+                .timestampPrecision(networkInterfaceConfig.getTimestampPrecision())
+                .direction(networkInterfaceConfig.getDirection());
+
+        if (networkInterfaceConfig.getRfmonMode() == NetworkInterfaceMode.RfmonMode.RfmonMode)
+            builder.rfmon(true);
+        else builder.rfmon(false);
+
+        if (networkInterfaceConfig.getImmediateMode() == NetworkInterfaceMode.ImmediateMode.ImmediateMode)
+            builder.immediateMode(true);
+        else builder.immediateMode(false);
+
+        PcapHandle handle = builder.build();
+        handle.setFilter(this.filterConfig.getFilter(), BpfProgram.BpfCompileMode.OPTIMIZE);
+
+        return handle;
     }
 
     @Override
-    public void Load() throws PcapNativeException {
-        // 此处代码较多, 待完善
-        if (this.activate) {
+    public void Load(Config filterConfig) throws PcapNativeException, NotOpenException {
+        if (this.handle == null)
             this.handle = this.builder.build();
-        }
+        this.handle.setFilter(this.filterConfig.getFilter(), BpfProgram.BpfCompileMode.OPTIMIZE);
+
     }
 
     @Override
-    public void Reload() throws PcapNativeException {
-        // 此处代码较多, 待完善
+    public void Load(Config networkInterfaceConfig, Config filterConfig) throws PcapNativeException, NotOpenException {
+        this.activate = true;
+        this.load = true;
+        this.start = false;
+        this.stop = false;
+
+        this.networkInterfaceConfig = (NetworkInterfaceConfig) networkInterfaceConfig;
+        this.filterConfig = (FilterConfig) filterConfig;
+
+        this.builder.snaplen(this.networkInterfaceConfig.getSnapshotLength())
+                .timeoutMillis(this.networkInterfaceConfig.getTimeoutMillis())
+                .bufferSize(this.networkInterfaceConfig.getBufferSize())
+                .promiscuousMode(this.networkInterfaceConfig.getPromiscuousMode())
+                .timestampPrecision(this.networkInterfaceConfig.getTimestampPrecision())
+                .direction(this.networkInterfaceConfig.getDirection());
+
+        if (this.networkInterfaceConfig.getRfmonMode() == NetworkInterfaceMode.RfmonMode.RfmonMode)
+            this.builder.rfmon(true);
+        else this.builder.rfmon(false);
+
+        if (this.networkInterfaceConfig.getImmediateMode() == NetworkInterfaceMode.ImmediateMode.ImmediateMode)
+            this.builder.immediateMode(true);
+        else this.builder.immediateMode(false);
+
         this.handle = this.builder.build();
+        this.handle.setFilter(this.filterConfig.getFilter(), BpfProgram.BpfCompileMode.OPTIMIZE);
+
     }
 
     @Override
-    public void Modify() throws PcapNativeException {
-        // 此处代码较多, 待完善
-        this.handle = this.builder.build();
+    public void Modify(Config networkInterfaceConfig, Config filterConfig) throws PcapNativeException, NotOpenException {
+        // todo 测试下列转换是否有效
+        NetworkInterfaceConfig tc1 = this.networkInterfaceConfig;
+        FilterConfig tc2 = this.filterConfig;
+        this.Load(networkInterfaceConfig, filterConfig);
+        this.networkInterfaceConfig = tc1;
+        this.filterConfig = tc2;
     }
 
     @Override
-    public void Start() throws PcapNativeException, NotOpenException {
-        if (this.handle != null)
-            this.handle.setFilter(this.filterConfig.getFilter(), BpfProgram.BpfCompileMode.OPTIMIZE);
-        // 此处代码较多, 待完善
+    public void Modify(Config filterConfig) throws PcapNativeException, NotOpenException {
+        // todo 测试下列转换是否有效
+        FilterConfig tc = this.filterConfig;
+        this.Load(filterConfig);
+        this.filterConfig = tc;
     }
 
     @Override
-    public void Restart() {
+    public void Start(){
+        // warning: Start 中的包捕获模式一定是 OfflineMode, 因为磁盘缓冲区
+        this.activate = true;
+        this.load = true;
+        this.start = true;
+        this.stop = false;
 
     }
 
     @Override
     public void Pause() {
+        this.activate = true;
+        this.load = true;
+        this.start = true;
+        this.stop = true; // start 和 stop 同时为 true 时代表当前网卡作业处于暂停状态
 
     }
 
     @Override
     public void Resume() {
+        this.activate = true;
+        this.load = true;
+        this.start = true;
+        this.stop = false;
 
     }
 
     @Override
     public void Stop() throws NotOpenException {
-        assert handle != null;
-        handle.breakLoop();
-        handle.close();
+        this.activate = true;
+        this.load = false;
+        this.start = false;
+        this.stop = true;
+        this.handle.close();
         // 此处代码较多, 待完善
     }
 
@@ -190,19 +282,16 @@ public final class CaptureNetworkInterface implements NetworkInterface{
         }
     }
 
-    public void setConfig(NetworkInterfaceConfig networkInterfaceConfig) {
+    public void setNetworkInterfaceConfig(NetworkInterfaceConfig networkInterfaceConfig) {
         this.networkInterfaceConfig = networkInterfaceConfig;
     }
     public void setFilterConfig(FilterConfig filterConfig) {
         this.filterConfig = filterConfig;
     }
+    public void setOfflineMode(NetworkInterfaceMode.OfflineMode offlineMode) {
+        this.offlineMode = offlineMode;
+    }
 
-    public NetworkInterfaceConfig getConfig() {
-        return this.networkInterfaceConfig;
-    }
-    public FilterConfig getFilterConfig() {
-        return this.filterConfig;
-    }
     public int getId(){
         return this.id;
     }
@@ -232,6 +321,29 @@ public final class CaptureNetworkInterface implements NetworkInterface{
     }
     public boolean isUp(){
         return this.up;
+    }
+
+    public NetworkInterfaceConfig getNetworkInterfaceConfig() {
+        return this.networkInterfaceConfig;
+    }
+    public FilterConfig getFilterConfig() {
+        return this.filterConfig;
+    }
+    public NetworkInterfaceMode.OfflineMode getOfflineMode() {
+        return offlineMode;
+    }
+
+    public boolean isActivate() {
+        return this.activate;
+    }
+    public boolean isLoad() {
+        return load;
+    }
+    public boolean isStart() {
+        return start;
+    }
+    public boolean isStop() {
+        return stop;
     }
 
     public int getSendPacketNumber(){
