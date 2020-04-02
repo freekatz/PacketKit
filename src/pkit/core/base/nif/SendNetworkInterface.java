@@ -65,32 +65,37 @@ public class SendNetworkInterface implements NetworkInterface {
 
 
     @Override
-    public void Initial() {
+    public void Initial() throws PcapNativeException, NotOpenException {
 
     }
 
     @Override
-    public void Activate() {
+    public void Activate() throws PcapNativeException {
 
     }
 
     @Override
-    public void Load(Config networkInterfaceConfig, Config filterConfig) throws PcapNativeException, NotOpenException {
+    public PcapHandle Load(PcapHandle.Builder builder) throws PcapNativeException, NotOpenException {
+        return null;
+    }
+
+    @Override
+    public void Load(Config c) throws PcapNativeException, NotOpenException {
 
     }
 
     @Override
-    public void Load(Config filterConfig) throws PcapNativeException, NotOpenException {
+    public void Load(Config c1, Config c2) throws PcapNativeException, NotOpenException {
 
     }
 
     @Override
-    public void Modify(Config networkInterfaceConfig, Config filterConfig) throws PcapNativeException, NotOpenException {
+    public void Modify(Config c1, Config c2) throws PcapNativeException, NotOpenException {
 
     }
 
     @Override
-    public void Modify(Config filterConfig) throws PcapNativeException, NotOpenException {
+    public void Modify(Config c) throws PcapNativeException, NotOpenException {
 
     }
 
@@ -113,6 +118,8 @@ public class SendNetworkInterface implements NetworkInterface {
     public void Stop() throws NotOpenException {
 
     }
+
+
 
     public int getId(){
         return this.id;
@@ -144,5 +151,4 @@ public class SendNetworkInterface implements NetworkInterface {
     public boolean isUp(){
         return this.up;
     }
-
 }

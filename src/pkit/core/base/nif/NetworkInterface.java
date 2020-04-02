@@ -3,10 +3,8 @@ package pkit.core.base.nif;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapHandle;
 import org.pcap4j.core.PcapNativeException;
-import org.pcap4j.core.PcapNetworkInterface;
 import pkit.core.base.config.Config;
 
-import java.util.List;
 // 此接口描述了一个网卡的生命周期, 以下操作均视为原子操作
 public interface NetworkInterface {
 
