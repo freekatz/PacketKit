@@ -50,20 +50,6 @@ public class SendNetworkInterface implements NetworkInterface {
         this.up = nif.isUp();
     }
 
-
-    void Send(){
-
-    }
-
-    void Resend(){
-
-    }
-
-    void Forward(){
-
-    }
-
-
     @Override
     public void Initial() throws PcapNativeException, NotOpenException {
 
@@ -75,22 +61,7 @@ public class SendNetworkInterface implements NetworkInterface {
     }
 
     @Override
-    public PcapHandle Load(PcapHandle.Builder builder) throws PcapNativeException, NotOpenException {
-        return null;
-    }
-
-    @Override
-    public void Load(Config c) throws PcapNativeException, NotOpenException {
-
-    }
-
-    @Override
-    public void Load(Config c1, Config c2) throws PcapNativeException, NotOpenException {
-
-    }
-
-    @Override
-    public void Modify(Config c1, Config c2) throws PcapNativeException, NotOpenException {
+    public void Load() throws PcapNativeException, NotOpenException {
 
     }
 
@@ -119,6 +90,17 @@ public class SendNetworkInterface implements NetworkInterface {
 
     }
 
+    void Send(){
+
+    }
+
+    void Resend(){
+
+    }
+
+    void Forward(){
+
+    }
 
 
     public int getId(){
@@ -151,4 +133,5 @@ public class SendNetworkInterface implements NetworkInterface {
     public boolean isUp(){
         return this.up;
     }
+
 }

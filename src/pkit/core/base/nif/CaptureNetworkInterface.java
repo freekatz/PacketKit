@@ -14,10 +14,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
 public final class CaptureNetworkInterface implements NetworkInterface{
-    private PcapHandle.Builder defaultBuilder;
-    private PcapHandle defaultHandle; // 默认 handle, 默认捕获全部数据包, 只加载部分配置
     private PcapHandle.Builder builder;  // 网卡构建对象, 通过 builder 设置网卡操作相关的字段
-    private PcapHandle handle;  // 网卡操作对象, 通过 handle 执行网卡的操作, 永远捕获缓冲区中的数据包
+    public PcapHandle defaultHandle; // 默认 handle, 默认捕获全部数据包, 只加载部分配置
+    public PcapDumper defaultDumper;
+    public PcapHandle handle;  // 网卡操作对象, 通过 handle 执行网卡的操作, 永远捕获缓冲区中的数据包
 
     // information reference, static
     // update when construction
@@ -59,7 +59,7 @@ public final class CaptureNetworkInterface implements NetworkInterface{
     public int liveTime = 0;  // 网卡活跃时长, 指的是在程序中处于启动状态下的时长
     public double usingRate = 0;  // 使用率, 上面两字段相除的百分比
 
-    private CaptureNetworkInterface(PcapNetworkInterface nif) {
+    public CaptureNetworkInterface(PcapNetworkInterface nif) {
         this.id = nif.hashCode(); // todo: 将这里修改为 hashCode()/n, n 为网卡总数, 将所有网卡依次存到一个 Hash 表中
         this.name = nif.getName();
 //        this.easyName = this.getEasyName();  // todo: 获取 easyName
@@ -97,20 +97,16 @@ public final class CaptureNetworkInterface implements NetworkInterface{
         this.liveTime = 0;
         this.usingRate = 0;
 
-        this.defaultBuilder = new PcapHandle.Builder(this.name);
-        this.defaultHandle = this.Load(this.defaultBuilder);
+        this.builder = new PcapHandle.Builder(this.name);
+        this.Load();  // 使用默认配置
+        this.defaultDumper = null;
         this.handle = null;
-        this.builder = null;
 
     }
 
     @Override
     public void Activate() throws PcapNativeException {
         this.activate = true;
-        this.load = false;
-        this.start = false;
-        this.stop = false;
-        this.builder = new PcapHandle.Builder(this.name);
         /*
         todo 缓冲区准备: tmp/id_date_size.tps
          */
@@ -123,95 +119,49 @@ public final class CaptureNetworkInterface implements NetworkInterface{
     }
 
     @Override
-    public PcapHandle Load(PcapHandle.Builder builder) throws PcapNativeException, NotOpenException {
-        networkInterfaceConfig = new NetworkInterfaceConfig();
-        filterConfig = new FilterConfig();
+    public void Load() throws PcapNativeException, NotOpenException {
 
-        networkInterfaceConfig.Initial();
-        filterConfig.Initial();
+        if (!this.isActivate()) {
+            this.builder.snaplen(this.networkInterfaceConfig.getSnapshotLength())
+                    .timeoutMillis(this.networkInterfaceConfig.getTimeoutMillis())
+                    .bufferSize(this.networkInterfaceConfig.getBufferSize())
+                    .promiscuousMode(this.networkInterfaceConfig.getPromiscuousMode())
+                    .timestampPrecision(this.networkInterfaceConfig.getTimestampPrecision());
 
-        builder.snaplen(networkInterfaceConfig.getSnapshotLength())
-                .timeoutMillis(networkInterfaceConfig.getTimeoutMillis())
-                .bufferSize(networkInterfaceConfig.getBufferSize())
-                .promiscuousMode(networkInterfaceConfig.getPromiscuousMode())
-                .timestampPrecision(networkInterfaceConfig.getTimestampPrecision())
-                .direction(networkInterfaceConfig.getDirection());
 
-        if (networkInterfaceConfig.getRfmonMode() == NetworkInterfaceMode.RfmonMode.RfmonMode)
-            builder.rfmon(true);
-        else builder.rfmon(false);
+            if (this.networkInterfaceConfig.getRfmonMode() == NetworkInterfaceMode.RfmonMode.RfmonMode)
+                this.builder.rfmon(true);
+            else this.builder.rfmon(false);
 
-        if (networkInterfaceConfig.getImmediateMode() == NetworkInterfaceMode.ImmediateMode.ImmediateMode)
-            builder.immediateMode(true);
-        else builder.immediateMode(false);
+            if (this.networkInterfaceConfig.getImmediateMode() == NetworkInterfaceMode.ImmediateMode.ImmediateMode)
+                this.builder.immediateMode(true);
+            else this.builder.immediateMode(false);
 
-        PcapHandle handle = builder.build();
-        handle.setFilter(this.filterConfig.getFilter(), BpfProgram.BpfCompileMode.OPTIMIZE);
 
-        return handle;
-    }
-
-    @Override
-    public void Load(Config filterConfig) throws PcapNativeException, NotOpenException {
-        if (this.handle == null)
+            this.defaultHandle = this.builder.build();
+            this.defaultHandle.setFilter(this.filterConfig.getFilter(), BpfProgram.BpfCompileMode.OPTIMIZE);
+//            this.defaultHandle.setDirection(this.filterConfig.getDirection());  // todo 需检测平台是否支持
+        } else {
             this.handle = this.builder.build();
-        this.handle.setFilter(this.filterConfig.getFilter(), BpfProgram.BpfCompileMode.OPTIMIZE);
+            this.handle.setFilter(this.filterConfig.getFilter(), BpfProgram.BpfCompileMode.OPTIMIZE);
+//            this.handle.setDirection(this.filterConfig.getDirection());  // todo 需检测平台是否支持
+        }
 
+        this.load = this.isActivate();
     }
 
-    @Override
-    public void Load(Config networkInterfaceConfig, Config filterConfig) throws PcapNativeException, NotOpenException {
-        this.activate = true;
-        this.load = true;
-        this.start = false;
-        this.stop = false;
-
-        this.networkInterfaceConfig = (NetworkInterfaceConfig) networkInterfaceConfig;
-        this.filterConfig = (FilterConfig) filterConfig;
-
-        this.builder.snaplen(this.networkInterfaceConfig.getSnapshotLength())
-                .timeoutMillis(this.networkInterfaceConfig.getTimeoutMillis())
-                .bufferSize(this.networkInterfaceConfig.getBufferSize())
-                .promiscuousMode(this.networkInterfaceConfig.getPromiscuousMode())
-                .timestampPrecision(this.networkInterfaceConfig.getTimestampPrecision())
-                .direction(this.networkInterfaceConfig.getDirection());
-
-        if (this.networkInterfaceConfig.getRfmonMode() == NetworkInterfaceMode.RfmonMode.RfmonMode)
-            this.builder.rfmon(true);
-        else this.builder.rfmon(false);
-
-        if (this.networkInterfaceConfig.getImmediateMode() == NetworkInterfaceMode.ImmediateMode.ImmediateMode)
-            this.builder.immediateMode(true);
-        else this.builder.immediateMode(false);
-
-        this.handle = this.builder.build();
-        this.handle.setFilter(this.filterConfig.getFilter(), BpfProgram.BpfCompileMode.OPTIMIZE);
-
-    }
-
-    @Override
-    public void Modify(Config networkInterfaceConfig, Config filterConfig) throws PcapNativeException, NotOpenException {
-        // todo 测试下列转换是否有效
-        NetworkInterfaceConfig tc1 = this.networkInterfaceConfig;
-        FilterConfig tc2 = this.filterConfig;
-        this.Load(networkInterfaceConfig, filterConfig);
-        this.networkInterfaceConfig = tc1;
-        this.filterConfig = tc2;
-    }
 
     @Override
     public void Modify(Config filterConfig) throws PcapNativeException, NotOpenException {
-        // todo 测试下列转换是否有效
         FilterConfig tc = this.filterConfig;
-        this.Load(filterConfig);
+        this.filterConfig = (FilterConfig) filterConfig;
+        this.Load();
         this.filterConfig = tc;
     }
 
     @Override
     public void Start(){
         // warning: Start 中的包捕获模式一定是 OfflineMode, 因为磁盘缓冲区
-        this.activate = true;
-        this.load = true;
         this.start = true;
         this.stop = false;
 
@@ -219,8 +169,6 @@ public final class CaptureNetworkInterface implements NetworkInterface{
 
     @Override
     public void Pause() {
-        this.activate = true;
-        this.load = true;
         this.start = true;
         this.stop = true; // start 和 stop 同时为 true 时代表当前网卡作业处于暂停状态
 
@@ -228,8 +176,6 @@ public final class CaptureNetworkInterface implements NetworkInterface{
 
     @Override
     public void Resume() {
-        this.activate = true;
-        this.load = true;
         this.start = true;
         this.stop = false;
 
@@ -237,8 +183,6 @@ public final class CaptureNetworkInterface implements NetworkInterface{
 
     @Override
     public void Stop() throws NotOpenException {
-        this.activate = true;
-        this.load = false;
         this.start = false;
         this.stop = true;
         this.handle.close();
@@ -378,5 +322,15 @@ public final class CaptureNetworkInterface implements NetworkInterface{
     }
     public double getUsingRate(){
         return this.usingRate;
+    }
+
+    @Override
+    public String toString() {
+        return "CaptureNetworkInterface{" +
+                ", activate=" + activate +
+                ", load=" + load +
+                ", start=" + start +
+                ", stop=" + stop +
+                '}';
     }
 }

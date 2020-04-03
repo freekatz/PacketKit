@@ -7,7 +7,8 @@ import pkit.core.base.nif.NetworkInterfaceMode;
 
 import java.util.Date;
 
-public class NetworkInterfaceConfig implements Config{
+// 静态配置
+public class NetworkInterfaceConfig implements Config, Cloneable{
 
 
     private int id; // 程序中设置的，保存到文件，永久不变
@@ -22,21 +23,26 @@ public class NetworkInterfaceConfig implements Config{
     private PcapNetworkInterface.PromiscuousMode promiscuousMode;
     private NetworkInterfaceMode.RfmonMode rfmonMode;
     private PcapHandle.TimestampPrecision timestampPrecision;
-    private PcapHandle.PcapDirection direction;
     private NetworkInterfaceMode.ImmediateMode immediateMode;
+
+
 
     @Override
     public void Initial() {
         this.timestamp = new Date(); // todo 这个需要修改
-        this.count = -1;
+        this.count = 0;
         this.snapshotLength = 65536;
         this.timeoutMillis = 0;
         this.bufferSize = 20 * 1024 * 1024; // 2MB 缓冲大小
         this.promiscuousMode = PcapNetworkInterface.PromiscuousMode.PROMISCUOUS;
-        this.rfmonMode = NetworkInterfaceMode.RfmonMode.RfmonMode;
-        this.timestampPrecision = PcapHandle.TimestampPrecision.NANO;
-        this.direction = PcapHandle.PcapDirection.INOUT;
+        this.rfmonMode = NetworkInterfaceMode.RfmonMode.NoRfmonMode;  // todo 需检测是否是无线网卡及是否支持
+        this.timestampPrecision = PcapHandle.TimestampPrecision.MICRO;  // todo 需检测平台是否支持
         this.immediateMode = NetworkInterfaceMode.ImmediateMode.ImmediateMode;
+    }
+
+    @Override
+    public NetworkInterfaceConfig clone() throws CloneNotSupportedException {
+        return (NetworkInterfaceConfig) super.clone();
     }
 
 
@@ -74,9 +80,6 @@ public class NetworkInterfaceConfig implements Config{
     }
     public void setTimestampPrecision(PcapHandle.TimestampPrecision timestampPrecision) {
         this.timestampPrecision = timestampPrecision;
-    }
-    public void setDirection(PcapHandle.PcapDirection direction) {
-        this.direction = direction;
     }
     public void setImmediateMode(NetworkInterfaceMode.ImmediateMode immediateMode) {
         this.immediateMode = immediateMode;
@@ -117,10 +120,25 @@ public class NetworkInterfaceConfig implements Config{
     public PcapHandle.TimestampPrecision getTimestampPrecision() {
         return timestampPrecision;
     }
-    public PcapHandle.PcapDirection getDirection() {
-        return direction;
-    }
     public NetworkInterfaceMode.ImmediateMode getImmediateMode() {
         return immediateMode;
+    }
+
+    @Override
+    public String toString() {
+        return "NetworkInterfaceConfig{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", comment='" + comment + '\'' +
+                ", timestamp=" + timestamp +
+                ", count=" + count +
+                ", snapshotLength=" + snapshotLength +
+                ", timeoutMillis=" + timeoutMillis +
+                ", bufferSize=" + bufferSize +
+                ", promiscuousMode=" + promiscuousMode +
+                ", rfmonMode=" + rfmonMode +
+                ", timestampPrecision=" + timestampPrecision +
+                ", immediateMode=" + immediateMode +
+                '}';
     }
 }

@@ -35,11 +35,8 @@ public interface NetworkInterface {
     从磁盘配置文件中加载用户网卡配置, 根据配置设置网卡字段，
     新建 PcapHandle 对象, 此时网卡已经具备进行捕获发送等操作的能力
      */
-    PcapHandle Load(PcapHandle.Builder builder) throws PcapNativeException, NotOpenException;  // 加载默认配置
 
-    void Load(Config c) throws PcapNativeException, NotOpenException;
-
-    void Load(Config c1, Config c2) throws PcapNativeException, NotOpenException; // 设置字段，从文件中加载
+    void Load() throws PcapNativeException, NotOpenException;
 
 
 
@@ -47,8 +44,6 @@ public interface NetworkInterface {
     临时修改但不保存配置，并需要重新加载到网卡的情况，不会使用到配置相关的操作，直接传入配置在内存中的映像，如 Json 对象
     比如暂停及恢复网卡作业（Pause->Resume）期间或停止再重新运行或运行新的（Stop->Start）网卡作业
      */
-    void Modify(Config c1, Config c2) throws PcapNativeException, NotOpenException; // 临时地重新设置字段，不保存
-
     void Modify(Config c) throws PcapNativeException, NotOpenException;
 
     /*
