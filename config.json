@@ -1,1 +1,0 @@
-{"id":1,"name":"nif config","comment":"this is the nif config","timestamp":"2020-04-02 14:49:28","count":-1,"snapshotLength":65536,"timeoutMillis":0,"bufferSize":20971520,"promiscuousMode":"PROMISCUOUS","rfmonMode":"RfmonMode","timestampPrecision":"NANO","direction":"INOUT","immediateMode":"ImmediateMode"}
