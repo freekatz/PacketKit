@@ -1,9 +1,10 @@
+*.pcap
+*.tps
+*.tp
+
 log/
 node_modules/
 *lock.json
-
-# test src
-tests/
 idea.txt
 
 
