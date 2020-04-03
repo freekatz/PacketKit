@@ -1,0 +1,46 @@
+{
+  "name": "pkit",
+  "version": "1.0.0",
+  "description": "Packet Kit: 一个强大的跨平台底层数据包工具箱:sunny:",
+  "main": ".commitlintrc.js",
+  "directories": {
+    "doc": "doc",
+    "lib": "lib",
+    "test": "tests"
+  },
+  "dependencies": {
+    "standard-version": "^7.1.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^8.3.5",
+    "commitizen": "^4.0.3",
+    "commitlint-config-cz": "^0.13.1",
+    "cz-conventional-changelog": "^3.1.0",
+    "husky": "^4.2.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "commit": "git-cz",
+    "release": "standard-version"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-customizable"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -e $GIT_PARAMS"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/1uvu/PKit.git"
+  },
+  "author": "Luv U",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/1uvu/PKit/issues"
+  },
+  "homepage": "https://github.com/1uvu/PKit#readme"
+}
