@@ -13,9 +13,11 @@
   },
   "devDependencies": {
     "@commitlint/cli": "^8.3.5",
+    "@commitlint/config-conventional": "^8.3.4",
     "commitizen": "^4.0.3",
     "commitlint-config-cz": "^0.13.1",
     "cz-conventional-changelog": "^3.1.0",
+    "cz-customizable": "^6.2.0",
     "husky": "^4.2.3"
   },
   "scripts": {
