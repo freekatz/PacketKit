@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
-public class DumpGet {
+public class Get {
 
     public static void main(String[] args) throws PcapNativeException, NotOpenException, CloneNotSupportedException, InterruptedException, EOFException, TimeoutException {
 
@@ -39,45 +39,16 @@ public class DumpGet {
         filterConfig.setFilter("icmp and ip src 192.168.2.114");
         captureNetworkInterface.setFilterConfig(filterConfig);
 
-        // 启动作业
-        ExecutorService pool = Executors.newSingleThreadExecutor();
-        Task task = new Task(captureNetworkInterface);
-
-        pool.execute(task);
 
         PcapHandle handle = Pcaps.openOffline(captureNetworkInterface.getTpsPath());
         handle.setFilter(filterConfig.getFilter(), BpfProgram.BpfCompileMode.OPTIMIZE);
 
-        Task task2 = new Task(handle);
-
-        pool.execute(task2);
+        PacketListener listener = System.out::println;
+        handle.loop(-1, listener);
 
 //        captureNetworkInterface.Stop();
 //        handle.close();
 //        pool.shutdown();
 
-    }
-
-
-    private static class Task implements Runnable {
-        private CaptureNetworkInterface captureNetworkInterface;
-        private PcapHandle handle;
-
-        public Task(CaptureNetworkInterface captureNetworkInterface) {
-            this.captureNetworkInterface=captureNetworkInterface;
-        }
-
-        public Task(PcapHandle handle) {
-            this.handle = handle;
-        }
-
-        @Override
-        public void run() {
-            try {
-                this.captureNetworkInterface.Start();
-            } catch (PcapNativeException | NotOpenException | EOFException | TimeoutException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }
