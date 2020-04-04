@@ -1,9 +1,6 @@
 package pkit.core;
 
-import org.pcap4j.core.NotOpenException;
-import org.pcap4j.core.PcapNativeException;
-import org.pcap4j.core.PcapNetworkInterface;
-import org.pcap4j.core.Pcaps;
+import org.pcap4j.core.*;
 import org.pcap4j.packet.Packet;
 import org.pcap4j.util.NifSelector;
 import pkit.core.base.config.FilterConfig;
@@ -12,12 +9,14 @@ import pkit.core.base.nif.CaptureNetworkInterface;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
 public class DumpGet {
 
-    public static void main(String[] args) throws PcapNativeException, NotOpenException, CloneNotSupportedException {
-        String tmpPath = "tmp/tmp.tps";
+    public static void main(String[] args) throws PcapNativeException, NotOpenException, CloneNotSupportedException, InterruptedException {
 
         PcapNetworkInterface nif = null;
         try {
@@ -35,20 +34,32 @@ public class DumpGet {
 
         // 加载配置
         captureNetworkInterface.Activate();  // 资源分配完成
-        captureNetworkInterface.Load();
+        captureNetworkInterface.Load();  // 配置加载完成
 
 
         // 修改配置并保存
-        captureNetworkInterface.getFilterConfig().setFilter("icmp");
-        captureNetworkInterface.Load();
+        captureNetworkInterface.getFilterConfig().setFilter("tcp");
+        captureNetworkInterface.getNetworkInterfaceConfig().setCount(20);
 
         // 修改配置不保存
         FilterConfig filterConfig = (FilterConfig) captureNetworkInterface.getFilterConfig().clone();
-        filterConfig.setFilter("tcp or icmp");
-        captureNetworkInterface.Modify(filterConfig);
+        filterConfig.setFilter("tcp and ip src 192.168.2.114");
 
-        // todo 多线程实现: 在线模式缓冲区+离线模式
-        
+        BpfProgram bpfProgram = captureNetworkInterface.handle.compileFilter(filterConfig.getFilter(), BpfProgram.BpfCompileMode.OPTIMIZE, (Inet4Address) captureNetworkInterface.getIPv4Address().getNetmask());
+        System.out.println(captureNetworkInterface.handle.getFilteringExpression()+"\n");
+        System.out.println(filterConfig.getFilter());
+        int num=0;
+        while (num < captureNetworkInterface.getNetworkInterfaceConfig().getCount()) {
+            PcapPacket packet = captureNetworkInterface.handle.getNextPacket(); // // 调用 getNextPacket 函数进行抓包, 一次得到一个包
+            if (packet != null) {
+                captureNetworkInterface.dumper.dump(packet); // 依次将数据包 Dump 到文件中
+                if (bpfProgram.applyFilter(packet))
+                    System.out.println(packet);
+                num++;
+            }
+        }
+        captureNetworkInterface.handle.close();
+        captureNetworkInterface.dumper.close();
 
     }
 }

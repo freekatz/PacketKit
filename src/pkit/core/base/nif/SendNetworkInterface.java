@@ -66,11 +66,6 @@ public class SendNetworkInterface implements NetworkInterface {
     }
 
     @Override
-    public void Modify(Config c) throws PcapNativeException, NotOpenException {
-
-    }
-
-    @Override
     public void Start() {
 
     }

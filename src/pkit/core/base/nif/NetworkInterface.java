@@ -28,6 +28,7 @@ public interface NetworkInterface {
         3. 准备磁盘缓冲区，创建临时文件，分配缓冲和内存资源，创建需要的对象
         4.
      */
+    // only once
     void Activate() throws PcapNativeException; // 分配资源
 
 
@@ -35,16 +36,9 @@ public interface NetworkInterface {
     从磁盘配置文件中加载用户网卡配置, 根据配置设置网卡字段，
     新建 PcapHandle 对象, 此时网卡已经具备进行捕获发送等操作的能力
      */
-
+    // only once
     void Load() throws PcapNativeException, NotOpenException;
 
-
-
-    /*
-    临时修改但不保存配置，并需要重新加载到网卡的情况，不会使用到配置相关的操作，直接传入配置在内存中的映像，如 Json 对象
-    比如暂停及恢复网卡作业（Pause->Resume）期间或停止再重新运行或运行新的（Stop->Start）网卡作业
-     */
-    void Modify(Config c) throws PcapNativeException, NotOpenException;
 
     /*
     开启并运行一个网卡作业, 调用相关操作，如 Capture、Send 等

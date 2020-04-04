@@ -7,6 +7,8 @@ import pkit.core.base.config.FilterConfig;
 import pkit.core.base.config.NetworkInterfaceConfig;
 
 import java.io.EOFException;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -15,9 +17,8 @@ import java.util.concurrent.TimeoutException;
 
 public final class CaptureNetworkInterface implements NetworkInterface{
     private PcapHandle.Builder builder;  // 网卡构建对象, 通过 builder 设置网卡操作相关的字段
-    public PcapHandle defaultHandle; // 默认 handle, 默认捕获全部数据包, 只加载部分配置
-    public PcapDumper defaultDumper;
-    public PcapHandle handle;  // 网卡操作对象, 通过 handle 执行网卡的操作, 永远捕获缓冲区中的数据包
+    public PcapHandle handle; // 默认 handle, 默认捕获全部数据包, 只加载部分配置
+    public PcapDumper dumper;
 
     // information reference, static
     // update when construction
@@ -26,7 +27,8 @@ public final class CaptureNetworkInterface implements NetworkInterface{
     private final String easyName = "easyName";  // 网卡的别名, 如 WLAN 等
     private final String description;  // 网卡描述信息
     private final ArrayList<LinkLayerAddress> MacAddresses;  // 网卡物理地址数组
-    private final List<PcapAddress> IPAddresses;  // 网卡 IP 地址列表, 包括 IPv4 和 IPv6, 且可能有多个
+    private final PcapAddress IPv4Address;  // 网卡 IPv4 地址
+    private final PcapAddress IPv6Address;  // 网卡 IPv6 地址
     private final boolean local; // 是否是本地接口
     private final boolean loopback; // 是否是回环网卡
     private final boolean running; // 是否运行, 这里的运行指的是在操作系统中的运行状态, 而不是程序中
@@ -35,7 +37,6 @@ public final class CaptureNetworkInterface implements NetworkInterface{
     // operator reference
     private NetworkInterfaceConfig networkInterfaceConfig;
     private FilterConfig filterConfig;
-    private NetworkInterfaceMode.OfflineMode offlineMode;  // 用于控制抓包模式, 读取 pcap 文件还是实时
 
 
     // live circle
@@ -43,6 +44,12 @@ public final class CaptureNetworkInterface implements NetworkInterface{
     private boolean load;  // 是否加载了配置
     private boolean start;  // 是否正在运行作业
     private boolean stop;  // 是否运行完毕
+
+    // tmp path
+
+    private String tpsPath;
+    private String tpPath;
+    private String logPath;
 
     // statistic reference
     // use trigger auto update
@@ -65,7 +72,8 @@ public final class CaptureNetworkInterface implements NetworkInterface{
 //        this.easyName = this.getEasyName();  // todo: 获取 easyName
         this.description = nif.getDescription();
         this.MacAddresses = nif.getLinkLayerAddresses();
-        this.IPAddresses = nif.getAddresses();
+        this.IPv4Address = nif.getAddresses().get(1);  // todo: fit more cases
+        this.IPv6Address = nif.getAddresses().get(0);
         this.local = nif.isLocal();
         this.loopback = nif.isLoopBack();
         this.running = nif.isRunning();
@@ -97,19 +105,16 @@ public final class CaptureNetworkInterface implements NetworkInterface{
         this.liveTime = 0;
         this.usingRate = 0;
 
-        this.builder = new PcapHandle.Builder(this.name);
-        this.Load();  // 使用默认配置
-        this.defaultDumper = null;
-        this.handle = null;
-
     }
 
     @Override
     public void Activate() throws PcapNativeException {
         this.activate = true;
+        this.builder = new PcapHandle.Builder(this.name);
         /*
         todo 缓冲区准备: tmp/id_date_size.tps
          */
+        this.tpsPath = "tmp/tmp.tps";
         /*
         todo 临时文件准备: tmp/id_date.tp
          */
@@ -120,44 +125,27 @@ public final class CaptureNetworkInterface implements NetworkInterface{
 
     @Override
     public void Load() throws PcapNativeException, NotOpenException {
+        this.load = true;
 
-        if (!this.isActivate()) {
-            this.builder.snaplen(this.networkInterfaceConfig.getSnapshotLength())
-                    .timeoutMillis(this.networkInterfaceConfig.getTimeoutMillis())
-                    .bufferSize(this.networkInterfaceConfig.getBufferSize())
-                    .promiscuousMode(this.networkInterfaceConfig.getPromiscuousMode())
-                    .timestampPrecision(this.networkInterfaceConfig.getTimestampPrecision());
+        this.builder.snaplen(this.networkInterfaceConfig.getSnapshotLength())
+                .timeoutMillis(this.networkInterfaceConfig.getTimeoutMillis())
+                .bufferSize(this.networkInterfaceConfig.getBufferSize())
+                .promiscuousMode(this.networkInterfaceConfig.getPromiscuousMode())
+                .timestampPrecision(this.networkInterfaceConfig.getTimestampPrecision());
 
-
-            if (this.networkInterfaceConfig.getRfmonMode() == NetworkInterfaceMode.RfmonMode.RfmonMode)
+        if (this.networkInterfaceConfig.getRfmonMode() == NetworkInterfaceMode.RfmonMode.RfmonMode)
                 this.builder.rfmon(true);
-            else this.builder.rfmon(false);
+        else this.builder.rfmon(false);
 
-            if (this.networkInterfaceConfig.getImmediateMode() == NetworkInterfaceMode.ImmediateMode.ImmediateMode)
+        if (this.networkInterfaceConfig.getImmediateMode() == NetworkInterfaceMode.ImmediateMode.ImmediateMode)
                 this.builder.immediateMode(true);
-            else this.builder.immediateMode(false);
+        else this.builder.immediateMode(false);
 
 
-            this.defaultHandle = this.builder.build();
-            this.defaultHandle.setFilter(this.filterConfig.getFilter(), BpfProgram.BpfCompileMode.OPTIMIZE);
-//            this.defaultHandle.setDirection(this.filterConfig.getDirection());  // todo 需检测平台是否支持
-        } else {
-            this.handle = this.builder.build();
-            this.handle.setFilter(this.filterConfig.getFilter(), BpfProgram.BpfCompileMode.OPTIMIZE);
-//            this.handle.setDirection(this.filterConfig.getDirection());  // todo 需检测平台是否支持
-        }
-
-        this.load = this.isActivate();
+        this.handle = this.builder.build();
+        this.dumper = this.handle.dumpOpen(this.tpsPath);
     }
 
-
-    @Override
-    public void Modify(Config filterConfig) throws PcapNativeException, NotOpenException {
-        FilterConfig tc = this.filterConfig;
-        this.filterConfig = (FilterConfig) filterConfig;
-        this.Load();
-        this.filterConfig = tc;
-    }
 
     @Override
     public void Start(){
@@ -185,17 +173,16 @@ public final class CaptureNetworkInterface implements NetworkInterface{
     public void Stop() throws NotOpenException {
         this.start = false;
         this.stop = true;
-        this.handle.close();
         // 此处代码较多, 待完善
     }
 
 
-    void Capture(NetworkInterfaceMode.CaptureMode mode) throws PcapNativeException, InterruptedException, NotOpenException, EOFException, TimeoutException {
+    public void Capture(NetworkInterfaceMode.CaptureMode mode) throws PcapNativeException, InterruptedException, NotOpenException, EOFException, TimeoutException {
         // 以下代码这是示例
         PacketListener listener;
         switch (mode){
             case LoopMode:
-                 listener = System.out::println;
+                listener = System.out::println;
                 this.handle.loop(5, listener);
                 break;
             case HeavyLoopMode:
@@ -226,14 +213,24 @@ public final class CaptureNetworkInterface implements NetworkInterface{
         }
     }
 
+    public void Dump() {
+
+    }
+
     public void setNetworkInterfaceConfig(NetworkInterfaceConfig networkInterfaceConfig) {
         this.networkInterfaceConfig = networkInterfaceConfig;
     }
     public void setFilterConfig(FilterConfig filterConfig) {
         this.filterConfig = filterConfig;
     }
-    public void setOfflineMode(NetworkInterfaceMode.OfflineMode offlineMode) {
-        this.offlineMode = offlineMode;
+    public void setTpsPath(String path) {
+        this.tpsPath = path;
+    }
+    public void setTpPath(String path) {
+        this.tpPath = path;
+    }
+    public void setLogPathPath(String path) {
+        this.logPath = path;
     }
 
     public int getId(){
@@ -251,8 +248,11 @@ public final class CaptureNetworkInterface implements NetworkInterface{
     public ArrayList<LinkLayerAddress> getMacAddresses(){
         return this.MacAddresses;
     }
-    public List<PcapAddress> getIPAddresses(){
-        return this.IPAddresses;
+    public PcapAddress getIPv4Address(){
+        return this.IPv4Address;
+    }
+    public PcapAddress getIPv6Address(){
+        return this.IPv6Address;
     }
     public boolean isLocal(){
         return this.local;
@@ -273,9 +273,6 @@ public final class CaptureNetworkInterface implements NetworkInterface{
     public FilterConfig getFilterConfig() {
         return this.filterConfig;
     }
-    public NetworkInterfaceMode.OfflineMode getOfflineMode() {
-        return offlineMode;
-    }
 
     public boolean isActivate() {
         return this.activate;
@@ -288,6 +285,16 @@ public final class CaptureNetworkInterface implements NetworkInterface{
     }
     public boolean isStop() {
         return stop;
+    }
+
+    public String getTpsPath() {
+        return this.tpsPath;
+    }
+    public String getTpPath() {
+        return this.tpPath;
+    }
+    public String getLogPath() {
+        return this.logPath;
     }
 
     public int getSendPacketNumber(){
