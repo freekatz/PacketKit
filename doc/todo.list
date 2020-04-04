@@ -1,10 +1,18 @@
 一、捕获 Interface
 思路
 1 捕获默认全部捕获
-2 根据过滤器过滤已捕获的包，基于 p4 的 BpfProgram 实现(current)
+2 根据过滤器过滤已捕获的包，基于 p4 的 BpfProgram 实现
 3 每次重新开始捕获需要选择对以前已捕获包的处理（保存等等）
-4 使用 loop 一个一个 dump，dump 同时对此数据包应用过滤器
-可同时开启多个捕获作业（todo）
+4 使用 getNextPacket 一个一个 dump，dump 同时对此数据包应用过滤器
+5 todo 中途更新过滤器的处理步骤需要好好考虑
+    网卡的默认 handle 就是 loop+listener(dump)，而其余的处理则是仅仅利用网卡的 filterConfig，在接口之外实现
+    实现步骤如下：
+    情况 1) 开始捕获->中途不修改过滤器->结束捕获
+        a 默认 handle->getNextPacket->默认 handle->dumper->额外的 handle->bpf 判断->true 则将数据包送入其它模块处理
+    情况 2) 开始捕获->中途修改过滤器->结束捕获
+        a 默认 handle->getNextPacket->默认 handle->dumper->额外的 handle->bpf 判断->true 则将数据包送入其它模块处理
+        b 更新了过滤器->a 过程永远运行->首先使用临时的 handle->loop 读取文件, 将数据包列表送入其它模块->继续 a 过程
+6 todo 可同时开启多个捕获作业
 
 二、解析 PacketGroup+PacketOperator
 思路
@@ -37,7 +45,7 @@ ICMPv4 (RFC792) and ICMPv6 (RFC4443, RFC4861, and RFC6275)
 TCP (RFC793, RFC2018, and draft-ietf-tcpm-1323bis-21), UDP, and SCTP (only common header)
 GTPv1 (only GTP-U and GTP-C header)
 DNS (RFC1035, RFC3596, and RFC6844)
-3 自己可暂时实现额外的协议（todo）
+3 todo 自己可暂时实现额外的协议
 
 三、构造 PacketOperator
 1 提供丰富的模板，保存 packet 对象为二进制文件（.pk）
