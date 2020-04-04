@@ -2,26 +2,23 @@ package pkit.core.base.nif;
 
 import org.pcap4j.core.*;
 import org.pcap4j.util.LinkLayerAddress;
-import pkit.core.base.config.Config;
 import pkit.core.base.config.FilterConfig;
 import pkit.core.base.config.NetworkInterfaceConfig;
 
 import java.io.EOFException;
 import java.net.Inet4Address;
-import java.net.Inet6Address;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
 public final class CaptureNetworkInterface implements NetworkInterface{
     private PcapHandle.Builder builder;  // 网卡构建对象, 通过 builder 设置网卡操作相关的字段
-    public PcapHandle handle; // 默认 handle, 默认捕获全部数据包, 只加载部分配置
-    public PcapDumper dumper;
+    public PcapHandle handle;  // handle, 默认捕获全部数据包
+    public PcapDumper dumper;  // 用于存储到默认缓冲区
 
-    // information reference, static
-    // update when construction
+    // 网卡的静态信息
+    // 初始化时只更新一次
     private final int id;  // id 作为网卡的唯一不变的标识
     private final String name;  // 网卡名字, 形如 Device/...
     private final String easyName = "easyName";  // 网卡的别名, 如 WLAN 等
@@ -34,25 +31,24 @@ public final class CaptureNetworkInterface implements NetworkInterface{
     private final boolean running; // 是否运行, 这里的运行指的是在操作系统中的运行状态, 而不是程序中
     private final boolean up; // 是否打开, 同上
 
-    // operator reference
+    // 操作配置
     private NetworkInterfaceConfig networkInterfaceConfig;
     private FilterConfig filterConfig;
 
 
-    // live circle
+    // 生命周期
     private boolean activate;  // 是否激活
     private boolean load;  // 是否加载了配置
     private boolean start;  // 是否正在运行作业
     private boolean stop;  // 是否运行完毕
 
-    // tmp path
-
+    // 资源路径
     private String tpsPath;
     private String tpPath;
     private String logPath;
 
-    // statistic reference
-    // use trigger auto update
+    // 统计信息
+    // 使用触发器自动更新
     // todo: 考虑将下面的内容放置到其它的类中进行统一管理
     public int sendPacketNumber = 0;  // 发送数据包总数, 指的是源 MAC 为本网卡的数据包
     public int receivePacketNumber = 0;  // 收到数据包总数, 指的是目的 MAC 为本网卡的数据包
@@ -78,8 +74,6 @@ public final class CaptureNetworkInterface implements NetworkInterface{
         this.loopback = nif.isLoopBack();
         this.running = nif.isRunning();
         this.up = nif.isUp();
-
-
     }
 
     @Override
@@ -88,6 +82,7 @@ public final class CaptureNetworkInterface implements NetworkInterface{
         this.load = false;
         this.start = false;
         this.stop = false;
+
         this.networkInterfaceConfig = new NetworkInterfaceConfig();
         this.filterConfig = new FilterConfig();
         this.networkInterfaceConfig.Initial();
@@ -112,14 +107,14 @@ public final class CaptureNetworkInterface implements NetworkInterface{
         this.activate = true;
         this.builder = new PcapHandle.Builder(this.name);
         /*
-        todo 缓冲区准备: tmp/id_date_size.tps
+        todo 缓冲区准备+文件名格式: tmp/id_date_size.tps
          */
         this.tpsPath = "tmp/tmp.tps";
         /*
-        todo 临时文件准备: tmp/id_date.tp
+        todo 临时文件准备+文件名格式: tmp/id_date.tp，暂时用不上
          */
         /*
-        todo 日志文件准备: log/id_date.log
+        todo 日志文件准备+文件名格式: log/id_date.log，暂时用不上
          */
     }
 
@@ -148,73 +143,31 @@ public final class CaptureNetworkInterface implements NetworkInterface{
 
 
     @Override
-    public void Start(){
-        // warning: Start 中的包捕获模式一定是 OfflineMode, 因为磁盘缓冲区
+    public void Start() throws PcapNativeException, NotOpenException, EOFException, TimeoutException {
         this.start = true;
         this.stop = false;
-
-    }
-
-    @Override
-    public void Pause() {
-        this.start = true;
-        this.stop = true; // start 和 stop 同时为 true 时代表当前网卡作业处于暂停状态
-
-    }
-
-    @Override
-    public void Resume() {
-        this.start = true;
-        this.stop = false;
-
-    }
-
-    @Override
-    public void Stop() throws NotOpenException {
-        this.start = false;
-        this.stop = true;
-        // 此处代码较多, 待完善
-    }
-
-
-    public void Capture(NetworkInterfaceMode.CaptureMode mode) throws PcapNativeException, InterruptedException, NotOpenException, EOFException, TimeoutException {
-        // 以下代码这是示例
-        PacketListener listener;
-        switch (mode){
-            case LoopMode:
-                listener = System.out::println;
-                this.handle.loop(5, listener);
-                break;
-            case HeavyLoopMode:
-                listener =
-                        packet -> {
-                            System.out.println("start a heavy task");
-                            try {
-                                Thread.sleep(5000);
-                            } catch (InterruptedException ignored) {
-
-                            }
-                            System.out.println("done");
-                        };
-
-                try {
-                    ExecutorService pool = Executors.newCachedThreadPool();
-                    // 我们只需向 loop 函数传入 pool 即可, p4 作者已经将线程池的实现封装好
-                    handle.loop(5, listener, pool); // This is better than handle.loop(5, listener);
-                    pool.shutdown();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-            case GetNextPacketMode:
-                this.handle.getNextPacket();
-            case GetNextPacketExMode:
-                this.handle.getNextPacketEx();
+        boolean lop = false;
+        int num = 0;
+        BpfProgram bpfProgram = this.handle.compileFilter(filterConfig.getFilter(), BpfProgram.BpfCompileMode.OPTIMIZE, (Inet4Address) this.getIPv4Address().getNetmask());
+        // count < 0 时无限循环
+        if (this.networkInterfaceConfig.getCount()<0)
+            lop = true;
+        while (lop || num < this.networkInterfaceConfig.getCount()){
+            PcapPacket packet = this.handle.getNextPacket();
+            this.dumper.dump(packet); // 依次将数据包 Dump 到文件中
+            if (bpfProgram.applyFilter(packet))
+                // 将 packet 送入其它模块: a 过程
+                System.out.println("default!!!!!!!\n" + packet);
+            num++;
         }
     }
 
-    public void Dump() {
-
+    @Override
+    public void Stop(){
+        this.start = false;
+        this.stop = true;
+        this.handle.close();
+        this.dumper.close();
     }
 
     public void setNetworkInterfaceConfig(NetworkInterfaceConfig networkInterfaceConfig) {
@@ -334,7 +287,7 @@ public final class CaptureNetworkInterface implements NetworkInterface{
     @Override
     public String toString() {
         return "CaptureNetworkInterface{" +
-                ", activate=" + activate +
+                "activate=" + activate +
                 ", load=" + load +
                 ", start=" + start +
                 ", stop=" + stop +

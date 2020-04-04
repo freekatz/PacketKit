@@ -33,7 +33,7 @@ public class NetworkInterfaceConfig implements Config, Cloneable{
         this.count = 0;
         this.snapshotLength = 65536;
         this.timeoutMillis = 0;
-        this.bufferSize = 20 * 1024 * 1024; // 2MB 缓冲大小
+        this.bufferSize = 20 * 1024 * 1024; // 20MB 缓冲大小
         this.promiscuousMode = PcapNetworkInterface.PromiscuousMode.PROMISCUOUS;
         this.rfmonMode = NetworkInterfaceMode.RfmonMode.NoRfmonMode;  // todo 需检测是否是无线网卡及是否支持
         this.timestampPrecision = PcapHandle.TimestampPrecision.MICRO;  // todo 需检测平台是否支持
