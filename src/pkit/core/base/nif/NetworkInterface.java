@@ -5,6 +5,9 @@ import org.pcap4j.core.PcapHandle;
 import org.pcap4j.core.PcapNativeException;
 import pkit.core.base.config.Config;
 
+import java.io.EOFException;
+import java.util.concurrent.TimeoutException;
+
 // 此接口描述了一个网卡的生命周期, 以下操作均视为原子操作
 public interface NetworkInterface {
 
@@ -41,23 +44,16 @@ public interface NetworkInterface {
 
 
     /*
-    开启并运行一个网卡作业, 调用相关操作，如 Capture、Send 等
+    开启并运行一个网卡作业, 调用相关操作，如 Capture、Send、Dump 等
     一次 Start 就是一次操作过程, 可以执行并控制这个过程
     更高级的控制流程会在 service 包中定义实现
      */
-    void Start(); // 开启并控制一个网卡作业流程
+    void Start() throws PcapNativeException, NotOpenException, EOFException, TimeoutException; // 开启并控制一个网卡作业流程
 
     /*
-    暂停当前作业，实质上就是跳出作业执行的轮回，或是暂停作业的线程，
-    暂停期间可修改网卡的配置，即进行 Reload 或 Edit 操作
+    停止一个网卡作业, 即结束一个操作过程，
+    关闭 Handle，下一个作业从 Load 重新开始
      */
-    void Pause(); // 暂停当前作业
-
-    void Resume(); // 恢复当前作业
-
-    /*
-    停止一个网卡作业, 即结束一个操作过程
-     */
-    void Stop() throws NotOpenException; // 结束并控制一个网卡作业流程
+    void Stop(); // 结束并控制一个网卡作业流程
 
 }

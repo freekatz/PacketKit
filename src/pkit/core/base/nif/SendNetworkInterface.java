@@ -70,18 +70,9 @@ public class SendNetworkInterface implements NetworkInterface {
 
     }
 
-    @Override
-    public void Pause() {
-
-    }
 
     @Override
-    public void Resume() {
-
-    }
-
-    @Override
-    public void Stop() throws NotOpenException {
+    public void Stop() {
 
     }
 
