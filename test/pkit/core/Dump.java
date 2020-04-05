@@ -2,14 +2,11 @@ package pkit.core;
 
 import org.pcap4j.core.*;
 import org.pcap4j.util.NifSelector;
-import pkit.core.base.config.FilterConfig;
+import pkit.core.base.config.CaptureFilterConfig;
 import pkit.core.base.nif.CaptureNetworkInterface;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.net.Inet4Address;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
 public class Dump {
@@ -33,20 +30,20 @@ public class Dump {
         captureNetworkInterface.Activate();  // 资源分配完成
         captureNetworkInterface.Load();  // 配置加载完成
         // 修改配置
-        captureNetworkInterface.getNetworkInterfaceConfig().setCount(-1);
-        FilterConfig filterConfig = new FilterConfig();
-        filterConfig.Initial();
-        filterConfig.setFilter("icmp and ip src 192.168.2.114");
-        captureNetworkInterface.setFilterConfig(filterConfig);
+        captureNetworkInterface.getCaptureNetworkInterfaceConfig().setCount(-1);
+        CaptureFilterConfig captureFilterConfig = new CaptureFilterConfig();
+        captureFilterConfig.Initial();
+        captureFilterConfig.setFilter("icmp and ip src 192.168.2.114");
+        captureNetworkInterface.setCaptureFilterConfig(captureFilterConfig);
 
-        // 启动作业
-        ExecutorService pool = Executors.newSingleThreadExecutor();
-        Task task = new Task(captureNetworkInterface);
+//        // 启动作业
+//        ExecutorService pool = Executors.newSingleThreadExecutor();
+//        Task task = new Task(captureNetworkInterface);
+//
+//        pool.execute(task);
 
-        pool.execute(task);
-
-//        captureNetworkInterface.Stop();
-//        handle.close();
+        captureNetworkInterface.Start();
+        captureNetworkInterface.Stop();
 //        pool.shutdown();
 
     }
@@ -63,7 +60,7 @@ public class Dump {
         public void run() {
             try {
                 this.captureNetworkInterface.Start();
-            } catch (PcapNativeException | NotOpenException | EOFException | TimeoutException e) {
+            } catch (PcapNativeException | NotOpenException | EOFException | TimeoutException | InterruptedException e) {
                 e.printStackTrace();
             }
         }

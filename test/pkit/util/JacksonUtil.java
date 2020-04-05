@@ -1,7 +1,7 @@
 package pkit.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import pkit.core.base.config.NetworkInterfaceConfig;
+import pkit.core.base.config.CaptureNetworkInterfaceConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +12,7 @@ public class JacksonUtil {
 
     public static void main(String[] args) throws IOException {
         System.out.println("Hello World!");
-        NetworkInterfaceConfig config = new NetworkInterfaceConfig();
+        CaptureNetworkInterfaceConfig config = new CaptureNetworkInterfaceConfig();
         config.setId(1);
         config.setName("nif config");
         config.setComment("this is the nif config");
@@ -25,7 +25,7 @@ public class JacksonUtil {
         File configFile = new File(filepath);
         mapper.writeValue(configFile, config);
 
-        NetworkInterfaceConfig config1 = mapper.readValue(configFile, NetworkInterfaceConfig.class);
+        CaptureNetworkInterfaceConfig config1 = mapper.readValue(configFile, CaptureNetworkInterfaceConfig.class);
         System.out.println(config1.getTimestamp());
     }
 }
