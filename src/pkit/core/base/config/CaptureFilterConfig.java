@@ -5,7 +5,7 @@ import org.pcap4j.core.PcapHandle;
 import java.util.Date;
 
 // 动态配置
-public class FilterConfig implements Config, Cloneable{
+public class CaptureFilterConfig implements Config, Cloneable{
     private int id; // 程序中设置的，保存到文件，永久不变
     private String name;
     private String filter;
@@ -22,8 +22,8 @@ public class FilterConfig implements Config, Cloneable{
     }
 
     @Override
-    public FilterConfig clone() throws CloneNotSupportedException {
-        return (FilterConfig) super.clone();
+    public CaptureFilterConfig clone() throws CloneNotSupportedException {
+        return (CaptureFilterConfig) super.clone();
     }
 
     public void setId(int id) {

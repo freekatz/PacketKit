@@ -8,7 +8,7 @@ import pkit.core.base.nif.NetworkInterfaceMode;
 import java.util.Date;
 
 // 静态配置
-public class NetworkInterfaceConfig implements Config, Cloneable{
+public class CaptureNetworkInterfaceConfig implements Config, Cloneable{
 
 
     private int id; // 程序中设置的，保存到文件，永久不变
@@ -41,8 +41,8 @@ public class NetworkInterfaceConfig implements Config, Cloneable{
     }
 
     @Override
-    public NetworkInterfaceConfig clone() throws CloneNotSupportedException {
-        return (NetworkInterfaceConfig) super.clone();
+    public CaptureNetworkInterfaceConfig clone() throws CloneNotSupportedException {
+        return (CaptureNetworkInterfaceConfig) super.clone();
     }
 
 
