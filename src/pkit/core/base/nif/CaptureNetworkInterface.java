@@ -2,20 +2,19 @@ package pkit.core.base.nif;
 
 import org.pcap4j.core.*;
 import org.pcap4j.util.LinkLayerAddress;
-import pkit.core.base.config.FilterConfig;
-import pkit.core.base.config.NetworkInterfaceConfig;
+import pkit.core.base.config.CaptureFilterConfig;
+import pkit.core.base.config.CaptureNetworkInterfaceConfig;
 
 import java.io.EOFException;
 import java.net.Inet4Address;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
-public final class CaptureNetworkInterface implements NetworkInterface{
+public final class CaptureNetworkInterface implements NetworkInterface {
     private PcapHandle.Builder builder;  // 网卡构建对象, 通过 builder 设置网卡操作相关的字段
     public PcapHandle handle;  // handle, 默认捕获全部数据包
     public PcapDumper dumper;  // 用于存储到默认缓冲区
+//    public PacketListener listener;  // 方案 1
 
     // 网卡的静态信息
     // 初始化时只更新一次
@@ -32,8 +31,8 @@ public final class CaptureNetworkInterface implements NetworkInterface{
     private final boolean up; // 是否打开, 同上
 
     // 操作配置
-    private NetworkInterfaceConfig networkInterfaceConfig;
-    private FilterConfig filterConfig;
+    private CaptureNetworkInterfaceConfig captureNetworkInterfaceConfig;
+    private CaptureFilterConfig captureFilterConfig;
 
 
     // 生命周期
@@ -81,12 +80,12 @@ public final class CaptureNetworkInterface implements NetworkInterface{
         this.activate = false;
         this.load = false;
         this.start = false;
-        this.stop = false;
+        this.stop = true;
 
-        this.networkInterfaceConfig = new NetworkInterfaceConfig();
-        this.filterConfig = new FilterConfig();
-        this.networkInterfaceConfig.Initial();
-        this.filterConfig.Initial();
+        this.captureNetworkInterfaceConfig = new CaptureNetworkInterfaceConfig();
+        this.captureFilterConfig = new CaptureFilterConfig();
+        this.captureNetworkInterfaceConfig.Initial();
+        this.captureFilterConfig.Initial();
 
         this.sendPacketNumber = 0;
         this.receivePacketNumber = 0;
@@ -122,17 +121,17 @@ public final class CaptureNetworkInterface implements NetworkInterface{
     public void Load() throws PcapNativeException, NotOpenException {
         this.load = true;
 
-        this.builder.snaplen(this.networkInterfaceConfig.getSnapshotLength())
-                .timeoutMillis(this.networkInterfaceConfig.getTimeoutMillis())
-                .bufferSize(this.networkInterfaceConfig.getBufferSize())
-                .promiscuousMode(this.networkInterfaceConfig.getPromiscuousMode())
-                .timestampPrecision(this.networkInterfaceConfig.getTimestampPrecision());
+        this.builder.snaplen(this.captureNetworkInterfaceConfig.getSnapshotLength())
+                .timeoutMillis(this.captureNetworkInterfaceConfig.getTimeoutMillis())
+                .bufferSize(this.captureNetworkInterfaceConfig.getBufferSize())
+                .promiscuousMode(this.captureNetworkInterfaceConfig.getPromiscuousMode())
+                .timestampPrecision(this.captureNetworkInterfaceConfig.getTimestampPrecision());
 
-        if (this.networkInterfaceConfig.getRfmonMode() == NetworkInterfaceMode.RfmonMode.RfmonMode)
+        if (this.captureNetworkInterfaceConfig.getRfmonMode() == NetworkInterfaceMode.RfmonMode.RfmonMode)
                 this.builder.rfmon(true);
         else this.builder.rfmon(false);
 
-        if (this.networkInterfaceConfig.getImmediateMode() == NetworkInterfaceMode.ImmediateMode.ImmediateMode)
+        if (this.captureNetworkInterfaceConfig.getImmediateMode() == NetworkInterfaceMode.ImmediateMode.ImmediateMode)
                 this.builder.immediateMode(true);
         else this.builder.immediateMode(false);
 
@@ -143,38 +142,62 @@ public final class CaptureNetworkInterface implements NetworkInterface{
 
 
     @Override
-    public void Start() throws PcapNativeException, NotOpenException, EOFException, TimeoutException {
+    public void Start() throws PcapNativeException, NotOpenException, EOFException, TimeoutException, InterruptedException {
         this.start = true;
         this.stop = false;
-        boolean lop = false;
-        int num = 0;
-        BpfProgram bpfProgram = this.handle.compileFilter(filterConfig.getFilter(), BpfProgram.BpfCompileMode.OPTIMIZE, (Inet4Address) this.getIPv4Address().getNetmask());
-        // count < 0 时无限循环
-        if (this.networkInterfaceConfig.getCount()<0)
-            lop = true;
-        while (lop || num < this.networkInterfaceConfig.getCount()){
-            PcapPacket packet = this.handle.getNextPacket();
-            this.dumper.dump(packet); // 依次将数据包 Dump 到文件中
-            if (bpfProgram.applyFilter(packet))
-                // 将 packet 送入其它模块: a 过程
-                System.out.println("default!!!!!!!\n" + packet);
-            num++;
-        }
+
+        this.Capture();
     }
 
     @Override
     public void Stop(){
         this.start = false;
         this.stop = true;
-        this.handle.close();
-        this.dumper.close();
+        if (this.handle.isOpen())
+            this.handle.close();
+        if (this.dumper.isOpen())
+            this.dumper.close();
     }
 
-    public void setNetworkInterfaceConfig(NetworkInterfaceConfig networkInterfaceConfig) {
-        this.networkInterfaceConfig = networkInterfaceConfig;
+    private void Capture() throws NotOpenException, PcapNativeException, EOFException, TimeoutException {
+        // count < 0 时无限循环
+        // 方案 1
+//        this.listener = new PacketListener() {
+//            @Override
+//            public void gotPacket(PcapPacket pcapPacket) {
+//                try {
+//                    dumper.dump(pcapPacket);
+//                    BpfProgram bpfProgram = handle.compileFilter(filterConfig.getFilter(), BpfProgram.BpfCompileMode.OPTIMIZE, (Inet4Address) IPv4Address.getNetmask());
+//                    if (bpfProgram.applyFilter(pcapPacket))
+//                        System.out.println(pcapPacket);
+//                } catch (PcapNativeException | NotOpenException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        };
+//        handle.loop(this.networkInterfaceConfig.getCount(), this.listener);
+        // 方案 2
+        BpfProgram bpfProgram = this.handle.compileFilter(captureFilterConfig.getFilter(), BpfProgram.BpfCompileMode.OPTIMIZE, (Inet4Address) this.getIPv4Address().getNetmask());
+        boolean lop = false;
+        int num = 0;
+        if (this.captureNetworkInterfaceConfig.getCount()<0)
+            lop = true;
+        while (lop || num < this.captureNetworkInterfaceConfig.getCount()){
+            PcapPacket packet = this.handle.getNextPacketEx();
+            this.dumper.dump(packet); // 依次将数据包 Dump 到文件中
+            if (bpfProgram.applyFilter(packet))  // todo 将此判断过程得到的 packet 送入在线数据包组
+                // 将 packet 送入其它模块: a 过程完成
+                // 同时也可直接对临时文件进行读写，必须使用 getNextPacket，因为写入过程得缓冲区无 EOF
+                System.out.println("Default: \n" + packet);
+            num++;
+        }
     }
-    public void setFilterConfig(FilterConfig filterConfig) {
-        this.filterConfig = filterConfig;
+
+    public void setCaptureNetworkInterfaceConfig(CaptureNetworkInterfaceConfig captureNetworkInterfaceConfig) {
+        this.captureNetworkInterfaceConfig = captureNetworkInterfaceConfig;
+    }
+    public void setCaptureFilterConfig(CaptureFilterConfig captureFilterConfig) {
+        this.captureFilterConfig = captureFilterConfig;
     }
     public void setTpsPath(String path) {
         this.tpsPath = path;
@@ -220,11 +243,11 @@ public final class CaptureNetworkInterface implements NetworkInterface{
         return this.up;
     }
 
-    public NetworkInterfaceConfig getNetworkInterfaceConfig() {
-        return this.networkInterfaceConfig;
+    public CaptureNetworkInterfaceConfig getCaptureNetworkInterfaceConfig() {
+        return this.captureNetworkInterfaceConfig;
     }
-    public FilterConfig getFilterConfig() {
-        return this.filterConfig;
+    public CaptureFilterConfig getCaptureFilterConfig() {
+        return this.captureFilterConfig;
     }
 
     public boolean isActivate() {

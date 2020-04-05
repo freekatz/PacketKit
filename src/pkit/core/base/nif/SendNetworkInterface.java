@@ -2,7 +2,7 @@ package pkit.core.base.nif;
 
 import org.pcap4j.core.*;
 import org.pcap4j.util.LinkLayerAddress;
-import pkit.core.base.config.Config;
+import pkit.core.base.config.SendNetworkInterfaceConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,29 +12,29 @@ public class SendNetworkInterface implements NetworkInterface {
     private PcapHandle.Builder builder = null;
     private PcapHandle handle = null;
 
-    // information reference, static
-    // update when construction
-    private final int id; // 自编
+    private final int id;
     private final String name;
-    private final String easyName = "easyName"; // 需要一个函数来获取
+    private final String easyName = "easyName";
     private final String description;
     private final ArrayList<LinkLayerAddress> MacAddresses;
-    private final List<PcapAddress> IPAddresses;
+    private final PcapAddress IPv4Address;  // 网卡 IPv4 地址
+    private final PcapAddress IPv6Address;  // 网卡 IPv6 地址
     private final boolean local; // 是否是本地接口
     private final boolean loopback; // 是否是回环网卡
     private final boolean running; // 是否运行
     private final boolean up; // 是否打开
 
-    // operator reference
-    boolean activate = false; // 是否激活(编程属性而非网卡实体属性), 当一个网卡的处理类被新建时设为 true
-    int count = 1; // 发送数目
-    int timeoutMillis = 0; // 发送延迟
-    PcapNetworkInterface destNif = null; // 应用于 Forward，转发的目的网卡，默认选择目的网卡属于同一子网的接口
-    int retryCount = 1; // 重试次数，发送失败时使用
-    // etc...
+    // 操作配置
+    private SendNetworkInterfaceConfig sendNetworkInterfaceConfig;
 
-    public int sendPacketNumber = 0;  // 发送数据包总数, 单独统计, 与捕获网卡的字段相独立
-    public int failPacketNumber = 0;  // 发送失败数据包总数
+    // 生命周期
+    private boolean activate;  // 是否激活
+    private boolean load;  // 是否加载了配置
+    private boolean start;  // 是否正在运行作业
+    private boolean stop;  // 是否运行完毕
+
+    public int sendPacketNumber;  // 发送数据包总数, 单独统计, 与捕获网卡的字段相独立
+    public int failPacketNumber;  // 发送失败数据包总数
 
 
     SendNetworkInterface(PcapNetworkInterface nif) {
@@ -43,7 +43,8 @@ public class SendNetworkInterface implements NetworkInterface {
 //        this.easyName = this.getEasyName();
         this.description = nif.getDescription();
         this.MacAddresses = nif.getLinkLayerAddresses();
-        this.IPAddresses = nif.getAddresses();
+        this.IPv4Address = nif.getAddresses().get(1);  // todo: fit more cases
+        this.IPv6Address = nif.getAddresses().get(0);
         this.local = nif.isLocal();
         this.loopback = nif.isLoopBack();
         this.running = nif.isRunning();
@@ -52,7 +53,16 @@ public class SendNetworkInterface implements NetworkInterface {
 
     @Override
     public void Initial() throws PcapNativeException, NotOpenException {
+        this.activate = false;
+        this.load = false;
+        this.start = false;
+        this.stop = true;
 
+        this.sendNetworkInterfaceConfig = new SendNetworkInterfaceConfig();
+        this.sendNetworkInterfaceConfig.Initial();
+
+        this.sendPacketNumber = 0;
+        this.failPacketNumber = 0;
     }
 
     @Override
@@ -80,10 +90,6 @@ public class SendNetworkInterface implements NetworkInterface {
 
     }
 
-    void Resend(){
-
-    }
-
     void Forward(){
 
     }
@@ -104,8 +110,11 @@ public class SendNetworkInterface implements NetworkInterface {
     public ArrayList<LinkLayerAddress> getMacAddresses(){
         return this.MacAddresses;
     }
-    public List<PcapAddress> getIPAddresses(){
-        return this.IPAddresses;
+    public PcapAddress getIPv4Address(){
+        return this.IPv4Address;
+    }
+    public PcapAddress getIPv6Address(){
+        return this.IPv6Address;
     }
     public boolean isLocal(){
         return this.local;

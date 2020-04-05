@@ -48,7 +48,7 @@ public interface NetworkInterface {
     一次 Start 就是一次操作过程, 可以执行并控制这个过程
     更高级的控制流程会在 service 包中定义实现
      */
-    void Start() throws PcapNativeException, NotOpenException, EOFException, TimeoutException; // 开启并控制一个网卡作业流程
+    void Start() throws PcapNativeException, NotOpenException, EOFException, TimeoutException, InterruptedException; // 开启并控制一个网卡作业流程
 
     /*
     停止一个网卡作业, 即结束一个操作过程，
