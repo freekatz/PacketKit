@@ -36,6 +36,8 @@ public class Dump {
         captureFilterConfig.setFilter("icmp and ip src 192.168.2.114");
         captureNetworkInterface.setCaptureFilterConfig(captureFilterConfig);
 
+        System.out.println(captureNetworkInterface.isLoopBack());
+
 //        // 启动作业
 //        ExecutorService pool = Executors.newSingleThreadExecutor();
 //        Task task = new Task(captureNetworkInterface);
