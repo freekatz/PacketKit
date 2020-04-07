@@ -8,6 +8,7 @@ public class SendNetworkInterfaceConfig implements Config{
     private int timeoutMillis; // 发送延迟
     private PcapNetworkInterface dstNif; // 应用于 Forward，转发的目的网卡，默认选择目的网卡属于同一子网的接口
     private int retryCount; // 重试次数，发送失败时使用
+    // 目标主机信息等等，在构造包时设置，不属于网卡可控的内容
 
 
     @Override

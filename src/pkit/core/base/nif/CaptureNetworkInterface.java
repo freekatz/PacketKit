@@ -76,7 +76,10 @@ public final class CaptureNetworkInterface implements NetworkInterface {
     }
 
     @Override
-    public void Initial() throws PcapNativeException, NotOpenException {
+    public void Initial(){
+        this.builder = null;
+        this.handle = null;
+
         this.activate = false;
         this.load = false;
         this.start = false;
@@ -102,7 +105,7 @@ public final class CaptureNetworkInterface implements NetworkInterface {
     }
 
     @Override
-    public void Activate() throws PcapNativeException {
+    public void Activate(){
         this.activate = true;
         this.builder = new PcapHandle.Builder(this.name);
         /*

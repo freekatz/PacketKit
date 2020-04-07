@@ -20,7 +20,7 @@ public interface NetworkInterface {
         3. 将 builder 和 handle 设为 null
         4.
      */
-    void Initial() throws PcapNativeException, NotOpenException; // 初始化字段和属性值
+    void Initial(); // 初始化字段和属性值
 
     /*
     激活网卡，进行各种发送或捕获之前的准备工作，注意与初始化工作相区分，
@@ -32,7 +32,7 @@ public interface NetworkInterface {
         4.
      */
     // only once
-    void Activate() throws PcapNativeException; // 分配资源
+    void Activate(); // 分配资源
 
 
     /*

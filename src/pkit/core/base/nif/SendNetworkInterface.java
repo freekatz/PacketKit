@@ -2,15 +2,19 @@ package pkit.core.base.nif;
 
 import org.pcap4j.core.*;
 import org.pcap4j.util.LinkLayerAddress;
+import pkit.core.base.config.CaptureFilterConfig;
 import pkit.core.base.config.SendNetworkInterfaceConfig;
 
+import java.io.EOFException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 public class SendNetworkInterface implements NetworkInterface {
+    private PcapHandle.Builder builder;
+    private PcapHandle handle;
+    private PcapPacket packet;
 
-    private PcapHandle.Builder builder = null;
-    private PcapHandle handle = null;
 
     private final int id;
     private final String name;
@@ -27,17 +31,23 @@ public class SendNetworkInterface implements NetworkInterface {
     // 操作配置
     private SendNetworkInterfaceConfig sendNetworkInterfaceConfig;
 
+
     // 生命周期
     private boolean activate;  // 是否激活
     private boolean load;  // 是否加载了配置
     private boolean start;  // 是否正在运行作业
     private boolean stop;  // 是否运行完毕
 
+    // 资源路径
+    private String tpsPath;
+    private String tpPath;
+    private String logPath;
+
     public int sendPacketNumber;  // 发送数据包总数, 单独统计, 与捕获网卡的字段相独立
     public int failPacketNumber;  // 发送失败数据包总数
 
 
-    SendNetworkInterface(PcapNetworkInterface nif) {
+    public SendNetworkInterface(PcapNetworkInterface nif) {
         this.id = nif.hashCode();
         this.name = nif.getName();
 //        this.easyName = this.getEasyName();
@@ -52,7 +62,10 @@ public class SendNetworkInterface implements NetworkInterface {
     }
 
     @Override
-    public void Initial() throws PcapNativeException, NotOpenException {
+    public void Initial(){
+        this.handle = null;
+        this.packet = null;
+
         this.activate = false;
         this.load = false;
         this.start = false;
@@ -66,34 +79,79 @@ public class SendNetworkInterface implements NetworkInterface {
     }
 
     @Override
-    public void Activate() throws PcapNativeException {
-
+    public void Activate() {
+        this.activate = true;
+        this.builder = new PcapHandle.Builder(this.name);
+        /*
+        todo 缓冲区准备+文件名格式: tmp/id_date_size.tps
+         */
+        /*
+        todo 临时文件准备+文件名格式: tmp/id_date.tp，暂时用不上
+         */
+        this.tpPath = "tmp/tmp.tp";
+        /*
+        todo 日志文件准备+文件名格式: log/id_date.log，暂时用不上
+         */
     }
 
     @Override
-    public void Load() throws PcapNativeException, NotOpenException {
+    public void Load() throws PcapNativeException {
+        this.load = true;
+        this.handle = this.builder.build();
+
+        try {
+            this.packet = Pcaps.openOffline(this.tpPath).getNextPacketEx();
+        } catch (NotOpenException | TimeoutException | EOFException | PcapNativeException e) {
+            e.printStackTrace();
+        }
 
     }
 
     @Override
     public void Start() {
+        this.start = true;
+        this.stop = false;
 
+        this.Send();
     }
 
 
     @Override
     public void Stop() {
+        this.stop = true;
+        this.start = false;
+
+        this.handle.close();
 
     }
 
     void Send(){
-
+        try {
+            for (int i=0; i<this.sendNetworkInterfaceConfig.getCount(); ++i) {
+                Thread.sleep(this.sendNetworkInterfaceConfig.getTimeoutMillis());
+                this.handle.sendPacket(this.packet);
+            } // todo 发送失败重试次数实现
+        } catch (NotOpenException | PcapNativeException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     void Forward(){
-
+        // todo 将数据包直接转发到本地其它网卡
     }
 
+    public void setSendNetworkInterfaceConfig(SendNetworkInterfaceConfig sendNetworkInterfaceConfig) {
+        this.sendNetworkInterfaceConfig = sendNetworkInterfaceConfig;
+    }
+    public void setTpsPath(String path) {
+        this.tpsPath = path;
+    }
+    public void setTpPath(String path) {
+        this.tpPath = path;
+    }
+    public void setLogPathPath(String path) {
+        this.logPath = path;
+    }
 
     public int getId(){
         return this.id;
@@ -129,4 +187,37 @@ public class SendNetworkInterface implements NetworkInterface {
         return this.up;
     }
 
+    public SendNetworkInterfaceConfig getSendNetworkInterfaceConfig() {
+        return this.sendNetworkInterfaceConfig;
+    }
+    public boolean isActivate() {
+        return this.activate;
+    }
+    public boolean isLoad() {
+        return load;
+    }
+    public boolean isStart() {
+        return start;
+    }
+    public boolean isStop() {
+        return stop;
+    }
+
+    public String getTpsPath() {
+        return this.tpsPath;
+    }
+    public String getTpPath() {
+        return this.tpPath;
+    }
+    public String getLogPath() {
+        return this.logPath;
+    }
+
+    public int getSendPacketNumber() {
+        return sendPacketNumber;
+    }
+
+    public int getFailPacketNumber() {
+        return failPacketNumber;
+    }
 }
