@@ -1,78 +1,35 @@
 package pkit.core.base.packet;
 
+
 public class SendPacketGroup implements PacketGroup {
 
-    SendPacketGroup() {
+
+    // 包组存储与包组结构分离，建立结构文件，通过结构文件访问包组
+
+    public SendPacketGroup() {
+
+    }
+
+    public void Remove() {
+
+    }
+
+    public void Get() {
 
     }
 
     @Override
-    public void setId(String id) {
+    public SendPacketGroup clone() throws CloneNotSupportedException {
+        return (SendPacketGroup) super.clone();
+    }
+
+    @Override
+    public void Add() {
 
     }
 
     @Override
-    public void setInterfaceId(String interfaceId) {
-
-    }
-
-    @Override
-    public void setName(String name) {
-
-    }
-
-    @Override
-    public void setDescription(String description) {
-
-    }
-
-    @Override
-    public void setTimeStamp(String timeStamp) {
-
-    }
-
-    @Override
-    public void setPacketNumber(int packetNumber) {
-
-    }
-
-    @Override
-    public String getId() {
-        return null;
-    }
-
-    @Override
-    public String getInterfaceId() {
-        return null;
-    }
-
-    @Override
-    public String getName() {
-        return null;
-    }
-
-    @Override
-    public String getDescription() {
-        return null;
-    }
-
-    @Override
-    public String getTimeStamp() {
-        return null;
-    }
-
-    @Override
-    public int getPacketNumber() {
-        return 0;
-    }
-
-    @Override
-    public void dump() {
-
-    }
-
-    @Override
-    public void remove() {
+    public void ForEach() {
 
     }
 }

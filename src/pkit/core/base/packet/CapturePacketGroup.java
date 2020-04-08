@@ -2,77 +2,41 @@ package pkit.core.base.packet;
 
 public class CapturePacketGroup implements PacketGroup {
 
-    CapturePacketGroup() {
+    private String Id;
+    private String InterfaceId;
+    private String Name;
+    private String Description;
+    private String TimeStamp;
+    private int PacketNumber;
+
+    //  使用 LinkedHashMap 存储包映射
+
+    public CapturePacketGroup() {
+
+    }
+
+    public void Dump() {
+        //  转储当前组
+
+    }
+
+    void Reproduce(String filterExpression) {
+        //  根据过滤器繁殖生成子数据包组
 
     }
 
     @Override
-    public void setId(String id) {
+    public CapturePacketGroup clone() throws CloneNotSupportedException {
+        return (CapturePacketGroup) super.clone();
+    }
+
+    @Override
+    public void Add() {
 
     }
 
     @Override
-    public void setInterfaceId(String interfaceId) {
-
-    }
-
-    @Override
-    public void setName(String name) {
-
-    }
-
-    @Override
-    public void setDescription(String description) {
-
-    }
-
-    @Override
-    public void setTimeStamp(String timeStamp) {
-
-    }
-
-    @Override
-    public void setPacketNumber(int packetNumber) {
-
-    }
-
-    @Override
-    public String getId() {
-        return null;
-    }
-
-    @Override
-    public String getInterfaceId() {
-        return null;
-    }
-
-    @Override
-    public String getName() {
-        return null;
-    }
-
-    @Override
-    public String getDescription() {
-        return null;
-    }
-
-    @Override
-    public String getTimeStamp() {
-        return null;
-    }
-
-    @Override
-    public int getPacketNumber() {
-        return 0;
-    }
-
-    @Override
-    public void dump() {
-
-    }
-
-    @Override
-    public void remove() {
+    public void ForEach() {
 
     }
 }
