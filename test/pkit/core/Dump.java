@@ -4,9 +4,15 @@ import org.pcap4j.core.*;
 import org.pcap4j.util.NifSelector;
 import pkit.core.base.config.CaptureFilterConfig;
 import pkit.core.base.nif.CaptureNetworkInterface;
+import pkit.core.base.packet.CapturePacketGroup;
+import pkit.core.base.packet.PacketExtraInformation;
+import pkit.core.base.packet.PacketGroup;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.concurrent.TimeoutException;
 
 public class Dump {
@@ -30,11 +36,7 @@ public class Dump {
         captureNetworkInterface.Activate();  // 资源分配完成
         captureNetworkInterface.Load();  // 配置加载完成
         // 修改配置
-        captureNetworkInterface.getCaptureNetworkInterfaceConfig().setCount(-1);
-        CaptureFilterConfig captureFilterConfig = new CaptureFilterConfig();
-        captureFilterConfig.Initial();
-        captureFilterConfig.setFilter("icmp and ip src 192.168.2.114");
-        captureNetworkInterface.setCaptureFilterConfig(captureFilterConfig);
+        captureNetworkInterface.getCaptureNetworkInterfaceConfig().setCount(20);
 
         System.out.println(captureNetworkInterface.isLoopBack());
 
@@ -43,10 +45,52 @@ public class Dump {
 //        Task task = new Task(captureNetworkInterface);
 //
 //        pool.execute(task);
+//        pool.shutdown();
+
+        CaptureFilterConfig captureFilterConfig = new CaptureFilterConfig();
+        captureFilterConfig.Initial();
+        captureFilterConfig.setFilter("tcp");
+        captureNetworkInterface.setCaptureFilterConfig(captureFilterConfig);
 
         captureNetworkInterface.Start();
+        ArrayList<PacketGroup> packetGroupArrayList = captureNetworkInterface.getPacketGroupArrayList();
+        CapturePacketGroup packetGroup = (CapturePacketGroup) packetGroupArrayList.get(0);
+        LinkedHashMap<PcapPacket, PacketExtraInformation> group = packetGroup.getPacketGroup();
+        group.forEach(((packet, packetExtraInformation) -> System.out.println(packet)));
+
+        String path = "tmp/group.tps";
+        PcapDumper dumper = captureNetworkInterface.handle.dumpOpen(path);
+        packetGroup.Dump(dumper);
+
+        CaptureFilterConfig captureFilterConfig1 = new CaptureFilterConfig();
+        captureFilterConfig1.Initial();
+        captureFilterConfig1.setFilter("icmp");
+        captureNetworkInterface.setCaptureFilterConfig(captureFilterConfig1);
+        BpfProgram bpfProgram = captureNetworkInterface.handle
+                .compileFilter(
+                        captureFilterConfig1.getFilter(),
+                        BpfProgram.BpfCompileMode.OPTIMIZE,
+                        (Inet4Address) captureNetworkInterface.getIPv4Address().getNetmask()
+                );
+
+        // 更新过滤器之后的结果
+        packetGroup.Clear();
+        packetGroup.Add(captureNetworkInterface.getTpsPath(), bpfProgram);
+
+        captureNetworkInterface.Start();
+
+        LinkedHashMap<PcapPacket, PacketExtraInformation> group1 = packetGroup.getPacketGroup();
+        group1.forEach(((packet, packetExtraInformation) -> System.out.println(packet)));
+
+        String path1 = "tmp/group1.tps";
+        PcapDumper dumper1 = captureNetworkInterface.handle.dumpOpen(path1);
+        packetGroup.Dump(dumper1);
+
         captureNetworkInterface.Stop();
-//        pool.shutdown();
+
+        // 结果 tmp.tps 40 个包，group.tps 只有 tcp 包，group1.tps 只有 icmp 包
+        // 结果完全正确
+
 
     }
 
