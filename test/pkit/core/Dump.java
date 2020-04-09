@@ -49,7 +49,7 @@ public class Dump {
 
         CaptureFilterConfig captureFilterConfig = new CaptureFilterConfig();
         captureFilterConfig.Initial();
-        captureFilterConfig.setFilter("tcp");
+        captureFilterConfig.setFilter("ip src 192.168.2.113");
         captureNetworkInterface.setCaptureFilterConfig(captureFilterConfig);
 
         captureNetworkInterface.Start();
@@ -64,7 +64,7 @@ public class Dump {
 
         CaptureFilterConfig captureFilterConfig1 = new CaptureFilterConfig();
         captureFilterConfig1.Initial();
-        captureFilterConfig1.setFilter("icmp");
+        captureFilterConfig1.setFilter("ip src 192.168.2.113");
         captureNetworkInterface.setCaptureFilterConfig(captureFilterConfig1);
         BpfProgram bpfProgram = captureNetworkInterface.handle
                 .compileFilter(
