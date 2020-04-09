@@ -83,10 +83,10 @@ public class SendNetworkInterface implements NetworkInterface {
         this.activate = true;
         this.builder = new PcapHandle.Builder(this.name);
         /*
-        todo 缓冲区准备+文件名格式: tmp/id_date_size.tps
+        缓冲区准备+文件名格式: tmp/id_date_size.tps
          */
         /*
-        todo 临时文件准备+文件名格式: tmp/id_date.tp，暂时用不上
+        临时文件准备+文件名格式: tmp/id_date.tp，暂时用不上
          */
         this.tpPath = "tmp/tmp.tp";
         /*

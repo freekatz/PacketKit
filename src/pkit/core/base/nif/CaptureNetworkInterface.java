@@ -4,6 +4,8 @@ import org.pcap4j.core.*;
 import org.pcap4j.util.LinkLayerAddress;
 import pkit.core.base.config.CaptureFilterConfig;
 import pkit.core.base.config.CaptureNetworkInterfaceConfig;
+import pkit.core.base.packet.CapturePacketGroup;
+import pkit.core.base.packet.PacketGroup;
 
 import java.io.EOFException;
 import java.net.Inet4Address;
@@ -14,6 +16,7 @@ public final class CaptureNetworkInterface implements NetworkInterface {
     private PcapHandle.Builder builder;  // 网卡构建对象, 通过 builder 设置网卡操作相关的字段
     public PcapHandle handle;  // handle, 默认捕获全部数据包
     public PcapDumper dumper;  // 用于存储到默认缓冲区
+    private ArrayList<PacketGroup> packetGroupArrayList;
 //    public PacketListener listener;  // 方案 1
 
     // 网卡的静态信息
@@ -79,6 +82,7 @@ public final class CaptureNetworkInterface implements NetworkInterface {
     public void Initial(){
         this.builder = null;
         this.handle = null;
+        this.packetGroupArrayList = new ArrayList<>();
 
         this.activate = false;
         this.load = false;
@@ -108,12 +112,16 @@ public final class CaptureNetworkInterface implements NetworkInterface {
     public void Activate(){
         this.activate = true;
         this.builder = new PcapHandle.Builder(this.name);
+
+        CapturePacketGroup packetGroup = new CapturePacketGroup();
+        packetGroup.Initial();
+        this.packetGroupArrayList.add(packetGroup);
         /*
-        todo 缓冲区准备+文件名格式: tmp/id_date_size.tps
+        缓冲区准备+文件名格式: tmp/id_date_size.tps
          */
         this.tpsPath = "tmp/tmp.tps";
         /*
-        todo 临时文件准备+文件名格式: tmp/id_date.tp，暂时用不上
+        临时文件准备+文件名格式: tmp/id_date.tp，暂时用不上
          */
         /*
         todo 日志文件准备+文件名格式: log/id_date.log，暂时用不上
@@ -188,10 +196,13 @@ public final class CaptureNetworkInterface implements NetworkInterface {
         while (lop || num < this.captureNetworkInterfaceConfig.getCount()){
             PcapPacket packet = this.handle.getNextPacketEx();
             this.dumper.dump(packet); // 依次将数据包 Dump 到文件中
-            if (bpfProgram.applyFilter(packet))  // todo 将此判断过程得到的 packet 送入在线数据包组
+            if (bpfProgram.applyFilter(packet)) {  // todo 将此判断过程得到的 packet 送入在线数据包组
                 // 将 packet 送入其它模块: a 过程完成
                 // 同时也可直接对临时文件进行读写，必须使用 getNextPacket，因为写入过程得缓冲区无 EOF
-                System.out.println("Default: \n" + packet);
+                CapturePacketGroup packetGroup = (CapturePacketGroup) this.packetGroupArrayList.get(0);
+                packetGroup.Add(packet);
+                //  todo 界面实时更新在这里
+            }
             num++;
         }
     }
@@ -210,6 +221,10 @@ public final class CaptureNetworkInterface implements NetworkInterface {
     }
     public void setLogPathPath(String path) {
         this.logPath = path;
+    }
+
+    public ArrayList<PacketGroup> getPacketGroupArrayList() {
+        return packetGroupArrayList;
     }
 
     public int getId(){

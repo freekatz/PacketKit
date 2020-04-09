@@ -1,6 +1,14 @@
 package pkit.core.base.packet;
 
 
+import org.pcap4j.core.BpfProgram;
+import org.pcap4j.core.NotOpenException;
+import org.pcap4j.core.PcapNativeException;
+import org.pcap4j.core.PcapPacket;
+
+import java.io.EOFException;
+import java.util.concurrent.TimeoutException;
+
 public class SendPacketGroup implements PacketGroup {
 
 
@@ -24,12 +32,24 @@ public class SendPacketGroup implements PacketGroup {
     }
 
     @Override
-    public void Add() {
+    public void Initial() {
 
     }
 
     @Override
-    public void ForEach() {
+    public void Add(PcapPacket packet) {
 
     }
+
+    @Override
+    public void Add(String path, BpfProgram bpfProgram) throws PcapNativeException, EOFException, TimeoutException, NotOpenException {
+
+        // 根据过滤器批量导入
+    }
+
+    @Override
+    public void Clear() {
+
+    }
+
 }

@@ -1,27 +1,80 @@
 package pkit.core.base.packet;
 
+import org.pcap4j.core.*;
+
+import java.io.EOFException;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.concurrent.TimeoutException;
+
 public class CapturePacketGroup implements PacketGroup {
 
-    private String Id;
-    private String InterfaceId;
-    private String Name;
-    private String Description;
-    private String TimeStamp;
-    private int PacketNumber;
+
+    private LinkedHashMap<PcapPacket, PacketExtraInformation> onlinePacketGroup;
+    private LinkedHashMap<PcapPacket, PacketExtraInformation>  offlinePacketGroup;
+    private LinkedHashMap<PcapPacket, PacketExtraInformation> packetGroup;
+
+
+    private String id;
+    private String name;
+    private String description;
+    private Date timeStamp;
+    private int size;
 
     //  使用 LinkedHashMap 存储包映射
 
-    public CapturePacketGroup() {
+    @Override
+    public void Initial() {
+        this.offlinePacketGroup = new LinkedHashMap<>();
+        this.onlinePacketGroup = new LinkedHashMap<>();
+        this.packetGroup = new LinkedHashMap<>();
+
+        this.id = null;
+        this.name = null;
+        this.description = null;
+        this.timeStamp = new Date();
+        this.size = 0;
 
     }
 
-    public void Dump() {
-        //  转储当前组
+    @Override
+    public void Add(PcapPacket packet) {
+        //  更新在线组
+        this.onlinePacketGroup.put(packet, null);
 
     }
 
-    void Reproduce(String filterExpression) {
-        //  根据过滤器繁殖生成子数据包组
+    @Override
+    public void Add(String path, BpfProgram bpfProgram) throws PcapNativeException, EOFException, TimeoutException, NotOpenException {
+        //  更新离线组
+        PcapHandle handle = Pcaps.openOffline(path);
+        while (true) {
+            try {
+                PcapPacket packet = handle.getNextPacketEx();
+                if (bpfProgram.applyFilter(packet))
+                    this.offlinePacketGroup.put(packet, null);
+            } catch (EOFException e) {
+                //  读取结束的工作
+                System.out.println("End of file");
+                break;
+            } catch (TimeoutException e) {
+                //  读取超时的工作
+                System.out.println("Timed out");
+                break;
+            }
+        }
+
+        handle.close();
+
+    }
+
+    @Override
+    public void Clear() {
+        //  清空在线组
+        //  todo 记录上次读取位置，减少磁盘 IO，如实现可不清空离线组
+        this.onlinePacketGroup.clear();
+        this.offlinePacketGroup.clear();  // 暂时清空
+        this.packetGroup.clear();
 
     }
 
@@ -30,13 +83,47 @@ public class CapturePacketGroup implements PacketGroup {
         return (CapturePacketGroup) super.clone();
     }
 
-    @Override
-    public void Add() {
+
+    public void Dump(PcapDumper dumper) throws PcapNativeException, NotOpenException {
+
+        this.packetGroup.forEach(((packet, packetExtraInformation) -> {
+            try {
+                dumper.dump(packet);
+            } catch (NotOpenException e) {
+                e.printStackTrace();
+            }
+        }));
+
+        dumper.close();
 
     }
 
-    @Override
-    public void ForEach() {
 
+    public LinkedHashMap<PcapPacket, PacketExtraInformation> getPacketGroup() {
+        // 在线组会直接覆盖离线组的重复元素，因此顺便保证了不丢包
+        this.packetGroup.putAll(this.offlinePacketGroup);
+        this.packetGroup.putAll(this.onlinePacketGroup);
+
+        return this.packetGroup;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Date getTimeStamp() {
+        return timeStamp;
+    }
+
+    public int getSize() {
+        return size;
     }
 }
