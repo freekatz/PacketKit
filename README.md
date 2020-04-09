@@ -70,7 +70,7 @@
 
 结构如图：
 
-![proj-struct](res/README/proj-struct.png)
+![proj-struct](res/README/project-struct.png)
 
 #### 技术栈
 
@@ -97,7 +97,7 @@
 
    > 答：我选择将捕获这一抽象的操作实例化为网络接口，因此捕获操作的实现就转化为网络接口对象及操作的实现；此外，为了更好地描述和控制捕获过程，我引入了网卡（网络接口）生命周期的概念，如下图，具体介绍可查看文档：[网卡生命周期](uml/网卡生命周期.pdf)
 
-   ![nif-life](res/README/nif-life.png)
+   ![nif-life](res/README/nif-live.png)
 
 4. 如何实现捕获过程中实时地更新过滤器
 
