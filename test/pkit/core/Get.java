@@ -17,6 +17,7 @@ public class Get {
         while (true) {
             try {
                 packet = handle.getNextPacketEx();
+                PcapPacket.Builder builders = packet.getBuilder();
                 System.out.println("Get: \n" + packet);
             } catch (EOFException e) {
                 System.out.println("End of file");

@@ -4,9 +4,8 @@ import org.pcap4j.core.*;
 import org.pcap4j.util.NifSelector;
 import pkit.core.base.config.CaptureFilterConfig;
 import pkit.core.base.nif.CaptureNetworkInterface;
-import pkit.core.base.packet.CapturePacketGroup;
-import pkit.core.base.packet.PacketExtraInformation;
-import pkit.core.base.packet.PacketGroup;
+import pkit.core.base.group.CapturePacketGroup;
+import pkit.core.base.group.PacketGroup;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -55,8 +54,8 @@ public class Dump {
         captureNetworkInterface.Start();
         ArrayList<PacketGroup> packetGroupArrayList = captureNetworkInterface.getPacketGroupArrayList();
         CapturePacketGroup packetGroup = (CapturePacketGroup) packetGroupArrayList.get(0);
-        LinkedHashMap<PcapPacket, PacketExtraInformation> group = packetGroup.getPacketGroup();
-        group.forEach(((packet, packetExtraInformation) -> System.out.println(packet)));
+        LinkedHashMap<Integer, PcapPacket> group = packetGroup.getPacketGroup();
+        group.forEach(((index, packet) -> System.out.println(packet)));
 
         String path = "tmp/group.tps";
         PcapDumper dumper = captureNetworkInterface.handle.dumpOpen(path);
@@ -79,8 +78,8 @@ public class Dump {
 
         captureNetworkInterface.Start();
 
-        LinkedHashMap<PcapPacket, PacketExtraInformation> group1 = packetGroup.getPacketGroup();
-        group1.forEach(((packet, packetExtraInformation) -> System.out.println(packet)));
+        LinkedHashMap<Integer, PcapPacket> group1 = packetGroup.getPacketGroup();
+        group1.forEach(((index, packet) -> System.out.println(packet)));
 
         String path1 = "tmp/group1.tps";
         PcapDumper dumper1 = captureNetworkInterface.handle.dumpOpen(path1);
