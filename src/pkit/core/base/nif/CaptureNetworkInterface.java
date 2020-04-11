@@ -4,8 +4,8 @@ import org.pcap4j.core.*;
 import org.pcap4j.util.LinkLayerAddress;
 import pkit.core.base.config.CaptureFilterConfig;
 import pkit.core.base.config.CaptureNetworkInterfaceConfig;
-import pkit.core.base.packet.CapturePacketGroup;
-import pkit.core.base.packet.PacketGroup;
+import pkit.core.base.group.CapturePacketGroup;
+import pkit.core.base.group.PacketGroup;
 
 import java.io.EOFException;
 import java.net.Inet4Address;
@@ -50,8 +50,7 @@ public final class CaptureNetworkInterface implements NetworkInterface {
     private String logPath;
 
     // 统计信息
-    // 使用触发器自动更新
-    // todo: 考虑将下面的内容放置到其它的类中进行统一管理
+    // todo: 使用触发器自动更新，考虑将下面的内容放置到其它的类中进行统一管理
     public int sendPacketNumber = 0;  // 发送数据包总数, 指的是源 MAC 为本网卡的数据包
     public int receivePacketNumber = 0;  // 收到数据包总数, 指的是目的 MAC 为本网卡的数据包
     public int capturePacketNumber = 0;  // 捕获数据包总数, 在非嗅探模式下等于上面两字段的和
