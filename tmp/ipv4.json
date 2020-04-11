@@ -1,0 +1,1 @@
+{"length":20,"version":"4","ihl":5,"tos":0,"totalLength":701,"identification":-28899,"reservedFlag":false,"dontFragmentFlag":true,"moreFragmentFlag":false,"fragmentOffset":0,"ttl":55,"protocol":"6","headerChecksum":-4807,"srcAddr":"/125.39.132.162","dstAddr":"/192.168.2.114","options":[],"padding":""}

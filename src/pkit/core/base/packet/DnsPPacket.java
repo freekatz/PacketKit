@@ -1,6 +1,4 @@
 package pkit.core.base.packet;
 
-public class PacketMapping {
-
-
+public class DnsPPacket {
 }

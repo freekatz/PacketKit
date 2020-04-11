@@ -10,9 +10,9 @@ import java.util.concurrent.TimeoutException;
 public class CapturePacketGroup implements PacketGroup {
 
 
-    private LinkedHashMap<PcapPacket, PacketExtraInformation> onlinePacketGroup;
-    private LinkedHashMap<PcapPacket, PacketExtraInformation>  offlinePacketGroup;
-    private LinkedHashMap<PcapPacket, PacketExtraInformation> packetGroup;
+    private LinkedHashMap<Integer, PcapPacket> onlinePacketGroup;
+    private LinkedHashMap<Integer, PcapPacket>  offlinePacketGroup;
+    private LinkedHashMap<Integer, PcapPacket> packetGroup;
 
 
     private String id;
@@ -40,7 +40,9 @@ public class CapturePacketGroup implements PacketGroup {
     @Override
     public void Add(PcapPacket packet) {
         //  更新在线组
-        this.onlinePacketGroup.put(packet, null);
+        this.size++;
+        int index = this.size;
+        this.onlinePacketGroup.put(index, packet);
 
     }
 
@@ -51,8 +53,11 @@ public class CapturePacketGroup implements PacketGroup {
         while (true) {
             try {
                 PcapPacket packet = handle.getNextPacketEx();
-                if (bpfProgram.applyFilter(packet))
-                    this.offlinePacketGroup.put(packet, null);
+                if (bpfProgram.applyFilter(packet)) {
+                    this.size++;
+                    int index = this.size;
+                    this.offlinePacketGroup.put(index, packet);
+                }
             } catch (EOFException e) {
                 //  读取结束的工作
                 System.out.println("End of file");
@@ -75,6 +80,7 @@ public class CapturePacketGroup implements PacketGroup {
         this.onlinePacketGroup.clear();
         this.offlinePacketGroup.clear();  // 暂时清空
         this.packetGroup.clear();
+        this.size = 0;
 
     }
 
@@ -86,7 +92,7 @@ public class CapturePacketGroup implements PacketGroup {
 
     public void Dump(PcapDumper dumper) throws PcapNativeException, NotOpenException {
 
-        this.packetGroup.forEach(((packet, packetExtraInformation) -> {
+        this.packetGroup.forEach(((index, packet) -> {
             try {
                 dumper.dump(packet);
             } catch (NotOpenException e) {
@@ -99,7 +105,7 @@ public class CapturePacketGroup implements PacketGroup {
     }
 
 
-    public LinkedHashMap<PcapPacket, PacketExtraInformation> getPacketGroup() {
+    public LinkedHashMap<Integer, PcapPacket> getPacketGroup() {
         // 在线组会直接覆盖离线组的重复元素，因此顺便保证了不丢包
         this.packetGroup.putAll(this.offlinePacketGroup);
         this.packetGroup.putAll(this.onlinePacketGroup);

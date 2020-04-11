@@ -1,7 +1,8 @@
+
 .cz-config.js
 .commitlintrc.js
 
-
+tmp/
 *.pcap
 *.tps
 *.tp
