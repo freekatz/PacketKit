@@ -2,19 +2,9 @@ package pkit.core.base.packet;
 
 import org.pcap4j.core.*;
 import org.pcap4j.packet.*;
-import org.pcap4j.packet.namednumber.NamedNumber;
-import org.pcap4j.util.MacAddress;
-import pkit.util.JsonHandle;
 
-import java.io.EOFException;
-import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.concurrent.TimeoutException;
 
 public class PacketHandle {
     private PcapPacket packet;
@@ -51,50 +41,47 @@ public class PacketHandle {
         this.payloadLength = this.packet.getPayload().length();
         if (this.packet.contains(EthernetPacket.class)) {
             EthernetPPacket ethernetPPacket = new EthernetPPacket();
-            ethernetPPacket.Parse(this.packet);
+            this.ArrayHandle(ethernetPPacket);
             this.sourceMac = ethernetPPacket.getSrcAddr();
             this.destinationMac = ethernetPPacket.getDstAddr();
-            this.typeArrayList.add(ethernetPPacket.getType());
-            this.packetArrayList.add(ethernetPPacket);
             if (this.packet.contains(ArpPacket.class)) {
                 ArpPPacket arpPPacket = new ArpPPacket();
-                arpPPacket.Parse(this.packet);
+                this.ArrayHandle(arpPPacket);
                 this.sourceIp = arpPPacket.getSrcProtocolAddr();
                 this.destinationIp = arpPPacket.getDstProtocolAddr();
-                this.typeArrayList.add(arpPPacket.getProtocolType());
-                this.packetArrayList.add(arpPPacket);
             } else if (this.packet.contains(IpV4Packet.class)) {
                 Ipv4PPacket ipv4PPacket = new Ipv4PPacket();
-                ipv4PPacket.Parse(this.packet);
+                this.ArrayHandle(ipv4PPacket);
                 this.sourceIp = ipv4PPacket.getSrcAddr();
                 this.destinationIp = ipv4PPacket.getDstAddr();
-                this.typeArrayList.add(ipv4PPacket.getProtocol());
-                this.packetArrayList.add(ipv4PPacket);
                 if (this.packet.contains(UdpPacket.class)) {
                     UdpPPacket udpPPacket = new UdpPPacket();
-                    udpPPacket.Parse(this.packet);
-                    this.typeArrayList.add(udpPPacket.getSrcPort());
-                    this.typeArrayList.add(udpPPacket.getDstPort());
-                    this.packetArrayList.add(udpPPacket);
+                    this.ArrayHandle(udpPPacket);
+//                    if (this.packet.contains(DnsPacket.class)) {
+//                        DnsPPacket dnsPPacket = new DnsPPacket();
+//                        this.ArrayHandle(dnsPPacket);
+//                    }  // todo dns 实现
                 } else if (this.packet.contains(TcpPacket.class)) {
                     TcpPPacket tcpPPacket = new TcpPPacket();
-                    tcpPPacket.Parse(this.packet);
-                    this.typeArrayList.add(tcpPPacket.getSrcPort());
-                    this.typeArrayList.add(tcpPPacket.getDstPort());
-                    this.packetArrayList.add(tcpPPacket);
+                    this.ArrayHandle(tcpPPacket);
                 }  // todo 添加更多协议支持，icmpv4
             } else if (this.packet.contains(IpV6Packet.class)) {
                 Ipv6PPacket ipv6PPacket = new Ipv6PPacket();
-                ipv6PPacket.Parse(this.packet);
+                this.ArrayHandle(ipv6PPacket);
                 this.sourceIp = ipv6PPacket.getSrcAddr();
                 this.destinationIp = ipv6PPacket.getDstAddr();
-                this.typeArrayList.add(ipv6PPacket.getNextHeader());
-                this.packetArrayList.add(ipv6PPacket);
-
                 // todo 添加更多协议支持，icmpv6
             }
         }
     }
+
+    private void ArrayHandle(PPacket pPacket) {
+        pPacket.Parse(this.packet);
+        this.description = pPacket.description();  // todo 实现描述
+        this.typeArrayList.add(pPacket.name());
+        this.packetArrayList.add(pPacket);
+    }
+
 
     public Date getTimeStamp() {
         return timeStamp;

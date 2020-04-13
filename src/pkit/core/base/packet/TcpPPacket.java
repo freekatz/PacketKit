@@ -1,18 +1,30 @@
 package pkit.core.base.packet;
 
-import org.pcap4j.core.PcapPacket;
+import org.pcap4j.core.*;
 import org.pcap4j.packet.EthernetPacket;
+import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.TcpPacket;
+import org.pcap4j.packet.UdpPacket;
+import org.pcap4j.packet.namednumber.DataLinkType;
 import org.pcap4j.packet.namednumber.TcpPort;
+import pkit.util.JsonHandle;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
-public class TcpPPacket implements PPacket {
+public class TcpPPacket implements PPacket{
+    private TcpPacket.Builder builder;
+    private PcapHandle pcapHandle;
+    private JsonHandle jsonHandle;
+    private PcapDumper dumper;
+    private String packetPath;  // todo 设置默认路径
+    private String configPath;
+
     private String name;
     private int length;
-    private String srcPort;
-    private String dstPort;
+    private short srcPort;
+    private short dstPort;
     private int sequenceNumber;
     private int acknowledgmentNumber;
     private byte dataOffset;
@@ -26,20 +38,51 @@ public class TcpPPacket implements PPacket {
     private short window;
     private short checksum;
     private short urgentPointer;
-    private ArrayList<String> options;
+//    private ArrayList<String> options;
     private byte[] padding;
 
     @Override
+    public Packet.Builder builder() {
+        return this.builder;
+    }
+
+
+    @Override
+    public String name() {
+        return this.name;
+    }
+
+    @Override
     public void Initial() {
+        this.builder = new TcpPacket.Builder();
+        this.packetPath = "tmp/";
+        this.configPath = "tmp/";
+
         this.name = "tcp";
+        this.srcPort = 1080;
+        this.dstPort = 80;
+        this.sequenceNumber = 1;
+        this.acknowledgmentNumber = 1;
+        this.dataOffset = 20;
+        this.reserved = 0;
+        this.urg = false;
+        this.ack = false;
+        this.psh = false;
+        this.rst = false;
+        this.syn = true;
+        this.fin = false;
+        this.window = 10000;
+        this.checksum = 0;
+        this.urgentPointer = 0;
+        this.padding = new byte[0];
     }
 
     @Override
     public void Parse(PcapPacket pcapPacket) {
         TcpPacket.TcpHeader header = pcapPacket.get(TcpPacket.class).getHeader();
         this.length = header.length();
-        this.srcPort = header.getSrcPort().valueAsString();
-        this.dstPort = header.getDstPort().valueAsString();
+        this.srcPort = header.getSrcPort().value();
+        this.dstPort = header.getDstPort().value();
         this.sequenceNumber = header.getSequenceNumber();
         this.acknowledgmentNumber = header.getAcknowledgmentNumber();
         this.dataOffset = header.getDataOffset();
@@ -53,22 +96,63 @@ public class TcpPPacket implements PPacket {
         this.window = header.getWindow();
         this.checksum = header.getChecksum();
         this.urgentPointer = header.getUrgentPointer();
-        ArrayList<String> options = new ArrayList<>();
-        header.getOptions().forEach(opt -> {
-            options.add(opt.getKind().valueAsString());
-        });
+//        ArrayList<String> options = new ArrayList<>();
+//        header.getOptions().forEach(opt -> {
+//            options.add(opt.getKind().value());
+//        });
         this.padding = header.getPadding();
     }
 
     @Override
-    public PcapPacket Craft() {
+    public String description() {
         return null;
     }
 
     @Override
-    public void Dump(String path) {
+    public void CraftBuilder() {
+        this.builder.srcPort(TcpPort.getInstance(this.srcPort))
+                .dstPort(TcpPort.getInstance(dstPort))
+                .sequenceNumber(this.sequenceNumber)
+                .acknowledgmentNumber(this.acknowledgmentNumber)
+                .dataOffset(this.dataOffset)
+                .reserved(this.reserved)
+                .urg(this.urg)
+                .ack(this.ack)
+                .psh(this.psh)
+                .rst(this.rst)
+                .syn(this.syn)
+                .fin(this.fin)
+                .window(this.window)
+                .checksum(this.checksum)
+                .urgentPointer(this.urgentPointer)
+                .padding(this.padding)
+                .correctLengthAtBuild(true)
+                .correctChecksumAtBuild(true);
 
     }
+
+    @Override
+    public void CraftBuilder(Packet.Builder builder) {
+        this.CraftBuilder();
+        this.builder.payloadBuilder(builder);
+    }
+
+
+    @Override
+    public Packet CraftPacket() {
+        return this.builder.build();
+    }
+
+    @Override
+    public void Dump(String filename) throws PcapNativeException, NotOpenException, IOException {
+        this.pcapHandle = Pcaps.openDead(DataLinkType.EN10MB, 0);  // todo 链路类型自动适应
+        this.jsonHandle = new JsonHandle();
+        this.dumper = this.pcapHandle.dumpOpen(this.packetPath+filename+".pcap");
+
+        this.dumper.dump(this.builder.build());
+        this.jsonHandle.Object2Json(new File(this.configPath+filename+".json"), this);
+    }
+
 
     public byte[] getPadding() {
         return padding;
@@ -78,13 +162,13 @@ public class TcpPPacket implements PPacket {
         this.padding = padding;
     }
 
-    public ArrayList<String> getOptions() {
-        return options;
-    }
-
-    public void setOptions(ArrayList<String> options) {
-        this.options = options;
-    }
+//    public ArrayList<String> getOptions() {
+//        return options;
+//    }
+//
+//    public void setOptions(ArrayList<String> options) {
+//        this.options = options;
+//    }
 
     public short getUrgentPointer() {
         return urgentPointer;
@@ -190,19 +274,19 @@ public class TcpPPacket implements PPacket {
         this.sequenceNumber = sequenceNumber;
     }
 
-    public String getDstPort() {
+    public Short getDstPort() {
         return dstPort;
     }
 
-    public void setDstPort(String dstPort) {
+    public void setDstPort(Short dstPort) {
         this.dstPort = dstPort;
     }
 
-    public String getSrcPort() {
+    public Short getSrcPort() {
         return srcPort;
     }
 
-    public void setSrcPort(String srcPort) {
+    public void setSrcPort(Short srcPort) {
         this.srcPort = srcPort;
     }
 

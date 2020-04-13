@@ -1,41 +1,79 @@
 package pkit.core.base.packet;
 
-import org.pcap4j.core.PcapPacket;
+import org.pcap4j.core.*;
 import org.pcap4j.packet.ArpPacket;
+import org.pcap4j.packet.EthernetPacket;
+import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.namednumber.ArpHardwareType;
 import org.pcap4j.packet.namednumber.ArpOperation;
+import org.pcap4j.packet.namednumber.DataLinkType;
 import org.pcap4j.packet.namednumber.EtherType;
 import org.pcap4j.util.MacAddress;
+import pkit.util.JsonHandle;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
-public class ArpPPacket implements PPacket {
+public class ArpPPacket implements PPacket{
+    private ArpPacket.Builder builder;
+    private PcapHandle pcapHandle;
+    private JsonHandle jsonHandle;
+    private PcapDumper dumper;
+    private String packetPath;  // todo 设置默认路径
+    private String configPath;
+
     private String name;
     private int length;
-    private String hardwareType;
-    private String protocolType;
+    private Short hardwareType;
+    private Short protocolType;
     private byte hardwareAddrLength;
     private byte protocolAddrLength;
-    private String operation;
+    private Short operation;
     private String  srcHardwareAddr;
     private String srcProtocolAddr;
     private String dstHardwareAddr;
     private String dstProtocolAddr;
 
     @Override
+    public Packet.Builder builder() {
+        return this.builder;
+    }
+
+    @Override
+    public String name() {
+        return this.name;
+    }
+
+    @Override
     public void Initial() {
+        this.builder = new ArpPacket.Builder();
+        this.packetPath = "tmp/";
+        this.configPath = "tmp/";
+
         this.name = "arp";
+        this.length = 28;
+        this.hardwareType = ArpHardwareType.ETHERNET.value();
+        this.protocolType = EtherType.IPV4.value();
+        this.hardwareAddrLength = 6;
+        this.protocolAddrLength  = 4;
+        this.operation = ArpOperation.REQUEST.value();
+        this.srcHardwareAddr = "00:00:00:00:00:01";
+        this.srcProtocolAddr = "192.168.1.1";
+        this.dstHardwareAddr = MacAddress.ETHER_BROADCAST_ADDRESS.toString();
+        this.dstProtocolAddr = "192.168.1.0";
     }
 
     @Override
     public void Parse(PcapPacket pcapPacket) {
         ArpPacket.ArpHeader header = pcapPacket.get(ArpPacket.class).getHeader();
         this.length = header.length();
-        this.hardwareType = header.getHardwareType().valueAsString();
-        this.protocolType = header.getProtocolType().valueAsString();
+        this.hardwareType = header.getHardwareType().value();
+        this.protocolType = header.getProtocolType().value();
         this.hardwareAddrLength = header.getHardwareAddrLength();
         this.protocolAddrLength = header.getProtocolAddrLength();
-        this.operation = header.getOperation().valueAsString();
+        this.operation = header.getOperation().value();
         this.srcHardwareAddr = header.getSrcHardwareAddr().toString();
         this.srcProtocolAddr = header.getSrcProtocolAddr().getHostAddress();
         this.dstHardwareAddr = header.getDstHardwareAddr().toString();
@@ -43,14 +81,50 @@ public class ArpPPacket implements PPacket {
     }
 
     @Override
-    public PcapPacket Craft() {
+    public String description() {
         return null;
     }
 
-    @Override
-    public void Dump(String path) {
 
+    @Override
+    public void CraftBuilder() {
+        this.builder.hardwareType(ArpHardwareType.getInstance(this.hardwareType))
+                .protocolType(EtherType.getInstance(this.protocolType))
+                .hardwareAddrLength(this.hardwareAddrLength)
+                .protocolAddrLength(this.protocolAddrLength)
+                .operation(ArpOperation.getInstance(this.operation))
+                .srcHardwareAddr(MacAddress.getByName(this.srcHardwareAddr))
+                .dstHardwareAddr(MacAddress.getByName(this.dstHardwareAddr));
+        try {
+            this.builder.srcProtocolAddr(InetAddress.getByName(this.srcProtocolAddr))
+                    .dstProtocolAddr(InetAddress.getByName(this.dstProtocolAddr));
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
     }
+
+    @Override
+    public void CraftBuilder(Packet.Builder builder) {
+        this.CraftBuilder();
+        this.builder.payloadBuilder(builder);
+    }
+
+    @Override
+    public Packet CraftPacket() {
+        return this.builder.build();
+    }
+
+    @Override
+    public void Dump(String filename) throws PcapNativeException, NotOpenException, IOException {
+        this.pcapHandle = Pcaps.openDead(DataLinkType.EN10MB, 0);  // todo 链路类型自动适应
+        this.jsonHandle = new JsonHandle();
+        this.dumper = this.pcapHandle.dumpOpen(this.packetPath+filename+".pcap");
+
+        this.dumper.dump(this.builder.build());
+        this.jsonHandle.Object2Json(new File(this.configPath+filename+".json"), this);
+    }
+
+
 
     public String getDstProtocolAddr() {
         return dstProtocolAddr;
@@ -84,11 +158,11 @@ public class ArpPPacket implements PPacket {
         this.srcHardwareAddr = srcHardwareAddr;
     }
 
-    public String getOperation() {
+    public Short getOperation() {
         return operation;
     }
 
-    public void setOperation(String operation) {
+    public void setOperation(Short operation) {
         this.operation = operation;
     }
 
@@ -108,19 +182,19 @@ public class ArpPPacket implements PPacket {
         this.hardwareAddrLength = hardwareAddrLength;
     }
 
-    public String getProtocolType() {
+    public Short getProtocolType() {
         return protocolType;
     }
 
-    public void setProtocolType(String protocolType) {
+    public void setProtocolType(Short protocolType) {
         this.protocolType = protocolType;
     }
 
-    public String getHardwareType() {
+    public Short getHardwareType() {
         return hardwareType;
     }
 
-    public void setHardwareType(String hardwareType) {
+    public void setHardwareType(Short hardwareType) {
         this.hardwareType = hardwareType;
     }
 

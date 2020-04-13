@@ -1,22 +1,30 @@
 package pkit.core.base.packet;
 
-import org.pcap4j.core.PcapPacket;
-import org.pcap4j.packet.DnsPacket;
-import org.pcap4j.packet.DnsQuestion;
-import org.pcap4j.packet.DnsResourceRecord;
-import org.pcap4j.packet.IpV4Packet;
-import org.pcap4j.packet.namednumber.DnsOpCode;
-import org.pcap4j.packet.namednumber.DnsRCode;
+import org.pcap4j.core.*;
+import org.pcap4j.packet.*;
+import org.pcap4j.packet.namednumber.*;
+import org.pcap4j.util.MacAddress;
+import pkit.util.JsonHandle;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.List;
+// todo 改正 DNS
+public class DnsPPacket implements PPacket{
+    private DnsPacket.Builder builder;
+    private PcapHandle pcapHandle;
+    private JsonHandle jsonHandle;
+    private PcapDumper dumper;
+    private String packetPath;  // todo 设置默认路径
+    private String configPath;
 
-public class DnsPPacket implements PPacket {
     private String name;
     private int length;
     private short id;
     private boolean response;
-    private String opCode;
+    private byte opCode;
     private boolean authoritativeAnswer;
     private boolean truncated;
     private boolean recursionDesired;
@@ -24,19 +32,64 @@ public class DnsPPacket implements PPacket {
     private boolean reserved;
     private boolean authenticData;
     private boolean checkingDisabled;
-    private String rCode;
+    private byte rCode;
     private short qdCount;
     private short anCount;
     private short nsCount;
     private short arCount;
-    private ArrayList<String > questions;
-    private ArrayList<String> answers;
-    private ArrayList<String > authorities;
-    private ArrayList<String > additionalInfo;
+//    private ArrayList<ArrayList<String>> questions;
+//    private ArrayList<ArrayList<String>> answers;
+//    private ArrayList<ArrayList<String>> authorities;
+//    private ArrayList<ArrayList<String>> additionalInfo;
+
+    @Override
+    public Packet.Builder builder() {
+        return this.builder;
+    }
 
     @Override
     public void Initial() {
+        this.builder = new DnsPacket.Builder();
+        this.packetPath = "tmp/";
+        this.configPath = "tmp/";
+
         this.name = "dns";
+        this.length = 12;
+        this.id = 0x0001;
+        this.response = false;
+        this.opCode = 0;
+        this.authoritativeAnswer = false;
+        this.truncated = false;
+        this.recursionDesired = true;
+        this.recursionAvailable = false;
+        this.reserved = false;
+        this.authenticData = false;
+        this.checkingDisabled = false;
+        this.rCode = 0;
+        this.qdCount = 0;
+        this.anCount = 0;
+        this.nsCount = 0;
+        this.arCount = 0;
+//        this.questions = new ArrayList<>();
+//        ArrayList<String> domainNameArrayList = new ArrayList<>();
+//        domainNameArrayList.add("www.google.com");
+//        DnsDomainName.Builder dnsDomainNameBuilder = new DnsDomainName.Builder();
+//        dnsDomainNameBuilder.labels(domainNameArrayList);
+//        DnsDomainName qName = dnsDomainNameBuilder.build();
+//        DnsResourceRecordType qType = DnsResourceRecordType.A;
+//        DnsClass qClass = DnsClass.IN;
+//        DnsQuestion.Builder questionBuilder = new DnsQuestion.Builder();
+//        questionBuilder.qName(qName)
+//                .qType(qType)
+//                .qClass(qClass);
+//        this.questions.add(questionBuilder.build());
+        //  pass the last field
+
+    }
+
+    @Override
+    public String name() {
+        return this.name;
     }
 
     @Override
@@ -45,7 +98,7 @@ public class DnsPPacket implements PPacket {
         this.length = header.length();
         this.id = header.getId();
         this.response = header.isResponse();
-        this.opCode = header.getOpCode().valueAsString();
+        this.opCode = header.getOpCode().value();
         this.authoritativeAnswer = header.isAuthoritativeAnswer();
         this.truncated = header.isTruncated();
         this.recursionDesired = header.isRecursionDesired();
@@ -53,75 +106,99 @@ public class DnsPPacket implements PPacket {
         this.reserved = header.getReservedBit();
         this.authenticData = header.isAuthenticData();
         this.checkingDisabled = header.isCheckingDisabled();
-        this.rCode = header.getrCode().valueAsString();
+        this.rCode = header.getrCode().value();
         this.qdCount = header.getQdCount();
         this.anCount = header.getAnCount();
         this.nsCount = header.getNsCount();
         this.arCount = header.getArCount();
-        ArrayList<String> questions = new ArrayList<>();
-        header.getQuestions().forEach(qst -> {
-            questions.add(qst.getQClass().valueAsString());
-        });
-        this.questions = questions;
-        ArrayList<String> answers = new ArrayList<>();
-        header.getAnswers().forEach(asw -> {
-            answers.add(asw.getDataClass().valueAsString());
-        });
-        this.answers = answers;
-        ArrayList<String> authorities = new ArrayList<>();
-        header.getAuthorities().forEach(auth -> {
-            authorities.add(auth.getDataClass().valueAsString());
-        });
-        this.authorities = authorities;
-        ArrayList<String> additionalInfo = new ArrayList<>();
-        header.getAdditionalInfo().forEach(adi -> {
-            additionalInfo.add(adi.getDataClass().valueAsString());
-        });
-        this.additionalInfo = additionalInfo;
-
+//        this.questions = new ArrayList<>(header.getQuestions());
+//        this.answers = new ArrayList<>(header.getAnswers());
+//        this.authorities = new ArrayList<>(header.getAuthorities());
+//        this.additionalInfo = new ArrayList<>(header.getAdditionalInfo());
     }
 
     @Override
-    public PcapPacket Craft() {
+    public String description() {
         return null;
     }
 
     @Override
-    public void Dump(String path) {
+    public void CraftBuilder() {
+        this.builder.id(this.id)
+                .response(this.response)
+                .opCode(DnsOpCode.getInstance(this.opCode))
+                .authoritativeAnswer(this.authoritativeAnswer)
+                .truncated(this.truncated)
+                .recursionDesired(this.recursionDesired)
+                .recursionAvailable(this.recursionAvailable)
+                .reserved(this.reserved)
+                .authenticData(this.authenticData)
+                .checkingDisabled(this.checkingDisabled)
+                .rCode(DnsRCode.getInstance(this.rCode))
+                .qdCount(this.qdCount)
+                .anCount(this.anCount)
+                .nsCount(this.nsCount)
+                .arCount(this.arCount);
+//                .questions(this.questions)
+//                .answers(this.answers)
+//                .authorities(this.authorities)
+//                .additionalInfo(this.additionalInfo);
 
     }
 
-    public ArrayList<String> getAdditionalInfo() {
-        return additionalInfo;
+    @Override
+    public void CraftBuilder(Packet.Builder builder) {
+        this.CraftBuilder();
+        this.builder.payloadBuilder(builder);
     }
 
-    public void setAdditionalInfo(ArrayList<String> additionalInfo) {
-        this.additionalInfo = additionalInfo;
+
+    @Override
+    public Packet CraftPacket() {
+        return this.builder.build();
     }
 
-    public ArrayList<String> getAuthorities() {
-        return authorities;
-    }
+    @Override
+    public void Dump(String filename) throws PcapNativeException, NotOpenException, IOException {
+        this.pcapHandle = Pcaps.openDead(DataLinkType.EN10MB, 0);  // todo 链路类型自动适应
+        this.jsonHandle = new JsonHandle();
+        this.dumper = this.pcapHandle.dumpOpen(this.packetPath+filename+".pcap");
 
-    public void setAuthorities(ArrayList<String> authorities) {
-        this.authorities = authorities;
+        this.dumper.dump(this.builder.build());
+        this.jsonHandle.Object2Json(new File(this.configPath+filename+".json"), this);
     }
-
-    public ArrayList<String> getAnswers() {
-        return answers;
-    }
-
-    public void setAnswers(ArrayList<String> answers) {
-        this.answers = answers;
-    }
-
-    public ArrayList<String> getQuestions() {
-        return questions;
-    }
-
-    public void setQuestions(ArrayList<String> questions) {
-        this.questions = questions;
-    }
+//
+//    public ArrayList<DnsResourceRecord> getAdditionalInfo() {
+//        return additionalInfo;
+//    }
+//
+//    public void setAdditionalInfo(ArrayList<DnsResourceRecord> additionalInfo) {
+//        this.additionalInfo = additionalInfo;
+//    }
+//
+//    public ArrayList<DnsResourceRecord> getAuthorities() {
+//        return authorities;
+//    }
+//
+//    public void setAuthorities(ArrayList<DnsResourceRecord> authorities) {
+//        this.authorities = authorities;
+//    }
+//
+//    public ArrayList<DnsResourceRecord> getAnswers() {
+//        return answers;
+//    }
+//
+//    public void setAnswers(ArrayList<DnsResourceRecord> answers) {
+//        this.answers = answers;
+//    }
+//
+//    public ArrayList<DnsQuestion> getQuestions() {
+//        return questions;
+//    }
+//
+//    public void setQuestions(ArrayList<DnsQuestion> questions) {
+//        this.questions = questions;
+//    }
 
     public short getArCount() {
         return arCount;
@@ -155,11 +232,11 @@ public class DnsPPacket implements PPacket {
         this.qdCount = qdCount;
     }
 
-    public String getrCode() {
+    public Byte getrCode() {
         return rCode;
     }
 
-    public void setrCode(String rCode) {
+    public void setrCode(Byte rCode) {
         this.rCode = rCode;
     }
 
@@ -219,11 +296,11 @@ public class DnsPPacket implements PPacket {
         this.authoritativeAnswer = authoritativeAnswer;
     }
 
-    public String getOpCode() {
+    public Byte getOpCode() {
         return opCode;
     }
 
-    public void setOpCode(String opCode) {
+    public void setOpCode(Byte opCode) {
         this.opCode = opCode;
     }
 

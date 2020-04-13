@@ -4,6 +4,7 @@ import com.esotericsoftware.kryo.util.ObjectMap;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.jetbrains.annotations.NotNull;
 import pkit.core.base.config.Config;
+import pkit.core.base.packet.TcpPPacket;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +18,7 @@ public class JsonHandle {
         this.mapper.writeValue(jsonFile, object);
     }
 
-    public Object Json2Object(@NotNull File jsonFile, @NotNull Class<Object> clazz) throws IOException {
+    public Object Json2Object(@NotNull File jsonFile, @NotNull Class<TcpPPacket> clazz) throws IOException {
         return this.mapper.readValue(jsonFile, clazz);
     }
 }
