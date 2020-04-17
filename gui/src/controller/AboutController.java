@@ -1,4 +1,4 @@
 package controller;
 
-public class About {
+public class AboutController {
 }

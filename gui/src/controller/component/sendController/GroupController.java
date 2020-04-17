@@ -1,4 +1,4 @@
 package controller.component.sendController;
 
-public class Group {
+public class GroupController {
 }

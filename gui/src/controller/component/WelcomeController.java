@@ -1,4 +1,4 @@
-package controller.module;
+package controller.component;
 
-public class Welcome {
+public class WelcomeController {
 }

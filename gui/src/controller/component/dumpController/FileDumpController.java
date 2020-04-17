@@ -1,4 +1,4 @@
-package controller.module.dumpController;
+package controller.component.dumpController;
 
 public class FileDumpController {
 }

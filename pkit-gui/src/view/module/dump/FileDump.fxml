@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.scene.layout.AnchorPane?>
-
-
-<AnchorPane prefHeight="342.0" prefWidth="349.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pkit.gui.controller.module.dump.FileDump">
-
-</AnchorPane>

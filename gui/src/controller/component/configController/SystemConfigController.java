@@ -1,4 +1,4 @@
-package controller.module.configController;
+package controller.component.configController;
 
 public class SystemConfigController {
 

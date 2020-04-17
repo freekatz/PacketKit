@@ -1,6 +1,7 @@
 package controller;
 
-import controller.module.config.ConfigController;
+import controller.component.configController.ConfigController;
+import controller.component.configController.FilterConfigController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -13,7 +14,7 @@ import java.io.IOException;
 import java.net.URL;
 
 // TODO: 2020/4/16 系统界面文字国际化
-public class Setting {
+public class SettingController {
     private FXMLLoader loader;
 
     @FXML
@@ -37,14 +38,13 @@ public class Setting {
     @FXML
     ListView<Label> systemListView;
 
-    public Setting() {
+    public SettingController() {
 
     }
 
     public void initialize() {
         // 初始化操作
         // 在此处添加界面组件
-        this.loader = new FXMLLoader();
         this.InitializeNifListView();
         this.InitializeDumpListView();
         this.InitializeSystemListView();
@@ -97,8 +97,9 @@ public class Setting {
     @FXML
     private void OkButtonOnClicked() {
         System.out.println(okButton.getText());
-        ConfigController configController = this.loader.getController();
-        configController.dump();
+        FilterConfigController filterConfigController = this.loader.getController();
+        filterConfigController.dump();
+        System.out.println(filterConfigController.getConfig().toString());
     }
 
     @FXML
@@ -112,18 +113,18 @@ public class Setting {
         switch (id) {
             case "captureLabel":
                 System.out.println("capture");
-                this.UpdateContent("view/module/config/CaptureConfigView.fxml");
+                this.UpdateContent("view/component/configView/CaptureConfigView.fxml");
                 break;
             case "filterLabel":
-                this.UpdateContent("view/module/config/FilterConfig.fxml");
+                this.UpdateContent("view/component/configView/FilterConfigView.fxml");
                 System.out.println("filter");
                 break;
             case "sendLabel":
-                this.UpdateContent("view/module/config/SendNetworkInterfaceConfig.fxml");
+                this.UpdateContent("view/component/configView/SendConfigView.fxml");
                 System.out.println("send");
                 break;
             default:
-                this.UpdateContent("view/Blank.fxml");
+                this.UpdateContent("view/BlankView.fxml");
                 System.out.println("blank");
                 break;
         }
@@ -135,14 +136,14 @@ public class Setting {
         switch (id) {
             case "folderLabel":
                 System.out.println("folder");
-                this.UpdateContent("view/module/config/FolderConfig.fxml");
+                this.UpdateContent("view/component/configView/FolderConfigView.fxml");
                 break;
             case "dbLabel":
-                this.UpdateContent("view/module/config/DBConfig.fxml");
+                this.UpdateContent("view/component/configView/DBConfigView.fxml");
                 System.out.println("db");
                 break;
             default:
-                this.UpdateContent("view/Blank.fxml");
+                this.UpdateContent("view/BlankView.fxml");
                 System.out.println("blank");
                 break;
         }
@@ -154,20 +155,25 @@ public class Setting {
         switch (id) {
             case "systemLabel":
                 System.out.println("system");
-                this.UpdateContent("view/module/config/SystemConfig.fxml");
+                this.UpdateContent("view/component/configView/SystemConfigView.fxml");
                 break;
             case "otherLabel":
-                this.UpdateContent("view/module/config/OtherConfig.fxml");
+                this.UpdateContent("view/component/configView/OtherConfigView.fxml");
                 System.out.println("other");
                 break;
             default:
-                this.UpdateContent("view/Blank.fxml");
+                this.UpdateContent("view/BlankView.fxml");
                 System.out.println("blank");
                 break;
         }
     }
 
     private void UpdateContent(@NotNull String fxmlPath) throws IOException {
+        if (this.loader!=null && this.loader.getLocation().getPath().contains(fxmlPath)) {
+            System.out.println(this.loader.getLocation());
+            return;
+        }
+        this.loader = new FXMLLoader();
 
         URL url = this.loader.getClassLoader().getResource(fxmlPath);
 

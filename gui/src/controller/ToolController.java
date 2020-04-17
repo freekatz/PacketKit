@@ -4,11 +4,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
 
-public class Tool {
+public class ToolController {
     @FXML
     Label label;
 
-    public Tool() {
+    public ToolController() {
 
     }
 

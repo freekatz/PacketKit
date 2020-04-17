@@ -16,9 +16,9 @@ import java.net.URL;
 import java.util.Date;
 
 
-public class Index{
+public class IndexController {
 
-    public Index() {
+    public IndexController() {
 
     }
 

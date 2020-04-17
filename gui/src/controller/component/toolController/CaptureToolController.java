@@ -6,7 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
 
-public class CaptureTool {
+public class CaptureToolController {
 
     @FXML
     Button button;

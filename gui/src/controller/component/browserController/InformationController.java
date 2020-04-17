@@ -1,4 +1,4 @@
-package controller.component.bowlerController;
+package controller.component.browserController;
 
 public class InformationController {
 }

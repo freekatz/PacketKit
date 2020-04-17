@@ -1,7 +1,7 @@
 package controller;
 
-public class Blank {
-    public Blank() {
+public class BlankController {
+    public BlankController() {
 
     }
 

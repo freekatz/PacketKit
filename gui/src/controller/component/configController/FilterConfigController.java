@@ -1,4 +1,4 @@
-package controller.module.configController;
+package controller.component.configController;
 
 import config.CaptureFilterConfig;
 import javafx.collections.FXCollections;
@@ -48,6 +48,7 @@ public class FilterConfigController implements ConfigController {
         allLabel.setId("allLabel");
         ob.addAll(inLabel, outLabel, allLabel);
         directionComboBox.setItems(ob);
+        directionComboBox.setValue(allLabel);
 
     }
 
