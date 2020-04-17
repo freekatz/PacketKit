@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXCheckBox?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXTextArea?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
+
+<AnchorPane prefHeight="330.0" prefWidth="283.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pkit.gui.controller.module.config.CaptureNetworkInterfaceConfig">
+   <children>
+      <FlowPane layoutX="20.0" layoutY="18.0" prefHeight="298.0" prefWidth="231.0">
+         <children>
+            <JFXTextField prefHeight="23.0" prefWidth="241.0" />
+            <JFXTextField prefHeight="23.0" prefWidth="241.0" />
+            <JFXTextField prefHeight="23.0" prefWidth="242.0" />
+            <JFXTextField prefHeight="23.0" prefWidth="241.0" />
+            <JFXTextField prefHeight="23.0" prefWidth="243.0" />
+            <JFXCheckBox />
+            <JFXCheckBox />
+            <JFXCheckBox />
+            <JFXCheckBox />
+            <JFXTextArea prefHeight="70.0" prefWidth="237.0" />
+            <JFXComboBox prefHeight="31.0" prefWidth="244.0" />
+            <JFXButton />
+            <JFXButton />
+         </children>
+      </FlowPane>
+   </children>
+</AnchorPane>
