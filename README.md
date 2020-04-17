@@ -1,7 +1,7 @@
 
 <p align="center">
   <a href="https://github.com/1uvu/pkit" target="_blank">
-    <img src="./res/logo.png" alt="Packet Kit Logo" width=72 height=72>
+    <img src="src/main/resources/logo.png" alt="Packet Kit Logo" width=72 height=72>
   </a>
   <h3 align="center">PKit(Packet Kit)</h3>
   <p align="center">
@@ -95,7 +95,7 @@
 
 3. 如何优雅地实现及控制捕获过程？
 
-   > 答：我选择将捕获这一抽象的操作实例化为网络接口，因此捕获操作的实现就转化为网络接口对象及操作的实现；此外，为了更好地描述和控制捕获过程，我引入了网卡（网络接口）生命周期的概念，如下图，具体介绍可查看文档：[网卡生命周期](uml/网卡生命周期.pdf)
+   > 答：我选择将捕获这一抽象的操作实例化为网络接口，因此捕获操作的实现就转化为网络接口对象及操作的实现；此外，为了更好地描述和控制捕获过程，我引入了网卡（网络接口）生命周期的概念，如下图，具体介绍可查看文档：[网卡生命周期](doc/uml/网卡生命周期.pdf)
 
    ![nif-life](res/README/nif-live.png)
 
@@ -127,7 +127,7 @@
 
 6. 网络接口、数据包和数据包组之间的关系是怎样的？
 
-   > 答：如下图，具体介绍可查看文档：[数据包、数据包组与网卡关系图](uml/数据包、数据包组与网卡关系图.pdf)
+   > 答：如下图，具体介绍可查看文档：[数据包、数据包组与网卡关系图](doc/uml/数据包、数据包组与网卡关系图.pdf)
 
    ![nif-p-pg.png](res/README/nif-p-pg.png)
 
@@ -137,7 +137,7 @@
    >
    > 1）优先实现通用及常用的协议：Ethernet、ARP、IPv4、IPv6、TCP、UDP、ICMPv4、ICMPv6、DNS 等
    >
-   > 2）按照协议树的分支逻辑来处理每一个未知的数据包（此逻辑同样适用于数据包构造过程），初级的协议树如下图所示，具体介绍可查看文档：[协议树形图](uml/协议树形图.pdf)
+   > 2）按照协议树的分支逻辑来处理每一个未知的数据包（此逻辑同样适用于数据包构造过程），初级的协议树如下图所示，具体介绍可查看文档：[协议树形图](doc/uml/协议树形图.pdf)
 
    ![protocol-tree](res/README/protocol-tree.png)
 
