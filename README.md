@@ -1,7 +1,7 @@
 
 <p align="center">
   <a href="https://github.com/1uvu/pkit" target="_blank">
-    <img src="src/main/res/logo.png" alt="Packet Kit Logo" width=72 height=72>
+    <img src="res/logo.png" alt="Packet Kit Logo" width=72 height=72>
   </a>
   <h3 align="center">PKit(Packet Kit)</h3>
   <p align="center">
