@@ -1,10 +1,9 @@
 package packet;
 
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.pcap4j.core.*;
 import org.pcap4j.packet.*;
 import org.pcap4j.packet.namednumber.*;
-import org.pcap4j.util.MacAddress;
-import util.JsonHandle;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,7 +12,7 @@ import java.io.IOException;
 public class DnsPPacket implements PPacket{
     private DnsPacket.Builder builder;
     private PcapHandle pcapHandle;
-    private JsonHandle jsonHandle;
+    private JsonMapper jsonMapper;
     private PcapDumper dumper;
     private String packetPath;  // todo 设置默认路径
     private String configPath;
@@ -159,11 +158,11 @@ public class DnsPPacket implements PPacket{
     @Override
     public void Dump(String filename) throws PcapNativeException, NotOpenException, IOException {
         this.pcapHandle = Pcaps.openDead(DataLinkType.EN10MB, 0);  // todo 链路类型自动适应
-        this.jsonHandle = new JsonHandle();
+        this.jsonMapper = new JsonMapper();
         this.dumper = this.pcapHandle.dumpOpen(this.packetPath+filename+".pcap");
 
         this.dumper.dump(this.builder.build());
-        this.jsonHandle.Object2Json(new File(this.configPath+filename+".json"), this);
+        this.jsonMapper.writeValue(new File(this.configPath+filename+".json"), this);
     }
 //
 //    public ArrayList<DnsResourceRecord> getAdditionalInfo() {

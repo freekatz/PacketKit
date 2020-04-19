@@ -25,6 +25,8 @@ public class CaptureNetworkInterfaceConfig implements Config, Cloneable{
     private PcapHandle.TimestampPrecision timestampPrecision;
     private NetworkInterfaceMode.ImmediateMode immediateMode;
 
+    private CaptureFilterConfig filterConfig;
+
 
 
     @Override
@@ -38,6 +40,8 @@ public class CaptureNetworkInterfaceConfig implements Config, Cloneable{
         this.rfmonMode = NetworkInterfaceMode.RfmonMode.NoRfmonMode;  // todo 需检测是否是无线网卡及是否支持
         this.timestampPrecision = PcapHandle.TimestampPrecision.MICRO;  // todo 需检测平台是否支持
         this.immediateMode = NetworkInterfaceMode.ImmediateMode.ImmediateMode;
+        this.filterConfig = new CaptureFilterConfig();
+        this.filterConfig.Initial();
     }
 
     @Override
@@ -124,9 +128,17 @@ public class CaptureNetworkInterfaceConfig implements Config, Cloneable{
         return immediateMode;
     }
 
+    public CaptureFilterConfig getFilterConfig() {
+        return filterConfig;
+    }
+
+    public void setFilterConfig(CaptureFilterConfig filterConfig) {
+        this.filterConfig = filterConfig;
+    }
+
     @Override
     public String toString() {
-        return "NetworkInterfaceConfig{" +
+        return "CaptureNetworkInterfaceConfig{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", comment='" + comment + '\'' +
@@ -139,6 +151,7 @@ public class CaptureNetworkInterfaceConfig implements Config, Cloneable{
                 ", rfmonMode=" + rfmonMode +
                 ", timestampPrecision=" + timestampPrecision +
                 ", immediateMode=" + immediateMode +
+                ", filterConfig=" + filterConfig +
                 '}';
     }
 }

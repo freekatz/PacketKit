@@ -1,0 +1,1 @@
+{"id":0,"name":"c1","comment":"test c1","timestamp":"2020-04-19 20:45:20","count":1,"snapshotLength":65536,"timeoutMillis":1000,"bufferSize":1000,"promiscuousMode":"PROMISCUOUS","rfmonMode":"RfmonMode","timestampPrecision":"MICRO","immediateMode":"ImmediateMode","filterConfig":{"id":0,"name":"f6","filter":"tcp","comment":"f6","timestamp":1587292705718,"direction":"INOUT"}}

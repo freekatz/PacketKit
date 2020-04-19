@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+
+<AnchorPane prefHeight="556.0" prefWidth="692.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.StartCapture">
+    <children>
+        <MenuBar layoutY="2.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <menus>
+                <Menu mnemonicParsing="false" text="File">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="Close" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Edit">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="Delete" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Help">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+        <ToolBar layoutY="27.0" prefHeight="19.0" prefWidth="372.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="20.0">
+            <items>
+                <Button mnemonicParsing="false" text="Button" />
+            </items>
+        </ToolBar>
+        <SplitPane dividerPositions="0.34057971014492755" layoutY="60.0" prefHeight="415.0" prefWidth="715.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="50.0">
+            <items>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                    <children>
+                        <SplitPane dividerPositions="0.6701612903225806" layoutY="208.0" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <items>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="254.0" prefWidth="205.0">
+                                    <children>
+                                      <ScrollPane prefHeight="301.0" prefWidth="212.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                        <content>
+                                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="296.0" prefWidth="216.0">
+                                                <CheckBox fx:id="offline" layoutX="15.0" layoutY="4.0" mnemonicParsing="false" text="Offline" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0" />
+                                                <ComboBox fx:id="nif" layoutX="58.0" layoutY="24.0" prefHeight="23.0" prefWidth="144.0" AnchorPane.rightAnchor="5.0" />
+                                                <Label layoutX="14.0" layoutY="28.0" text="NIF" AnchorPane.leftAnchor="5.0" />
+                                                <Label layoutX="10.0" layoutY="54.0" text="Pcap" AnchorPane.leftAnchor="5.0" />
+                                                <Label layoutX="-1.0" layoutY="107.0" text="Length" AnchorPane.leftAnchor="5.0" />
+                                                <Label layoutX="1.0" layoutY="80.0" text="Count" AnchorPane.leftAnchor="5.0" />
+                                                <Label layoutX="1.0" layoutY="135.0" text="Timeout" AnchorPane.leftAnchor="5.0" />
+                                                <Label layoutX="5.0" layoutY="161.0" text="Buffer" AnchorPane.leftAnchor="5.0" />
+                                                <CheckBox fx:id="promiscuous" layoutX="10.0" layoutY="184.0" mnemonicParsing="false" text="Promiscuous" AnchorPane.leftAnchor="10.0" />
+                                                <CheckBox fx:id="rfmon" layoutX="110.0" layoutY="184.0" mnemonicParsing="false" text="RfMon" AnchorPane.leftAnchor="110.0" AnchorPane.rightAnchor="30.0" />
+                                                <CheckBox fx:id="precision" layoutX="8.0" layoutY="200.0" mnemonicParsing="false" text="Precision" AnchorPane.leftAnchor="10.0" />
+                                                <CheckBox fx:id="immediate" layoutX="110.0" layoutY="200.0" mnemonicParsing="false" text="Immediate" AnchorPane.leftAnchor="110.0" AnchorPane.rightAnchor="10.0" />
+                                                <Label layoutX="5.0" layoutY="230.0" text="Filter" AnchorPane.leftAnchor="5.0" />
+                                                <TextField fx:id="count" layoutX="66.0" layoutY="76.0" prefHeight="22.0" prefWidth="145.0" AnchorPane.rightAnchor="5.0" />
+                                                <TextField fx:id="pcap" layoutX="58.0" layoutY="50.0" prefHeight="22.0" prefWidth="145.0" AnchorPane.rightAnchor="5.0" />
+                                                <TextField fx:id="length" layoutX="65.0" layoutY="103.0" prefHeight="22.0" prefWidth="145.0" AnchorPane.rightAnchor="5.0" />
+                                                <TextField fx:id="timeout" layoutX="66.0" layoutY="131.0" prefHeight="22.0" prefWidth="145.0" AnchorPane.rightAnchor="5.0" />
+                                                <TextField fx:id="buffer" layoutX="65.0" layoutY="157.0" prefHeight="22.0" prefWidth="145.0" AnchorPane.rightAnchor="5.0" />
+                                                <TextField fx:id="filter" layoutX="65.0" layoutY="226.0" prefHeight="2.0" prefWidth="145.0" AnchorPane.rightAnchor="5.0" />
+                                                <ComboBox fx:id="diretion" layoutX="61.0" layoutY="257.0" prefHeight="23.0" prefWidth="145.0" AnchorPane.rightAnchor="5.0" />
+                                                <Label layoutX="4.0" layoutY="261.0" text="Direction" AnchorPane.leftAnchor="5.0" />
+                                            </AnchorPane>
+                                        </content>
+                                      </ScrollPane>
+                                        <HBox layoutX="-1.0" layoutY="301.0" prefHeight="30.0" prefWidth="212.0" spacing="30.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                            <Button fx:id="saveButton" layoutX="10.0" layoutY="248.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="60.0" text="Save" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" />
+                                            <Button fx:id="applyButton" layoutX="81.0" layoutY="245.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="60.0" text="Apply" AnchorPane.bottomAnchor="5.666666666666686" />
+                                            <Button fx:id="startButton" layoutX="141.0" layoutY="248.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="60.0" text="Start" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="10.0" />
+                                        </HBox>
+                            </children>
+                                </AnchorPane>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                                    <children>
+                                        <ScrollPane layoutX="-41.0" layoutY="-55.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <content>
+                                                <TableView fx:id="statTable" prefHeight="116.0" prefWidth="157.0" />
+                                            </content>
+                                        </ScrollPane>
+                                    </children>
+                                </AnchorPane>
+                            </items>
+                        </SplitPane>
+                    </children>
+                </AnchorPane>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="415.0" prefWidth="475.0">
+                    <children>
+                        <SplitPane dividerPositions="0.5903225806451613" layoutX="16.0" layoutY="14.0" orientation="VERTICAL" prefHeight="415.0" prefWidth="475.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <items>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="218.0" prefWidth="489.0">
+                                    <children>
+                                        <ScrollPane layoutX="25.0" layoutY="7.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <content>
+                                                <TableView fx:id="packetTable" prefHeight="223.0" prefWidth="383.0" />
+                                            </content>
+                                        </ScrollPane>
+                                    </children>
+                                </AnchorPane>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="492.0">
+                                    <children>
+                                        <SplitPane dividerPositions="0.4309623430962343" layoutX="14.0" layoutY="3.0" prefHeight="160.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <items>
+                                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                                    <children>
+                                                        <ScrollPane layoutX="-16.0" layoutY="-29.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                            <content>
+                                                                <TreeView fx:id="headerTree" prefHeight="153.0" prefWidth="185.0" />
+                                                            </content>
+                                                        </ScrollPane>
+                                                    </children>
+                                                </AnchorPane>
+                                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                                    <children>
+                                                        <ScrollPane fx:id="packetContent" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                    </children>
+                                                </AnchorPane>
+                                            </items>
+                                        </SplitPane>
+                                    </children>
+                                </AnchorPane>
+                            </items>
+                        </SplitPane>
+                    </children>
+                </AnchorPane>
+            </items>
+        </SplitPane>
+    </children>
+</AnchorPane>

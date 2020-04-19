@@ -89,9 +89,8 @@ public final class CaptureNetworkInterface implements NetworkInterface {
         this.stop = true;
 
         this.captureNetworkInterfaceConfig = new CaptureNetworkInterfaceConfig();
-        this.captureFilterConfig = new CaptureFilterConfig();
         this.captureNetworkInterfaceConfig.Initial();
-        this.captureFilterConfig.Initial();
+        this.captureFilterConfig = this.captureNetworkInterfaceConfig.getFilterConfig();
 
         this.sendPacketNumber = 0;
         this.receivePacketNumber = 0;
