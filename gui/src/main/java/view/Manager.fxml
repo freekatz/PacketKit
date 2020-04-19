@@ -8,11 +8,10 @@
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Manager">
+<AnchorPane prefHeight="414.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Manager">
    <children>
       <TabPane layoutY="39.0" prefHeight="236.0" prefWidth="355.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
         <tabs>
@@ -23,16 +22,16 @@
           </Tab>
           <Tab text="Capture">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="373.0" prefWidth="600.0">
                      <children>
-                         <VBox layoutX="500.0" layoutY="50.0" prefHeight="201.0" prefWidth="31.0" AnchorPane.bottomAnchor="100.0" AnchorPane.rightAnchor="70.0" AnchorPane.topAnchor="50.0">
+                         <VBox layoutX="500.0" layoutY="50.0" prefHeight="200.0" prefWidth="30.0" AnchorPane.bottomAnchor="100.0" AnchorPane.rightAnchor="70.0" AnchorPane.topAnchor="50.0">
                              <children>
-                                 <Button fx:id="captureAddButton" mnemonicParsing="false" prefHeight="29.0" prefWidth="39.0" text="+" />
-                                 <Button fx:id="captureDeleteButton" mnemonicParsing="false" prefHeight="31.0" prefWidth="33.0" text="-" />
+                                 <Button fx:id="captureAddButton" mnemonicParsing="false" onAction="#CaptureAddButtonOnClicked" prefHeight="29.0" prefWidth="39.0" text="+" />
+                                 <Button fx:id="captureDeleteButton" mnemonicParsing="false" onAction="#CaptureDeleteButtonOnClicked" prefHeight="31.0" prefWidth="33.0" text="-" />
                              </children>
                          </VBox>
-                         <Button fx:id="captureStartButton" layoutX="503.0" layoutY="293.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="67.0" text="Start" AnchorPane.bottomAnchor="30.0" AnchorPane.rightAnchor="50.0" />
-                         <TableView fx:id="captureConfigTable" layoutX="300.0" layoutY="50.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0" AnchorPane.topAnchor="50.0" />
+                         <Button fx:id="captureStartButton" layoutX="503.0" layoutY="293.0" mnemonicParsing="false" onAction="#CaptureStartButtonOnClicked" prefHeight="36.0" prefWidth="67.0" text="Start" AnchorPane.bottomAnchor="30.0" AnchorPane.rightAnchor="50.0" />
+                         <TableView fx:id="captureConfigTable" fixedCellSize="1.0" prefHeight="200.0" prefWidth="389.0" tableMenuButtonVisible="true" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0" AnchorPane.topAnchor="50.0" />
                      </children>
               </AnchorPane>
             </content>
@@ -41,11 +40,11 @@
              <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Button fx:id="sendStartButton" layoutX="466.0" layoutY="280.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="67.0" text="Start" AnchorPane.bottomAnchor="30.0" AnchorPane.rightAnchor="50.0" />
+                        <Button fx:id="sendStartButton" layoutX="466.0" layoutY="280.0" mnemonicParsing="false" onAction="#SendStartButtonOnClicked" prefHeight="36.0" prefWidth="67.0" text="Start" AnchorPane.bottomAnchor="30.0" AnchorPane.rightAnchor="50.0" />
                         <VBox layoutX="500.0" layoutY="49.0" prefHeight="201.0" prefWidth="31.0" AnchorPane.bottomAnchor="100.0" AnchorPane.rightAnchor="70.0" AnchorPane.topAnchor="50.0">
                            <children>
-                              <Button fx:id="sendAddButton" mnemonicParsing="false" prefHeight="29.0" prefWidth="39.0" text="+" />
-                              <Button fx:id="sendDeleteButton" mnemonicParsing="false" prefHeight="31.0" prefWidth="33.0" text="-" />
+                              <Button fx:id="sendAddButton" mnemonicParsing="false" onAction="#SendAddButtonOnClicked" prefHeight="29.0" prefWidth="39.0" text="+" />
+                              <Button fx:id="sendDeleteButton" mnemonicParsing="false" onAction="#SendDeleteButtonOnClicked" prefHeight="31.0" prefWidth="33.0" text="-" />
                            </children>
                         </VBox>
                         <TableView fx:id="sendConfigTable" layoutX="215.0" layoutY="23.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="100.66666666666669" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0" AnchorPane.topAnchor="50.0" />
@@ -58,11 +57,7 @@
                      <children>
                         <SplitPane dividerPositions="0.2140468227424749" layoutX="7.0" prefHeight="299.0" prefWidth="461.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <items>
-                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                                 <children>
-                                    <TreeView fx:id="helpTreeView" layoutX="-54.0" layoutY="-18.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                 </children>
-                              </AnchorPane>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
                           </items>
                         </SplitPane>

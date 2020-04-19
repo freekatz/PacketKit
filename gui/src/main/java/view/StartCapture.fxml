@@ -53,7 +53,7 @@
                                       <ScrollPane prefHeight="301.0" prefWidth="212.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                         <content>
                                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="296.0" prefWidth="216.0">
-                                                <CheckBox fx:id="offline" layoutX="15.0" layoutY="4.0" mnemonicParsing="false" text="Offline" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0" />
+                                                <CheckBox fx:id="offline" layoutX="15.0" layoutY="4.0" mnemonicParsing="false" onAction="#OfflineChecked" text="Offline" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0" />
                                                 <ComboBox fx:id="nif" layoutX="58.0" layoutY="24.0" prefHeight="23.0" prefWidth="144.0" AnchorPane.rightAnchor="5.0" />
                                                 <Label layoutX="14.0" layoutY="28.0" text="NIF" AnchorPane.leftAnchor="5.0" />
                                                 <Label layoutX="10.0" layoutY="54.0" text="Pcap" AnchorPane.leftAnchor="5.0" />
@@ -72,7 +72,7 @@
                                                 <TextField fx:id="timeout" layoutX="66.0" layoutY="131.0" prefHeight="22.0" prefWidth="145.0" AnchorPane.rightAnchor="5.0" />
                                                 <TextField fx:id="buffer" layoutX="65.0" layoutY="157.0" prefHeight="22.0" prefWidth="145.0" AnchorPane.rightAnchor="5.0" />
                                                 <TextField fx:id="filter" layoutX="65.0" layoutY="226.0" prefHeight="2.0" prefWidth="145.0" AnchorPane.rightAnchor="5.0" />
-                                                <ComboBox fx:id="diretion" layoutX="61.0" layoutY="257.0" prefHeight="23.0" prefWidth="145.0" AnchorPane.rightAnchor="5.0" />
+                                                <ComboBox fx:id="direction" layoutX="61.0" layoutY="257.0" prefHeight="23.0" prefWidth="145.0" AnchorPane.rightAnchor="5.0" />
                                                 <Label layoutX="4.0" layoutY="261.0" text="Direction" AnchorPane.leftAnchor="5.0" />
                                             </AnchorPane>
                                         </content>
@@ -86,11 +86,7 @@
                                 </AnchorPane>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                                     <children>
-                                        <ScrollPane layoutX="-41.0" layoutY="-55.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <content>
-                                                <TableView fx:id="statTable" prefHeight="116.0" prefWidth="157.0" />
-                                            </content>
-                                        </ScrollPane>
+                                          <TableView fx:id="statTable" fixedCellSize="1.0" prefHeight="116.0" prefWidth="157.0" tableMenuButtonVisible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                     </children>
                                 </AnchorPane>
                             </items>
@@ -103,11 +99,7 @@
                             <items>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="218.0" prefWidth="489.0">
                                     <children>
-                                        <ScrollPane layoutX="25.0" layoutY="7.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <content>
-                                                <TableView fx:id="packetTable" prefHeight="223.0" prefWidth="383.0" />
-                                            </content>
-                                        </ScrollPane>
+                                          <TableView fx:id="packetTable" fixedCellSize="1.0" prefHeight="223.0" prefWidth="383.0" tableMenuButtonVisible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                     </children>
                                 </AnchorPane>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="492.0">

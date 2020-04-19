@@ -1,4 +1,4 @@
-package controller.single;
+package bak.controller.single;
 
 public class BlankController {
     public BlankController() {

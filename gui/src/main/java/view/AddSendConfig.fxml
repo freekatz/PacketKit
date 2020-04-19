@@ -15,8 +15,8 @@
         <Label layoutX="152.0" layoutY="56.0" text="Name" AnchorPane.leftAnchor="80.0" />
         <Label layoutX="77.0" layoutY="96.0" text="Comment" AnchorPane.leftAnchor="80.0" />
         <Label layoutX="79.0" layoutY="291.0" text="DstNIF" AnchorPane.leftAnchor="80.0" />
-        <Button fx:id="okButton" layoutX="347.0" layoutY="319.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="65.0" text="Ok" AnchorPane.bottomAnchor="50.0" AnchorPane.rightAnchor="50.0" />
-        <Button fx:id="cancelButton" layoutX="268.0" layoutY="312.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="65.0" text="Cancel" AnchorPane.bottomAnchor="50.0" AnchorPane.rightAnchor="120.0" />
+        <Button fx:id="okButton" layoutX="347.0" layoutY="319.0" mnemonicParsing="false" onAction="#okButtonOnClicked" prefHeight="38.0" prefWidth="65.0" text="Ok" AnchorPane.bottomAnchor="50.0" AnchorPane.rightAnchor="50.0" />
+        <Button fx:id="cancelButton" layoutX="268.0" layoutY="312.0" mnemonicParsing="false" onAction="#cancelButtonOnClicked" prefHeight="38.0" prefWidth="65.0" text="Cancel" AnchorPane.bottomAnchor="50.0" AnchorPane.rightAnchor="120.0" />
       <Label layoutX="82.0" layoutY="190.0" text="Count" AnchorPane.leftAnchor="80.0" />
       <Label layoutX="82.0" layoutY="221.0" text="Retry" AnchorPane.leftAnchor="80.0" />
       <Label layoutX="82.0" layoutY="254.0" text="Timeout" AnchorPane.leftAnchor="80.0" />

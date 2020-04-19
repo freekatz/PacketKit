@@ -1,4 +1,4 @@
-package controller.component.toolController;
+package bak.controller.component.toolController;
 
 // 捕获时顶部的工具栏
 import javafx.fxml.FXML;

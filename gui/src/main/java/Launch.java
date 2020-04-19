@@ -3,6 +3,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import util.ConfigHandle;
 
 import java.net.URL;
 
@@ -24,4 +25,5 @@ public class Launch extends Application {
         stage.setScene(scene);
         stage.show();
     }
+
 }

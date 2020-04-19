@@ -1,0 +1,108 @@
+gradle文件夹 存放gradle wrapper相关文件；
+build.gradle相当于maven里面的pom.xml；
+setting.gradle用于多模块的配置。
+
+gradle wrapper是gradle项目构建工具，它能在本地没有gradle的情况下，
+从远程下载gradle并自动解压缩以构建项目，自动管理gradle版本。
+gradle-wrapper.properties是gradle wrapper的配置，
+distributionUrl指定本地没有配置gradle的情况下从哪下载gradle，
+distributionBase指定gradle下载和缓存jar的根目录，默认用户目录。
+
+在实际使用中我们一般不直接使用gradle，而是使用gradle wrapper,
+而对于idea而言我们可以不去关心两者区别，idea的gradle环境是基于gradle wrapper的
+
+gradle:
+    gradle wrapper: 项目构建工具，自动配置 gradle 环境
+        gradle-wrapper.properties: wrapper 的配置文件，可配置如 gradle 的版本
+        gradle 目录: 存放 gradle wrapper 相关文件
+
+    build.gradle: 相当于 maven 中的 pom.xml，包含项目构建所使用的脚本
+        plugins {
+            id 'java' // id «plugin id» version «plugin version» [apply «false»]
+        }
+        group 'com.muggle'
+        version '1.0-SNAPSHOT'
+        sourceCompatibility = 1.8 // jdk version
+        repositories {
+            // mavenCentral()代表中央仓库，也可以用maven{url <url>}的方式添加一个仓库
+            // mavenCentral()
+            maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
+        }
+        dependencies {
+            // 依赖的坐标集合
+            testCompile group: 'junit', name: 'junit', version: '4.12'
+        }
+        项目依赖的格式为作用范修饰符 'groupId:artifactId:version'，作用范围修饰符包括
+
+        complie：编译范围依赖在所有的 classpath 中可用，同时它们也会被打包，这个是最常用的
+        runtime：runtime 依赖在运行和测试系统的时候需要，但在编译的时候不需要。
+        testComplie：测试期编译需要的附加依赖
+        testRuntime：测试运行期需要
+
+    settings.gradle: 多模块配置文件，将包含必要的一些设置，例如任务或项目之间的依赖关系等
+
+    gradlew: 构建命令文件，分为 unix 和 windows
+
+    task: gradle中的任务，包括任务动作(task action)和任务依赖(task dependency)。
+        task代表细分的下来的构建任务：编译classes、生成jar包相关信息等一些任务。
+        所以我们能编写task来控制打包过程。
+        task和task之间也存在依赖关系，通过task dependency来指定。
+        其实build指令本质就是执行各个task，
+        在做protobuf开发的时候，
+        可以通过配置task来在指定指定位置生成对应的java代码。
+
+gradle 多模块配置:
+    在父模块中有一个settings.gradle文件，指定了子模块包含哪些，
+    而需要继承给子模块的东西需要在父模块build.gradle中配置 sub projects 闭包。
+    build.gradle:
+        plugins {
+            id 'java'
+        }
+        group 'com.muggle'
+        version '1.0-SNAPSHOT'
+        sourceCompatibility = 1.8
+        repositories {
+            mavenCentral()
+        }
+        subprojects {
+            apply plugin: 'java'
+            apply plugin: 'idea'
+
+            version = '1.0'
+            // JVM 版本号要求
+            sourceCompatibility = 1.8
+            targetCompatibility = 1.8
+            // java编译的时候缺省状态下会因为中文字符而失败
+            [compileJava,compileTestJava,javadoc]*.options*.encoding = 'UTF-8'
+            //相当于maven的properties
+            ext {
+                springVersion = '4.3.3.RELEASE'
+            }
+            repositories {
+                mavenCentral()
+            }
+            dependencies {
+                // 通用依赖
+                compile(
+                        "org.springframework:spring-context:$springVersion",
+                        "org.springframework:spring-orm:$springVersion",
+                )
+                // 依赖maven中不存在的jar
+                ext.jarTree = fileTree(dir: 'libs', include: '**/*.jar')
+                // 测试依赖
+                testCompile(
+                        "org.springframework:spring-test:$springVersion",
+                        "junit:junit:4.12"
+                )
+            }
+            // 显示当前项目下所有用于 compile 的 jar.
+            task listJars(description: 'Display all compile jars.') << {
+                configurations.compile.each { File file -> println file.name }
+            }
+        }
+
+    settings.gradle:
+        dependencies{
+            // 这个子模块 依赖 test 模块
+            compile project(":test")
+        }

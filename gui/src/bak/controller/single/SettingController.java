@@ -1,6 +1,7 @@
-package controller.single;
+package bak.controller.single;
 
-import controller.component.configController.*;
+import bak.controller.component.configController.FilterConfigController;
+import bak.controller.component.configController.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -8,7 +9,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import org.jetbrains.annotations.NotNull;
-import util.JsonHandle;
 
 import java.io.File;
 import java.io.IOException;
@@ -149,22 +149,22 @@ public class SettingController {
         switch (id) {
             case "captureLabel":
                 System.out.println("capture");
-                fxmlPath = "view/component/configView/CaptureConfigView.fxml";
+                fxmlPath = "bak/controller/view/component/configView/CaptureConfigView.fxml";
                 this.UpdateContent(this.captureLoader, fxmlPath);
                 break;
             case "filterLabel":
                 System.out.println("filter");
-                fxmlPath = "view/component/configView/FilterConfigView.fxml";
+                fxmlPath = "bak/controller/view/component/configView/FilterConfigView.fxml";
                 this.UpdateContent(this.filterLoader, fxmlPath);
                 break;
             case "sendLabel":
                 System.out.println("send");
-                fxmlPath = "view/component/configView/SendConfigView.fxml";
+                fxmlPath = "bak/controller/view/component/configView/SendConfigView.fxml";
                 this.UpdateContent(this.sendLoader, fxmlPath);
                 break;
             default:
                 System.out.println("blank");
-                fxmlPath = "view/single/BlankView.fxml";
+                fxmlPath = "bak/controller/view/single/BlankView.fxml";
                 this.UpdateContent(this.blankLoader, fxmlPath);
                 break;
         }
@@ -177,17 +177,17 @@ public class SettingController {
         switch (id) {
             case "folderLabel":
                 System.out.println("folder");
-                fxmlPath = "view/component/configView/FolderConfigView.fxml";
+                fxmlPath = "bak/controller/view/component/configView/FolderConfigView.fxml";
                 this.UpdateContent(this.folderLoader, fxmlPath);
                 break;
             case "dbLabel":
                 System.out.println("db");
-                fxmlPath = "view/component/configView/DBConfigView.fxml";
+                fxmlPath = "bak/controller/view/component/configView/DBConfigView.fxml";
                 this.UpdateContent(this.dbLoader, fxmlPath);
                 break;
             default:
                 System.out.println("blank");
-                fxmlPath = "view/single/BlankView.fxml";
+                fxmlPath = "bak/controller/view/single/BlankView.fxml";
                 this.UpdateContent(this.blankLoader, fxmlPath);
                 break;
         }
@@ -200,17 +200,17 @@ public class SettingController {
         switch (id) {
             case "systemLabel":
                 System.out.println("system");
-                fxmlPath = "view/component/configView/SystemConfigView.fxml";
+                fxmlPath = "bak/controller/view/component/configView/SystemConfigView.fxml";
                 this.UpdateContent(this.systemLoader, fxmlPath);
                 break;
             case "otherLabel":
                 System.out.println("other");
-                fxmlPath = "view/component/configView/OtherConfigView.fxml";
+                fxmlPath = "bak/controller/view/component/configView/OtherConfigView.fxml";
                 this.UpdateContent(this.otherLoader, fxmlPath);
                 break;
             default:
                 System.out.println("blank");
-                fxmlPath = "view/single/BlankView.fxml";
+                fxmlPath = "bak/controller/view/single/BlankView.fxml";
                 this.UpdateContent(this.blankLoader, fxmlPath);
                 break;
         }
