@@ -1,14 +1,13 @@
 package controller;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import config.CaptureFilterConfig;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import model.Setting;
+import model.FilterProperty;
+import model.Property;
+import model.SettingProperty;
 import org.pcap4j.core.PcapHandle;
 import util.DirHandle;
 
@@ -16,14 +15,14 @@ import java.io.File;
 import java.io.IOException;
 
 public class AddFilterConfig {
-    private AddCaptureConfig addCaptureConfig;
-    private CaptureFilterConfig config;
+    private StartCapture startCapture;
+    private FilterProperty filterProperty;
 
     @FXML
     TextField name;
 
     @FXML
-    TextField filter;
+    TextField expression;
 
     @FXML
     TextArea comment;
@@ -39,38 +38,52 @@ public class AddFilterConfig {
 
     }
 
+    public void InitializeConfig() {
+        this.name.setText(filterProperty.getName());
+        this.expression.setText(filterProperty.getExpression());
+        this.comment.setText(filterProperty.getComment());
+        this.direction.getItems().forEach( item -> {
+            if (item.getText().equals(filterProperty.getDirection().toString()))
+                this.direction.getSelectionModel().select(item);
+        });
 
+    }
 
     private void SaveConfig() throws IOException {
-        this.config = new CaptureFilterConfig();
-        this.config.Initial();
-        this.config.setName(name.getText());
-        this.config.setComment(comment.getText());
-        this.config.setFilter(filter.getText());
+        this.filterProperty.setName(name.getText());
+        this.filterProperty.setComment(comment.getText());
+        this.filterProperty.setExpression(expression.getText());
         PcapHandle.PcapDirection pcapDirection;
-        switch (direction.getSelectionModel().getSelectedItem().getText()) {
-            case "入方向":
+        switch (direction.getSelectionModel().getSelectedItem().getId()) {
+            case "inLabel":
                 pcapDirection = PcapHandle.PcapDirection.IN;
                 break;
-            case "出方向":
+            case "outLabel":
                 pcapDirection = PcapHandle.PcapDirection.OUT;
                 break;
-            case "出入方向":
+            case "allLabel":
                 pcapDirection = PcapHandle.PcapDirection.INOUT;
                 break;
             default:
                 pcapDirection = PcapHandle.PcapDirection.INOUT;
                 break;
         }
-        this.config.setDirection(pcapDirection);
+        this.filterProperty.setDirection(pcapDirection);
         JsonMapper mapper = new JsonMapper();
-        File file = new File(Setting.filterConfigFolder + '/' + name.getText() + ".json");
-        mapper.writeValue(file, this.config);
+        File file = new File(SettingProperty.filterConfigFolder + '/' + name.getText() + ".json");
+        mapper.writeValue(file, this.filterProperty);
 
     }
 
-    public void setCaptureConfig(AddCaptureConfig captureConfig) {
-        this.addCaptureConfig = captureConfig;
+    public void setStartCapture(StartCapture startCapture) {
+        this.startCapture = startCapture;
+    }
+
+    public void setFilterProperty(Property property) {
+        if (property==null)
+            this.filterProperty = new FilterProperty();
+        else
+            this.filterProperty = (FilterProperty) property;
     }
 
     @FXML
@@ -78,7 +91,7 @@ public class AddFilterConfig {
         this.SaveConfig();
         Stage stage = (Stage)((Button)(event).getSource()).getScene().getWindow();
         stage.close();
-        this.addCaptureConfig.ReceiveFilterConfig(this.config);
+        this.startCapture.ReceiveFilterConfig(this.filterProperty);
     }
 
     @FXML

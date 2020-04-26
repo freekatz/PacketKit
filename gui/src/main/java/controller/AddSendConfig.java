@@ -1,35 +1,25 @@
 package controller;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import config.CaptureNetworkInterfaceConfig;
-import config.Config;
-import config.SendNetworkInterfaceConfig;
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import model.Setting;
-import org.pcap4j.core.PcapHandle;
-import org.pcap4j.core.PcapNativeException;
-import org.pcap4j.core.PcapNetworkInterface;
-import org.pcap4j.core.Pcaps;
-import util.ConfigHandle;
-import util.NIFHandle;
+import model.NIFProperty;
+import model.Property;
+import model.SendProperty;
+import model.SettingProperty;
+import util.TableHandle;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.util.List;
 
 public class AddSendConfig {
     private Manager manager;
-    private SendNetworkInterfaceConfig config;
+    private SendProperty sendProperty;
 
     @FXML
     TextField name;
@@ -47,7 +37,7 @@ public class AddSendConfig {
     TextField timeout;
 
     @FXML
-    ComboBox<Label> dstNIF;
+    TableView<Property> target;
 
     @FXML
     Button okButton;
@@ -58,26 +48,49 @@ public class AddSendConfig {
     public AddSendConfig() {}
 
     public void initialize() {
-        NIFHandle.InitializeNIF(this.dstNIF);
+        try {
+            TableHandle.InitializeTable(new NIFProperty(), target);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        TableHandle.UpdateNIFTable(this.target);
+    }
+
+    public void InitializeConfig() {
+        this.name.setText(this.sendProperty.getName());
+        this.comment.setText(this.sendProperty.getComment());
+        this.count.setText(String.valueOf(this.sendProperty.getCount()));
+        this.retry.setText(String.valueOf(this.sendProperty.getRetry()));
+        this.timeout.setText(String.valueOf(this.sendProperty.getTimeout()));
+        this.target.getItems().forEach( item -> {
+            if (((NIFProperty)item).getName().equals(sendProperty.getTarget()))
+                this.target.getSelectionModel().select(item);
+        });
     }
 
     private void SaveConfig() throws IOException {
-        this.config = new SendNetworkInterfaceConfig();
-        this.config.Initial();
-        this.config.setName(name.getText());
-        this.config.setComment(comment.getText());
-        this.config.setCount(Integer.parseInt(count.getText()));
-        this.config.setRetryCount(Integer.parseInt(retry.getText()));
-        this.config.setTimeoutMillis(Integer.parseInt(timeout.getText()));
-        this.config.setDstNif(this.dstNIF.getSelectionModel().getSelectedItem().getId());
+        this.sendProperty.setName(name.getText());
+        this.sendProperty.setComment(comment.getText());
+        this.sendProperty.setCount(Integer.parseInt(count.getText()));
+        this.sendProperty.setRetry(Integer.parseInt(retry.getText()));
+        this.sendProperty.setTimeout(Integer.parseInt(timeout.getText()));
+        this.sendProperty.setTarget(((NIFProperty) this.target.getSelectionModel().getSelectedItem()).getName());
+
         JsonMapper mapper = new JsonMapper();
-        File file = new File(Setting.sendConfigFolder + '/' + name.getText() + ".json");
-        mapper.writeValue(file, this.config);
+        File file = new File(SettingProperty.sendConfigFolder + '/' + name.getText() + ".json");
+        mapper.writeValue(file, this.sendProperty);
 
     }
 
     public void setManager(Manager manager) {
         this.manager = manager;
+    }
+
+    public void setSendProperty(Property property) {
+        if (property==null)
+            this.sendProperty = new SendProperty();
+        else
+            this.sendProperty = (SendProperty) property;
     }
 
     @FXML
@@ -91,6 +104,6 @@ public class AddSendConfig {
         this.SaveConfig();
         Stage stage = (Stage)((Button)(event).getSource()).getScene().getWindow();
         stage.close();
-        this.manager.ReceiveSendConfig(this.config);
+        this.manager.ReceiveSendConfig(this.sendProperty);
     }
 }

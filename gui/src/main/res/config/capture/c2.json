@@ -1,1 +1,0 @@
-{"id":0,"name":"c2","comment":"comment content...","timestamp":"2020-04-19 19:14:18","count":1,"snapshotLength":1,"timeoutMillis":1,"bufferSize":1,"promiscuousMode":"PROMISCUOUS","rfmonMode":"RfmonMode","timestampPrecision":"MICRO","immediateMode":"DelayMode","filterConfig":{"id":1,"name":"f2","filter":"","comment":"ttt\nhdha","timestamp":1587212934347,"direction":"IN"}}

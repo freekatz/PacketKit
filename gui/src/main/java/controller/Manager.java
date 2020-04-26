@@ -1,26 +1,17 @@
 package controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import config.CaptureFilterConfig;
-import config.CaptureNetworkInterfaceConfig;
-import config.Config;
-import config.SendNetworkInterfaceConfig;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import model.Setting;
-import util.ConfigHandle;
+import model.*;
 import util.TableHandle;
 
 import java.io.File;
@@ -28,15 +19,17 @@ import java.io.IOException;
 import java.net.URL;
 
 public class Manager {
-    private CaptureNetworkInterfaceConfig captureNetworkInterfaceConfig;
-    private CaptureFilterConfig filterConfig;
-    private SendNetworkInterfaceConfig sendNetworkInterfaceConfig;
+    private CaptureProperty captureProperty;
+    private SendProperty sendProperty;
 
     @FXML
-    TableView<Config> captureConfigTable;
+    TableView<Property> captureConfigTable;
 
     @FXML
     Button captureAddButton;
+
+    @FXML
+    Button captureEditButton;
 
     @FXML
     Button captureDeleteButton;
@@ -45,10 +38,22 @@ public class Manager {
     Button captureStartButton;
 
     @FXML
-    TableView<Config> sendConfigTable;
+    CheckBox offline;
+
+    @FXML
+    TableView<Property> captureNIFTable;
+
+    @FXML
+    TextField pcapFile;
+
+    @FXML
+    TableView<Property> sendConfigTable;
 
     @FXML
     Button sendAddButton;
+
+    @FXML
+    Button sendEditButton;
 
     @FXML
     Button sendDeleteButton;
@@ -56,27 +61,37 @@ public class Manager {
     @FXML
     Button sendStartButton;
 
+    @FXML
+    TableView<Property> sendNIFTable;
+
 
     public Manager() {}
 
-    public void initialize() throws IOException {
-        TableHandle.UpdateTable(Setting.captureConfigFolder, new CaptureNetworkInterfaceConfig(), this.captureConfigTable);
-        TableHandle.UpdateTable(Setting.sendConfigFolder, new SendNetworkInterfaceConfig(), this.sendConfigTable);
+    public void initialize() {
+        try {
+            TableHandle.InitializeTable(new NIFProperty(), captureNIFTable);
+            TableHandle.InitializeTable(new NIFProperty(), sendNIFTable);
+            TableHandle.InitializeTable(new CaptureProperty(), captureConfigTable);
+            TableHandle.InitializeTable(new SendProperty(), sendConfigTable);
+            TableHandle.UpdateConfigTable(SettingProperty.captureConfigFolder, new CaptureProperty(), captureConfigTable);
+            TableHandle.UpdateConfigTable(SettingProperty.sendConfigFolder, new SendProperty(), sendConfigTable);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        TableHandle.UpdateNIFTable(captureNIFTable);
+        TableHandle.UpdateNIFTable(sendNIFTable);
+        this.OfflineOnChecked();
     }
 
 
-    public void ReceiveCaptureConfig(CaptureNetworkInterfaceConfig captureNetworkInterfaceConfig) {
-        this.captureNetworkInterfaceConfig = captureNetworkInterfaceConfig;
-        if (!this.captureConfigTable.getItems().contains(captureNetworkInterfaceConfig))
-            this.captureConfigTable.getItems().add(captureNetworkInterfaceConfig);
-        this.captureConfigTable.refresh();
+    public void ReceiveCaptureConfig(CaptureProperty captureProperty) {
+        if (this.captureProperty != captureProperty)
+            this.captureConfigTable.getItems().add(captureProperty);
     }
 
-    public void ReceiveSendConfig(SendNetworkInterfaceConfig sendNetworkInterfaceConfig) {
-        this.sendNetworkInterfaceConfig = sendNetworkInterfaceConfig;
-        if (!this.sendConfigTable.getItems().contains(sendNetworkInterfaceConfig))
-            this.sendConfigTable.getItems().add(sendNetworkInterfaceConfig);
-        this.sendConfigTable.refresh();
+    public void ReceiveSendConfig(SendProperty sendProperty) {
+         if (this.sendProperty != sendProperty)
+            this.sendConfigTable.getItems().add(sendProperty);
     }
 
     @FXML
@@ -92,6 +107,30 @@ public class Manager {
         stage.setScene(scene);
         AddCaptureConfig addCaptureConfig = loader.getController();
         addCaptureConfig.setManager(this);
+        addCaptureConfig.setCaptureProperty(null);
+        stage.show();
+    }
+
+    @FXML
+    private void CaptureEditButtonOnClicked() throws IOException {
+        if (captureConfigTable.getSelectionModel().getSelectedItem()==null)
+            return;
+        this.captureProperty = (CaptureProperty) captureConfigTable.getSelectionModel().getSelectedItem();
+        Stage stage = new Stage();
+        stage.initStyle(StageStyle.UTILITY);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        FXMLLoader loader = new FXMLLoader();
+        URL url = loader.getClassLoader().getResource("view/AddCaptureConfig.fxml");
+        loader.setLocation(url);
+        AnchorPane pane = loader.load();
+        Scene scene = new Scene(pane);
+        stage.setScene(scene);
+        AddCaptureConfig addCaptureConfig = loader.getController();
+        addCaptureConfig.setManager(this);
+        addCaptureConfig.setCaptureProperty(this.captureConfigTable.getSelectionModel().getSelectedItem());
+        addCaptureConfig.InitializeConfig();
+        File file = new File(SettingProperty.captureConfigFolder + '/' + this.captureProperty.getName() + ".json");
+        file.delete();
         stage.show();
     }
 
@@ -99,9 +138,9 @@ public class Manager {
     private void CaptureDeleteButtonOnClicked() {
         if (this.captureConfigTable.getSelectionModel().getSelectedItem()!=null) {
             int index = this.captureConfigTable.getSelectionModel().getSelectedIndex();
-            CaptureNetworkInterfaceConfig config = (CaptureNetworkInterfaceConfig) this.captureConfigTable.getItems().get(index);
+            CaptureProperty captureProperty = (CaptureProperty) this.captureConfigTable.getItems().get(index);
             this.captureConfigTable.getItems().remove(index);
-            File file = new File(Setting.captureConfigFolder + '/' + config.getName() + ".json");
+            File file = new File(SettingProperty.captureConfigFolder + '/' + captureProperty.getName() + ".json");
             if (file!=null)
                 file.delete();
             this.captureConfigTable.getSelectionModel().clearSelection();
@@ -110,10 +149,9 @@ public class Manager {
 
     @FXML
     private void CaptureStartButtonOnClicked() throws IOException {
-        if (this.captureConfigTable.getSelectionModel().getSelectedItem()==null)
-            return;
-        CaptureNetworkInterfaceConfig config = (CaptureNetworkInterfaceConfig)this.captureConfigTable.getSelectionModel().getSelectedItem();
-
+        if (!offline.isSelected())
+            if (captureConfigTable.getSelectionModel().getSelectedItem()==null)
+                return;
         Stage stage = new Stage();
         stage.initStyle(StageStyle.DECORATED);
         stage.initModality(Modality.WINDOW_MODAL);
@@ -126,13 +164,25 @@ public class Manager {
         stage.setScene(scene);
         StartCapture startCapture = loader.getController();
         startCapture.setManager(this);
-        if (this.captureNetworkInterfaceConfig == null) {
-            JsonMapper mapper = new JsonMapper();
-            this.captureNetworkInterfaceConfig = mapper.readValue(new File(Setting.captureConfigFolder + '/' + config.getName() + ".json"), CaptureNetworkInterfaceConfig.class);
+        if (offline.isSelected())
+            startCapture.setPcapPath(pcapFile.getText());
+        else {
+            this.captureProperty = (CaptureProperty) this.captureConfigTable.getSelectionModel().getSelectedItem();
+            startCapture.setCaptureProperty(this.captureProperty);
+            startCapture.setNifName(((NIFProperty) captureNIFTable.getSelectionModel().getSelectedItem()).getName());
         }
-        startCapture.setNetworkInterfaceConfig(this.captureNetworkInterfaceConfig);
-        startCapture.InitializeConfig();
+        startCapture.setOffline(offline.isSelected());
         stage.show();
+    }
+
+
+    @FXML
+    private void OfflineOnChecked() {
+        captureNIFTable.setDisable(offline.isSelected());
+        pcapFile.setDisable(!offline.isSelected());
+        captureConfigTable.setDisable(offline.isSelected());
+        if (offline.isSelected())
+            this.captureProperty = null;
     }
 
     @FXML
@@ -149,6 +199,31 @@ public class Manager {
         stage.setScene(scene);
         AddSendConfig addSendConfig = loader.getController();
         addSendConfig.setManager(this);
+        addSendConfig.setSendProperty(null);
+        stage.show();
+    }
+
+    @FXML
+    private void SendEditButtonOnClicked() throws IOException {
+        if (this.sendConfigTable.getSelectionModel().getSelectedItem()==null)
+            return;
+        this.sendProperty = (SendProperty) this.sendConfigTable.getSelectionModel().getSelectedItem();
+        Stage stage = new Stage();
+        stage.initStyle(StageStyle.UTILITY);
+        stage.initModality(Modality.APPLICATION_MODAL);
+
+        FXMLLoader loader = new FXMLLoader();
+        URL url = loader.getClassLoader().getResource("view/AddSendConfig.fxml");
+        loader.setLocation(url);
+        AnchorPane pane = loader.load();
+        Scene scene = new Scene(pane);
+        stage.setScene(scene);
+        AddSendConfig addSendConfig = loader.getController();
+        addSendConfig.setManager(this);
+        addSendConfig.setSendProperty(this.sendConfigTable.getSelectionModel().getSelectedItem());
+        addSendConfig.InitializeConfig();
+        File file = new File(SettingProperty.sendConfigFolder + '/' + this.sendProperty.getName() + ".json");
+        file.delete();
         stage.show();
     }
 
@@ -156,9 +231,8 @@ public class Manager {
     private void SendDeleteButtonOnClicked() {
         if (this.sendConfigTable.getSelectionModel().getSelectedItem()!=null) {
             int index = this.sendConfigTable.getSelectionModel().getSelectedIndex();
-            SendNetworkInterfaceConfig config = (SendNetworkInterfaceConfig) this.sendConfigTable.getSelectionModel().getSelectedItem();
-            System.out.println(config.getName());
-            File file = new File(Setting.sendConfigFolder + '/' + config.getName() + ".json");
+            SendProperty sendProperty = (SendProperty) this.sendConfigTable.getSelectionModel().getSelectedItem();
+            File file = new File(SettingProperty.sendConfigFolder + '/' + sendProperty.getName() + ".json");
             if (file!=null)
                 file.delete();
             this.sendConfigTable.getItems().remove(index);

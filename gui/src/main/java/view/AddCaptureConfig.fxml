@@ -1,43 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.layout.VBox?>
-
-<AnchorPane prefHeight="470.0" prefWidth="588.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AddCaptureConfig">
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane prefHeight="436.0" prefWidth="512.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AddCaptureConfig">
     <children>
-      <TextField fx:id="name" layoutX="288.0" layoutY="36.0" prefHeight="23.0" prefWidth="199.0" text="config name..." AnchorPane.rightAnchor="100.0" />
-      <TextArea fx:id="comment" layoutX="288.0" layoutY="61.0" prefHeight="61.0" prefWidth="199.0" text="comment content..." AnchorPane.rightAnchor="100.0" />
-      <Label layoutX="68.0" layoutY="45.0" text="Name" AnchorPane.leftAnchor="80.0" AnchorPane.topAnchor="40.0" />
-      <Label layoutX="75.0" layoutY="76.0" text="Comment" AnchorPane.leftAnchor="80.0" />
-      <Button fx:id="okButton" mnemonicParsing="false" onAction="#OkButtonOnClicked" prefHeight="38.0" prefWidth="65.0" text="Ok" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="50.0" />
-      <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#CancelButtonOnClicked" prefHeight="38.0" prefWidth="65.0" text="Cancel" AnchorPane.bottomAnchor="80.0" AnchorPane.rightAnchor="50.0" />
-      <Label layoutX="67.0" layoutY="122.0" text="Count" AnchorPane.leftAnchor="80.0" />
-      <Label layoutX="65.0" layoutY="158.0" text="Length" AnchorPane.leftAnchor="80.0" />
-      <Label layoutX="61.0" layoutY="198.0" text="Timeout" AnchorPane.leftAnchor="80.0" />
-      <TextField fx:id="count" layoutX="288.0" layoutY="124.0" prefHeight="26.0" prefWidth="199.0" text="send count, must be int..." AnchorPane.rightAnchor="100.0" />
-      <TextField fx:id="length" layoutX="288.0" layoutY="153.0" prefHeight="26.0" prefWidth="199.0" text="max packet length, must be int..." AnchorPane.rightAnchor="100.0" />
-      <TextField fx:id="timeout" layoutX="288.0" layoutY="185.0" prefHeight="26.0" prefWidth="199.0" text="timeout, millis, must be int..." AnchorPane.rightAnchor="100.0" />
-      <Label layoutX="63.0" layoutY="227.0" text="Buffer" AnchorPane.leftAnchor="80.0" />
-      <TextField fx:id="buffer" layoutX="288.0" layoutY="215.0" prefHeight="23.0" prefWidth="199.0" text="buffer size, byte, must be int..." AnchorPane.rightAnchor="100.0" />
-      <TableView fx:id="filterConfigTable" fixedCellSize="1.0" prefHeight="122.0" prefWidth="333.0" tableMenuButtonVisible="true" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="80.0" AnchorPane.topAnchor="320.0" />
-      <VBox prefHeight="123.0" prefWidth="33.0" AnchorPane.rightAnchor="140.0" AnchorPane.topAnchor="320.0">
-         <children>
-            <Button fx:id="addButton" mnemonicParsing="false" onAction="#AddButtonOnClicked" prefHeight="29.0" prefWidth="39.0" text="+" />
-            <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#DeleteButtonOnClicked" prefHeight="31.0" prefWidth="33.0" text="-" />
-         </children>
-      </VBox>
-      <FlowPane hgap="25.0" layoutX="85.0" layoutY="268.0" prefHeight="23.0" prefWidth="420.0" AnchorPane.leftAnchor="80.0" AnchorPane.rightAnchor="100.0">
+      <TextField fx:id="name" layoutX="288.0" layoutY="36.0" prefHeight="23.0" prefWidth="222.0" text="config name..." AnchorPane.rightAnchor="77.0" />
+      <TextArea fx:id="comment" layoutX="212.0" layoutY="69.0" prefHeight="61.0" prefWidth="222.0" text="comment content..." AnchorPane.rightAnchor="78.0" />
+      <Label layoutX="76.0" layoutY="40.0" text="Name" AnchorPane.leftAnchor="80.0" />
+      <Label layoutX="77.0" layoutY="92.0" text="Comment" AnchorPane.leftAnchor="80.0" />
+      <Button fx:id="okButton" layoutX="424.0" layoutY="333.0" mnemonicParsing="false" onAction="#OkButtonOnClicked" prefHeight="38.0" prefWidth="65.0" text="Ok" AnchorPane.bottomAnchor="50.0" AnchorPane.rightAnchor="50.0" />
+      <Button fx:id="cancelButton" layoutX="327.0" layoutY="327.0" mnemonicParsing="false" onAction="#CancelButtonOnClicked" prefHeight="38.0" prefWidth="65.0" text="Cancel" AnchorPane.bottomAnchor="50.0" AnchorPane.rightAnchor="120.0" />
+      <Label layoutX="76.0" layoutY="142.0" text="Count" AnchorPane.leftAnchor="80.0" />
+      <Label layoutX="77.0" layoutY="178.0" text="Length" AnchorPane.leftAnchor="80.0" />
+      <Label layoutX="76.0" layoutY="211.0" text="Timeout" AnchorPane.leftAnchor="80.0" />
+      <TextField fx:id="count" layoutX="212.0" layoutY="137.0" prefHeight="26.0" prefWidth="222.0" text="send count, must be int..." AnchorPane.rightAnchor="78.0" />
+      <TextField fx:id="length" layoutX="212.0" layoutY="173.0" prefHeight="26.0" prefWidth="222.0" text="max packet length, must be int..." AnchorPane.rightAnchor="78.0" />
+      <TextField fx:id="timeout" layoutX="212.0" layoutY="206.0" prefHeight="26.0" prefWidth="222.0" text="timeout, millis, must be int..." AnchorPane.rightAnchor="78.0" />
+      <Label layoutX="80.0" layoutY="250.0" text="Buffer" AnchorPane.leftAnchor="80.0" />
+      <TextField fx:id="buffer" layoutX="212.0" layoutY="246.0" prefHeight="23.0" prefWidth="222.0" text="buffer size, byte, must be int..." AnchorPane.rightAnchor="78.0" />
+      <FlowPane hgap="25.0" layoutX="80.0" layoutY="291.0" prefHeight="31.0" prefWidth="391.0" AnchorPane.leftAnchor="80.0" AnchorPane.rightAnchor="33.0">
          <children>
             <CheckBox fx:id="promiscuous" mnemonicParsing="false" text="Promiscuous" />
-            <CheckBox fx:id="rfmon" mnemonicParsing="false" text="RfMon" />
-            <CheckBox fx:id="precision" mnemonicParsing="false" text="Precision" />
             <CheckBox fx:id="immediate" mnemonicParsing="false" text="Immediate" />
          </children>
       </FlowPane>

@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import org.pcap4j.core.PcapHandle;
 
 public class DirHandle {
 
@@ -18,5 +19,25 @@ public class DirHandle {
         allLabel.setId("allLabel");
         box.setItems(ob);
         box.setValue(allLabel);
+    }
+
+    public static PcapHandle.PcapDirection GetDirection(ComboBox<Label> direction) {
+        PcapHandle.PcapDirection pcapDirection;
+        switch (direction.getSelectionModel().getSelectedItem().getId()) {
+            case "inLabel":
+                pcapDirection = PcapHandle.PcapDirection.IN;
+                break;
+            case "outLabel":
+                pcapDirection = PcapHandle.PcapDirection.OUT;
+                break;
+            case "allLabel":
+                pcapDirection = PcapHandle.PcapDirection.INOUT;
+                break;
+            default:
+                pcapDirection = PcapHandle.PcapDirection.INOUT;
+                break;
+        }
+
+        return pcapDirection;
     }
 }

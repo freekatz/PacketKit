@@ -1,71 +1,65 @@
 package util;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import config.CaptureFilterConfig;
-import config.Config;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import nif.CaptureNetworkInterface;
-import nif.NetworkInterface;
+import model.NIFProperty;
+import model.Property;
+import org.pcap4j.core.PcapNativeException;
+import org.pcap4j.core.PcapNetworkInterface;
+import org.pcap4j.core.Pcaps;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 public class TableHandle {
 
-    public static void UpdateTable(String configPath, Config configObject, TableView<Config> table) throws IOException {
+    public static void InitializeTable(Property property, TableView<Property> table) throws IOException {
+        JsonMapper mapper = new JsonMapper();
+        String json = mapper.writeValueAsString(property);
+        JsonNode node = mapper.readTree(json);
+        ObservableList<Property> observableList = FXCollections.observableArrayList();
+        if (table.getColumns().size()==0) {
+            node.fields().forEachRemaining(field -> {
+                TableColumn<Property, Object> column = new TableColumn<>();
+                column.setText(field.getKey());
+                column.setId(field.getKey());
+                column.setCellValueFactory(new PropertyValueFactory<>(field.getKey()));
+                table.getColumns().add(column);
+            });
+        }
+        table.setItems(observableList);
+        table.mouseTransparentProperty().setValue(false);
+        table.fixedCellSizeProperty().setValue(50);
+    }
+
+    public static void UpdateConfigTable(String configPath, Property property, TableView<Property> table) throws IOException {
         File[] configList = ConfigHandle.ConfigScan(configPath);
         JsonMapper mapper = new JsonMapper();
-        ObservableList<Config> observableList = FXCollections.observableArrayList();
-        for (File config : configList) {
-            JsonNode node;
-            node = mapper.readTree(config);
-            if (table.getColumns().size() == 0) {
-                node.fields().forEachRemaining(field -> {
-                    if (!field.getKey().equals("filterConfig")) {
-                        TableColumn<Config, Object> column = new TableColumn<>();
-                        column.setText(field.getKey());
-                        column.setId(field.getKey());
-                        column.setCellValueFactory(new PropertyValueFactory<>(field.getKey()));
-                        table.getColumns().add(column);
-                    }
-                });
-            }
-            observableList.add(mapper.readValue(config, configObject.getClass()));
+        for (File config : configList)
+            table.getItems().add(mapper.readValue(config, property.getClass()));
+    }
+
+    public static void UpdateNIFTable(TableView<Property> table) {
+        List nifList = null;
+        try {
+            nifList = Pcaps.findAllDevs();
+        } catch (PcapNativeException e) {
+            e.printStackTrace();
         }
-
-        table.setItems(observableList);
-        table.mouseTransparentProperty().setValue(false);
-        table.fixedCellSizeProperty().setValue(50);
+        PcapNetworkInterface nif;
+        if (nifList != null && nifList.size() != 0) {
+            for (Object o : nifList) {
+                nif = (PcapNetworkInterface) o;
+                NIFProperty nifProperty = new NIFProperty(nif);
+                table.getItems().add(nifProperty);
+            }
+        }
     }
 
-    // TODO: 2020/4/19 nif stat class
-    public static void UpdateTable(CaptureNetworkInterface networkInterface, TableView<HashMap<String, String>> table) throws IOException {
-
-        JsonMapper mapper = new JsonMapper();
-        ObservableList<HashMap<String, String>> observableList = FXCollections.observableArrayList();
-        TableColumn<String, String> keyColumn = new TableColumn<>();
-        keyColumn.setText("statKey");
-        keyColumn.setText("statKey");
-        TableColumn<String, String> valueColumn = new TableColumn<>();
-        valueColumn.setText("statValue");
-        valueColumn.setText("statValue");
-        JsonNode node;
-        node = mapper.readTree(String.valueOf(networkInterface));
-        HashMap<String, String> hashMap = new HashMap<>();
-        node.fields().forEachRemaining(field -> {
-            hashMap.put(field.getKey(), field.getValue().textValue());
-        });
-        observableList.add(hashMap);
-        table.setItems(observableList);
-        table.mouseTransparentProperty().setValue(false);
-        table.fixedCellSizeProperty().setValue(50);
-    }
 }
