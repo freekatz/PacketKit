@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane prefHeight="496.0" prefWidth="665.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Manager">
+   <children>
+      <TabPane layoutY="39.0" prefHeight="236.0" prefWidth="355.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+        <tabs>
+          <Tab text="Welcome">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+            </content>
+          </Tab>
+          <Tab text="Capture">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="373.0" prefWidth="600.0">
+                     <children>
+                         <VBox layoutX="500.0" layoutY="50.0" prefHeight="201.0" prefWidth="30.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="30.0">
+                             <children>
+                                 <Button fx:id="captureAddButton" mnemonicParsing="false" onAction="#CaptureAddButtonOnClicked" prefHeight="30.0" prefWidth="40.0" text="A" />
+                              <Button fx:id="captureEditButton" mnemonicParsing="false" onAction="#CaptureEditButtonOnClicked" prefHeight="30.0" prefWidth="40.0" text="E" />
+                                 <Button fx:id="captureDeleteButton" mnemonicParsing="false" onAction="#CaptureDeleteButtonOnClicked" prefHeight="30.0" prefWidth="40.0" text="D" />
+                             </children>
+                         </VBox>
+                         <Button fx:id="captureStartButton" layoutX="503.0" layoutY="370.0" mnemonicParsing="false" onAction="#CaptureStartButtonOnClicked" prefHeight="50.0" prefWidth="90.0" text="Start" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="50.0" />
+                         <TableView fx:id="captureConfigTable" fixedCellSize="1.0" layoutX="100.0" layoutY="26.0" prefHeight="155.0" prefWidth="389.0" tableMenuButtonVisible="true" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="30.0" />
+                        <Label layoutX="10.0" layoutY="223.0" text="NIF" AnchorPane.bottomAnchor="208.99999999999997" AnchorPane.leftAnchor="10.0" />
+                        <CheckBox fx:id="offline" layoutX="50.0" layoutY="199.0" mnemonicParsing="false" onAction="#OfflineOnChecked" text="Offline" AnchorPane.leftAnchor="50.0" />
+                        <Label layoutX="54.0" layoutY="388.0" text="File" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="10.0" />
+                        <TextField fx:id="pcapFile" layoutX="104.0" layoutY="380.0" prefHeight="31.0" prefWidth="403.0" text="E:\GitHub\PKit\tmp\tmp.pcap" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="150.0" />
+                        <TableView fx:id="captureNIFTable" layoutX="101.0" layoutY="265.0" prefHeight="155.0" prefWidth="565.0" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" />
+                        <Label layoutX="5.0" layoutY="36.0" text="Config" AnchorPane.leftAnchor="10.0" />
+                     </children>
+              </AnchorPane>
+            </content>
+          </Tab>
+          <Tab text="Send">
+             <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Button fx:id="sendStartButton" layoutX="466.0" layoutY="280.0" mnemonicParsing="false" onAction="#SendStartButtonOnClicked" prefHeight="50.0" prefWidth="90.0" text="Start" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="50.0" />
+                        <VBox layoutX="500.0" layoutY="49.0" prefHeight="201.0" prefWidth="31.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="30.0">
+                           <children>
+                              <Button fx:id="sendAddButton" mnemonicParsing="false" onAction="#SendAddButtonOnClicked" prefHeight="30.0" prefWidth="40.0" text="A" />
+                              <Button fx:id="sendEditButton" mnemonicParsing="false" onAction="#SendEditButtonOnClicked" prefHeight="30.0" prefWidth="40.0" text="E" />
+                              <Button fx:id="sendDeleteButton" mnemonicParsing="false" onAction="#SendDeleteButtonOnClicked" prefHeight="30.0" prefWidth="40.0" text="D" />
+                           </children>
+                        </VBox>
+                        <TableView fx:id="sendConfigTable" layoutX="215.0" layoutY="23.0" prefHeight="155.0" prefWidth="200.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="30.0" />
+                        <Label layoutX="19.0" layoutY="223.0" text="NIF" AnchorPane.bottomAnchor="208.99999999999997" AnchorPane.leftAnchor="10.0" />
+                        <TableView fx:id="sendNIFTable" layoutX="117.0" layoutY="233.0" prefHeight="155.0" prefWidth="565.0" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" />
+                        <Label layoutX="14.0" layoutY="37.0" text="Label" AnchorPane.leftAnchor="10.0" />
+                     </children></AnchorPane>
+             </content>
+          </Tab>
+            <Tab text="Help">
+                <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <SplitPane dividerPositions="0.2140468227424749" layoutX="7.0" prefHeight="299.0" prefWidth="461.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <items>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
+                          </items>
+                        </SplitPane>
+                     </children></AnchorPane>
+                </content>
+            </Tab>
+            <Tab text="About">
+                <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+      <MenuBar layoutY="14.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </children>
+</AnchorPane>
