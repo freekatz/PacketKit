@@ -2,12 +2,10 @@ package core;
 
 import org.pcap4j.core.*;
 import org.pcap4j.util.NifSelector;
-import model.group.CapturePacketGroup;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.LinkedHashMap;
 import java.util.concurrent.TimeoutException;
 
 public class Dump {

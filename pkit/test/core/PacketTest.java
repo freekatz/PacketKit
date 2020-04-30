@@ -1,8 +1,8 @@
 package core;
 
-import model.packet.EthernetPPacket;
-import model.packet.Ipv4PPacket;
-import model.packet.UdpPPacket;
+import gui.model.packet.EthernetPPacket;
+import gui.model.packet.Ipv4PPacket;
+import gui.model.packet.UdpPPacket;
 import org.pcap4j.core.*;
 import org.pcap4j.packet.*;
 

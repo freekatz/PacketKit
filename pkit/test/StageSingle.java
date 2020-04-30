@@ -1,4 +1,4 @@
-package pkit.gui;
+
 
 import javafx.application.Application;
 import javafx.scene.image.Image;
