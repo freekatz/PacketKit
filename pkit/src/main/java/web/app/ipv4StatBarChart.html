@@ -5,7 +5,18 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <link rel="icon" href="https://static.jianshukeji.com/hcode/images/favicon.ico">
     <style>
-        /* css 代码  */
+        #container {
+            background-color: white;
+            font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            width: 800px;
+            padding: 17px;
+            border-radius: 5px;
+            text-align: center;
+            position: fixed;
+            left: 5%;
+            top: 15%;
+            overflow: hidden;
+            z-index: 99999; }
     </style>
     <script src="https://code.highcharts.com.cn/jquery/jquery-1.8.3.min.js"></script>
     <script src="https://code.highcharts.com.cn/highcharts/highcharts.js"></script>
@@ -13,9 +24,9 @@
     <script src="https://img.hcharts.cn/highcharts-plugins/highcharts-zh_CN.js"></script>
 </head>
 <body>
-<div id="container" style="min-width:400px;height:400px"></div>
+<div id="container"></div>
 <script>
-    $.getJSON('../api/ipStatBarChart.json', function (data) {
+    $.getJSON('../api/ipv4StatBarChart.json', function (data) {
         var chart = new Highcharts.Chart('container', {
             chart: {
                 type: 'bar'
@@ -29,13 +40,13 @@
             xAxis: {
                 categories: parseX(data),
                 title: {
-                    text: "ip 地址"
+                    text: "ipv4 地址"
                 }
             },
             yAxis: {
                 min: 0,
                 title: {
-                    text: '流量大小(Bytes)',
+                    text: '流量大小(KBytes)',
                     align: 'high'
                 },
                 labels: {
@@ -43,7 +54,7 @@
                 }
             },
             tooltip: {
-                valueSuffix: ' Bytes'
+                valueSuffix: ' KBytes'
             },
             plotOptions: {
                 bar: {
@@ -81,7 +92,6 @@
                 }
             },
             series: [{
-                name: 'ip 流量大小',
                 data: parseY(data)
             }]
         });
@@ -96,7 +106,7 @@
         function parseY(data) {
             var Y = [];
             for (let key in data.data)
-                Y.push(data.data[key]);
+                Y.push(Math.floor(parseFloat(data.data[key])*100)/100);
             return Y;
         }
     });

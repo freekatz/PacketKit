@@ -16,7 +16,7 @@ public class Launch extends Application {
     public void start(Stage stage) throws Exception {
 
         FXMLLoader loader = new FXMLLoader();
-        URL url = loader.getClassLoader().getResource("view/Manager.fxml");
+        URL url = loader.getClassLoader().getResource("gui/view/IndexView.fxml");
         loader.setLocation(url);
         AnchorPane pane = loader.load();
         // TODO: 2020/4/18 WebView load failed
