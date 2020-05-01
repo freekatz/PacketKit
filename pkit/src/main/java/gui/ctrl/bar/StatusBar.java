@@ -1,6 +1,7 @@
 package gui.ctrl.bar;
 
 import gui.ctrl.CaptureConfigView;
+import gui.ctrl.IndexView;
 import gui.ctrl.View;
 import gui.model.CaptureProperty;
 import gui.model.SettingProperty;
@@ -21,21 +22,21 @@ import util.ViewHandle;
 import java.io.IOException;
 import java.util.List;
 
-public class IndexStatusBar {
+public class StatusBar {
     View view;
     int selectIndex;
 
     @FXML
-    Label statusLabel;
+    public Label statusLabel;
 
     @FXML
-    Button configButton;
+    public Button configButton;
 
     ContextMenu configMenu;
     MenuItem managerItem;
 
 
-    public IndexStatusBar() {}
+    public StatusBar() {}
 
     public void initialize() {
         configMenu = new ContextMenu();
@@ -59,7 +60,7 @@ public class IndexStatusBar {
                     stage.setScene(scene);
 
                     CaptureConfigView captureConfigView = loader.getController();
-                    captureConfigView.setIndexStatusBar(self());
+                    captureConfigView.setStatusBar(self());
 
                     stage.show();
                 } catch (IOException e) {
@@ -77,7 +78,7 @@ public class IndexStatusBar {
 
     }
 
-    private IndexStatusBar self() {
+    private StatusBar self() {
         return this;
     }
 
@@ -94,10 +95,11 @@ public class IndexStatusBar {
             item.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
+                    IndexView indexView = (IndexView) view;
                     if (item.isSelected()) {
                         for (CaptureProperty property : list) {
-                            if (item.getText().contains(property.getName())) {
-                                view.setCaptureProperty(property);
+                            if (item.getText().equals(property.getName())) {
+                                indexView.setCaptureProperty(property);
                                 break;
                             }
                         }
@@ -113,7 +115,8 @@ public class IndexStatusBar {
 
     public void setView(View view) {
         this.view = view;
-        if (view.getCaptureProperty() == null && configMenu.getItems().size() > 2) {
+        IndexView indexView = (IndexView) view;
+        if (indexView.getCaptureProperty() == null && configMenu.getItems().size() > 2) {
             selectIndex = 2;
             RadioMenuItem item = (RadioMenuItem) configMenu.getItems().get(selectIndex);
             item.setSelected(true);
@@ -122,7 +125,7 @@ public class IndexStatusBar {
             assert list != null;
             for (CaptureProperty property : list) {
                 if (item.getText().contains(property.getName())) {
-                    view.setCaptureProperty(property);
+                    indexView.setCaptureProperty(property);
                     break;
                 }
             }

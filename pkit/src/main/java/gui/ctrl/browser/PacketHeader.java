@@ -5,17 +5,16 @@ import gui.model.Property;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeView;
 
-public class BrowserPacketHeader {
+public class PacketHeader {
     View view;
 
     @FXML
     TreeView<Property> headerTree;
 
-    public BrowserPacketHeader() {
+    public PacketHeader() {
     }
 
     public void initialize() {
-        System.out.println(this.toString());
     }
 
     public void setView(View view) {

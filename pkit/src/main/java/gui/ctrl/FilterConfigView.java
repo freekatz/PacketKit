@@ -1,6 +1,6 @@
 package gui.ctrl;
 
-import gui.ctrl.bar.CaptureFilterBar;
+import gui.ctrl.bar.FilterBar;
 import gui.model.FilterProperty;
 import gui.model.Property;
 import gui.model.SettingProperty;
@@ -14,8 +14,8 @@ import javafx.util.StringConverter;
 import util.FileHandle;
 import util.ViewHandle;
 
-public class FilterConfigView{
-    CaptureFilterBar captureFilterBar;
+public class FilterConfigView implements View{
+    FilterBar filterBar;
 
     @FXML
     TableView<Property> configTable;
@@ -104,8 +104,8 @@ public class FilterConfigView{
 
     }
 
-    public void setCaptureFilterBar(CaptureFilterBar bar) {
-        this.captureFilterBar = bar;
+    public void setFilterBar(FilterBar bar) {
+        this.filterBar = bar;
     }
 
     @FXML
@@ -139,7 +139,7 @@ public class FilterConfigView{
 
     @FXML
     private void OkButtonOnClicked(Event event) {
-        captureFilterBar.UpdateContextMenu();
+        filterBar.UpdateContextMenu();
         Stage stage = (Stage)((Button)(event).getSource()).getScene().getWindow();
         stage.close();
         // apply 过滤器
@@ -156,4 +156,18 @@ public class FilterConfigView{
 
     }
 
+    @Override
+    public String getType() {
+        return null;
+    }
+
+    @Override
+    public void setType(String type) {
+
+    }
+
+    @Override
+    public void close(Event event) {
+
+    }
 }

@@ -1,33 +1,23 @@
 package gui.ctrl.list;
 
-import gui.ctrl.CaptureView;
 import gui.ctrl.IndexView;
 import gui.ctrl.View;
 import gui.model.SettingProperty;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import util.FileHandle;
 import util.ViewHandle;
 
 import java.io.File;
-import java.io.IOException;
 
 
-public class IndexFileList {
+public class FileList {
     View view;
 
     @FXML
@@ -36,7 +26,7 @@ public class IndexFileList {
     @FXML
     ListView<String> fileList;
 
-    public IndexFileList() {}
+    public FileList() {}
 
     public void initialize() {
         ViewHandle.InitializeList(SettingProperty.pcapFileHistory, fileList);
@@ -51,9 +41,7 @@ public class IndexFileList {
                     File file = new File(item);
                     FileHandle.AddLine(SettingProperty.pcapFileHistory, file.getAbsolutePath());
                     ViewHandle.InitializeList(SettingProperty.pcapFileHistory, fileList);
-
                     StartCapture(item);
-                    view.close(event);
                 }
             }
         });
@@ -61,42 +49,39 @@ public class IndexFileList {
 
     public void setView(View view) {
         this.view = view;
-        if (view.getNifName()==null && fileList.getItems().size()>0)
-            view.setPcapFile(fileList.getItems().get(0));
+        String type = view.getType();
+        if (type.equals("index")) {
+            IndexView indexView = (IndexView) view;
+            if (indexView.getNifName() == null && fileList.getItems().size() > 0)
+                indexView.setPcapFile(fileList.getItems().get(0));
 
+        }
+
+    }
+
+    public ListView<String> getFileList() {
+        return fileList;
+    }
+
+    public void setFileList(ListView<String> fileList) {
+        this.fileList = fileList;
     }
 
     private void StartCapture(String pcapFile) {
-        try {
-            FXMLLoader loader = ViewHandle.GetLoader("gui/view/CaptureView.fxml");
-            AnchorPane capturePane = loader.load();
-            Stage stage = new Stage();
-
-            Scene scene = new Scene(capturePane);
-            stage.setScene(scene);
-
-            CaptureView captureView = loader.getController();
-            IndexView indexView = (IndexView) view;
-            captureView.setFilterExpression(indexView.filterProperty.getExpression());
-            captureView.setCaptureProperty(indexView.captureProperty);
-            captureView.setPcapFile(pcapFile);
-            captureView.setNifName(null);
-            captureView.setIndexView((IndexView) view);
-
-            System.out.println(indexView.filterProperty.getExpression());
-            System.out.println(indexView.captureProperty.getName());
-            System.out.println(pcapFile);
-
-            stage.show();
-
-            captureView.CaptureControl();
-        } catch (IOException e) {
-            e.printStackTrace();
+        String type = view.getType();
+        IndexView indexView = (IndexView) view;
+        if (type.equals("index")) {
+            indexView.setType("capture");
+            indexView.setNifName(null);
+            indexView.setPcapFile(pcapFile);
+            ViewHandle.InitializeCenter(indexView);
         }
+        indexView.StartCapture("offline");
+
     }
 
     @FXML
-    private void OpenButtonOnClicked(Event event) {
+    private void OpenButtonOnClicked() {
         Stage stage = new Stage();
         FileChooser fileChooser = new FileChooser();
         // setting
@@ -109,6 +94,5 @@ public class IndexFileList {
         if (file==null) return;
         FileHandle.AddLine(SettingProperty.pcapFileHistory, file.getAbsolutePath());
         StartCapture(file.getAbsolutePath());
-        view.close(event);
     }
 }

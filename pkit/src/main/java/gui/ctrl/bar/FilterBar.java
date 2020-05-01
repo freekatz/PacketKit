@@ -1,11 +1,8 @@
 package gui.ctrl.bar;
 
-import gui.bak.controller.StartCapture;
-import gui.bak.util.DirHandle;
-import gui.ctrl.CaptureView;
 import gui.ctrl.FilterConfigView;
+import gui.ctrl.IndexView;
 import gui.ctrl.View;
-import gui.model.CaptureProperty;
 import gui.model.FilterProperty;
 import gui.model.SettingProperty;
 import javafx.event.ActionEvent;
@@ -17,20 +14,19 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import util.FileHandle;
-import util.Job;
 import util.ViewHandle;
-import util.nif.CNIF;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class CaptureFilterBar {
+public class FilterBar {
     View view;
     private int selectIndex;
 
@@ -49,11 +45,11 @@ public class CaptureFilterBar {
     @FXML
     ComboBox<String> filterBox;
 
-    public CaptureFilterBar() {}
+    public FilterBar() {}
 
     public void initialize() {
 
-        ViewHandle.InitializeComboBox(SettingProperty.filterHistory, filterBox);
+        ViewHandle.InitializeFilterComboBox(SettingProperty.filterHistory, filterBox);
         Image clearImage = new Image(getClass().getResourceAsStream(SettingProperty.iconFolder3 + "/x-filter-clear.active.png"));
         clearButton.setGraphic(new ImageView(clearImage));
         Image applyImage = new Image(getClass().getResourceAsStream(SettingProperty.iconFolder2 + "/x-filter-apply.png"));
@@ -64,6 +60,14 @@ public class CaptureFilterBar {
         configMenu = new ContextMenu();
         managerItem = new MenuItem();
         this.InitialContextMenu();
+
+        filterBox.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {
+                if (keyEvent.getCode()==KeyCode.ENTER)
+                    ApplyButtonOnClicked();
+            }
+        });
 
     }
 
@@ -83,7 +87,7 @@ public class CaptureFilterBar {
                     stage.setScene(scene);
 
                     FilterConfigView filterConfigView = loader.getController();
-                    filterConfigView.setCaptureFilterBar(self());
+                    filterConfigView.setFilterBar(self());
 
                     stage.show();
                 } catch (IOException e) {
@@ -98,7 +102,7 @@ public class CaptureFilterBar {
         this.UpdateContextMenu();
     }
 
-    private CaptureFilterBar self() {
+    private FilterBar self() {
         return this;
     }
 
@@ -116,11 +120,12 @@ public class CaptureFilterBar {
             item.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
+                    IndexView indexView = (IndexView) view;
                     if (item.isSelected()) {
                         for (FilterProperty property : list) {
-                            if (item.getText().contains(property.getName())) {
+                            if (item.getText().equals(property.getName())) {
                                 filterBox.setValue(property.getExpression());
-                                view.setFilterProperty(property);
+                                indexView.setFilterProperty(property);
                                 break;
                             }
                         }
@@ -136,16 +141,16 @@ public class CaptureFilterBar {
 
     public void setView(View view) {
         this.view = view;
-        if (view.getFilterProperty()==null && configMenu.getItems().size()>2){
+        IndexView indexView = (IndexView) view;
+        if (indexView.getFilterProperty()==null && configMenu.getItems().size()>2){
             selectIndex = 2;
             RadioMenuItem item = (RadioMenuItem) configMenu.getItems().get(selectIndex);
             item.setSelected(true);
-            System.out.println(item.getText());
             List<FilterProperty> list = FileHandle.ReadJson(SettingProperty.filterConfig, FilterProperty.class);
             assert list != null;
             for (FilterProperty property : list) {
                 if (item.getText().contains(property.getName())) {
-                    view.setFilterProperty(property);
+                    indexView.setFilterProperty(property);
                     break;
                 }
             }
@@ -159,55 +164,36 @@ public class CaptureFilterBar {
 
     @FXML
     private void ClearButtonOnClicked() {
+        if (filterBox.getValue()==null)
+            filterBox.setValue("");
+        if (filterBox.getValue().equals(""))
+            return;
+        String type = view.getType();
+        IndexView indexView = (IndexView) view;
+        if (filterBox.getValue().equals(indexView.getFilterProperty().getExpression()))
+            indexView.getFilterProperty().setExpression("");
         filterBox.setValue("");
-        if (view.getClass().equals(CaptureView.class)) {
-            CaptureView captureView = (CaptureView) view;
-            captureView.getPacketListCtrl().getPacketTable().getItems().clear();
-            captureView.setFilterExpression("");
-            String path;
-            if (captureView.getPcapFile()==null)
-                path = SettingProperty.tempPcapFolder + "/tmp.pcapng";
-            else
-                path = captureView.getPcapFile();
-            File file = new File(path);
-            if (!file.exists())
-                return;
-            CNIF cnif = new CNIF(path);
-            Job.OfflineJob job = new Job.OfflineJob(captureView, cnif);
-            Thread thread = new Thread(job);
-            thread.start();
+        if (type.equals("capture")) {
+            indexView.getPacketListCtrl().getPacketTable().getItems().clear();
+            indexView.getFilterProperty().setExpression("");
+            indexView.StartCapture("apply");
         }
     }
 
     @FXML
     private void ApplyButtonOnClicked() {
+        String type = view.getType();
+        IndexView indexView = (IndexView) view;
         // 添加历史记录
+        if (filterBox.getValue()==null)
+            filterBox.setValue("");
         if (!filterBox.getValue().equals(""))
             FileHandle.AddLine(SettingProperty.filterHistory, filterBox.getValue());
-        ViewHandle.InitializeComboBox(SettingProperty.filterHistory, filterBox);
-        FilterProperty property = new FilterProperty();
-        property.setName("apply-tmp");
-        property.setExpression(filterBox.getValue());
-        view.setFilterProperty(property);
-
-        if (view.getClass().equals(CaptureView.class)) {
-            CaptureView captureView = (CaptureView) view;
-            captureView.getPacketListCtrl().getPacketTable().getItems().clear();
-            String path;
-            if (captureView.getPcapFile()==null)
-                path = SettingProperty.tempPcapFolder + "/tmp.pcapng";
-            else
-                path = captureView.getPcapFile();
-            File file = new File(path);
-            if (!file.exists())
-                return;
-            CNIF cnif = new CNIF(path);
-            Job.OfflineJob job = new Job.OfflineJob(captureView, cnif);
-            Thread thread = new Thread(job);
-            thread.start();
-
-            if (captureView.getPcapFile()==null)
-                captureView.CaptureControl();
+        ViewHandle.InitializeFilterComboBox(SettingProperty.filterHistory, filterBox);
+        indexView.getFilterProperty().setExpression(filterBox.getValue());
+        if (type.equals("capture")) {
+            indexView.clearBrowser();
+            indexView.StartCapture("apply");
         }
     }
 }

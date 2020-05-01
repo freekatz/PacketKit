@@ -1,6 +1,7 @@
-package gui.ctrl.analysis;
+package gui.ctrl;
 
-import gui.ctrl.bar.CaptureMenuBar;
+import gui.ctrl.bar.MenuBar;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.web.WebEngine;
@@ -10,8 +11,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class ChartView {
-    CaptureMenuBar captureMenuBar;
+public class ChartView implements View{
+    MenuBar menuBar;
     String path;
 
     WebView webView = new WebView();
@@ -33,14 +34,28 @@ public class ChartView {
         try {
             File file = new File(path);
             URL url = file.toURI().toURL();
-            System.out.println("Local URL: " + url.toString());
             webEngine.load(url.toString());
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
     }
 
-    public void setCaptureMenuBar(CaptureMenuBar captureMenuBar) {
-        this.captureMenuBar = captureMenuBar;
+    public void setMenuBar(MenuBar menuBar) {
+        this.menuBar = menuBar;
+    }
+
+    @Override
+    public String getType() {
+        return null;
+    }
+
+    @Override
+    public void setType(String type) {
+
+    }
+
+    @Override
+    public void close(Event event) {
+
     }
 }

@@ -1,27 +1,56 @@
 package gui.ctrl;
 
-import gui.ctrl.bar.IndexStatusBar;
-import gui.ctrl.list.IndexFileList;
-import gui.ctrl.list.IndexNIFList;
+import gui.ctrl.bar.FilterBar;
+import gui.ctrl.bar.MenuBar;
+import gui.ctrl.bar.StatusBar;
+import gui.ctrl.bar.ToolBar;
+import gui.ctrl.browser.PacketData;
+import gui.ctrl.browser.PacketHeader;
+import gui.ctrl.browser.PacketList;
+import gui.ctrl.list.FileList;
+import gui.ctrl.list.NIFList;
 import gui.model.CaptureProperty;
 import gui.model.FilterProperty;
-import gui.model.Property;
+import gui.model.SettingProperty;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SplitPane;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import util.ViewHandle;
+import util.*;
+import util.nif.CNIF;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class IndexView implements View{
-    public FilterProperty filterProperty;
-    public CaptureProperty captureProperty;
-    public String pcapFile;
-    public String nifName;
+    private FilterProperty filterProperty;
+    private CaptureProperty captureProperty;
+    private String pcapFile;
+    private String nifName;
+
+    private FileList fileListCtrl;
+    private NIFList nifListCtrl;
+
+    private PacketList packetListCtrl;
+    private PacketHeader packetHeaderCtrl;
+    private PacketData packetDataCtrl;
+
+    private MenuBar menuBarCtrl;
+    private ToolBar toolBarCtrl;
+    private FilterBar filterBarCtrl;
+    private StatusBar statusBarCtrl;
+
+    private Label status;
+
+    private String type;
+
+    private CNIF cnif;
 
     @FXML
     BorderPane pane;
@@ -29,63 +58,242 @@ public class IndexView implements View{
     @FXML
     VBox topBox;
 
-    @FXML
     VBox centerBox;
+    SplitPane browserPane;
 
     public IndexView() {}
 
     public void initialize() {
 
+        centerBox = new VBox();
+        browserPane = new SplitPane();
+        this.type = "index";
         // init two config and set statusbar
-        ViewHandle.InitializeCaptureTopBox(topBox, this);
-        try {
-            FXMLLoader nifListLoader = ViewHandle.GetLoader("gui/view/list/IndexNIFList.fxml");
-            AnchorPane nifListPane = nifListLoader.load();
-            nifListPane.setMaxWidth(Double.MAX_VALUE);
-            IndexNIFList indexNIFList = nifListLoader.getController();
-            indexNIFList.setView(this);
-            FXMLLoader fileListLoader = ViewHandle.GetLoader("gui/view/list/IndexFileList.fxml");
-            AnchorPane fileListPane = fileListLoader.load();
-            fileListPane.setMaxWidth(Double.MAX_VALUE);
-            IndexFileList indexFileList = fileListLoader.getController();
-            indexFileList.setView(this);
-            centerBox.getChildren().addAll(fileListPane, nifListPane);
-            centerBox.setSpacing(10);
+        browserPane.setOrientation(Orientation.VERTICAL);
 
-            FXMLLoader statusBarLoader = ViewHandle.GetLoader("gui/view/bar/IndexStatusBar.fxml");
-            AnchorPane statusBatPane = statusBarLoader.load();
-            statusBatPane.setMaxWidth(Double.MAX_VALUE);
-            IndexStatusBar indexStatusBar = statusBarLoader.getController();
-            indexStatusBar.setView(this);
-            pane.setBottom(statusBatPane);
-            pane.getBottom().setLayoutX(0);
-        } catch (IOException e) {
-            e.printStackTrace();
+        ViewHandle.InitializeTop(this);
+        ViewHandle.InitializeCenter(this);
+        ViewHandle.InitializeBottom(this);
+
+        status = statusBarCtrl.statusLabel;
+
+        status.setText("ready");
+    }
+
+    public void StartCapture(String opt) {
+        statusBarCtrl.configButton.setDisable(true);
+        // button logic
+        for (int i=8; i<16; i++)
+            toolBarCtrl.getToolBar().getItems().get(i).setDisable(true);
+        if (pcapFile!=null) {
+            for (int i=0; i<4; i++)
+                toolBarCtrl.getToolBar().getItems().get(i).setDisable(true);
+            for (int i=5; i<9; i++)
+                toolBarCtrl.getToolBar().getItems().get(i).setDisable(false);
+        } else {
+            toolBarCtrl.getToolBar().getItems().get(0).setDisable(true);
+            for (int i=1; i<3; i++)
+                toolBarCtrl.getToolBar().getItems().get(i).setDisable(false);
+            for (int i=5; i<9; i++)
+                toolBarCtrl.getToolBar().getItems().get(i).setDisable(true);
         }
-
+        // capture ctrl
+        switch (opt) {
+            case "online": {
+                status.setText("capture");
+                cnif = new CNIF(nifName, captureProperty);
+                OnlineJob onlineJob = new OnlineJob(this);
+                Thread thread = new Thread(onlineJob);
+                thread.start();
+                break;
+            }
+            case "offline": {
+                status.setText("read");
+                OfflineJob offlineJob = new OfflineJob(this);
+                Thread thread = new Thread(offlineJob);
+                thread.start();
+                break;
+            }
+            case "analysis": {
+                status.setText("analysis");
+                String path;
+                if (fileListCtrl.getFileList().getSelectionModel().getSelectedItem()==null && type.equals("index"))
+                    return;
+                else if (fileListCtrl.getFileList().getSelectionModel().getSelectedItem()!=null && type.equals("index"))
+                    path = fileListCtrl.getFileList().getSelectionModel().getSelectedItem().replaceAll("\\(.*?\\)", "");
+                else
+                    path = Objects.requireNonNullElseGet(pcapFile, () -> SettingProperty.tempPcapFolder + "/tmp.pcapng");
+                System.out.println(path);
+                AnalysisJob analysisJob = new AnalysisJob(path);
+                Thread thread = new Thread(analysisJob);
+                thread.start();
+                break;
+            }
+            case "apply": {
+                status.setText("apply");
+                String path;
+                path = Objects.requireNonNullElseGet(pcapFile, () -> SettingProperty.tempPcapFolder + "/tmp.pcapng");
+                OfflineJob offlineJob = new OfflineJob(this, path);
+                Thread thread = new Thread(offlineJob);
+                thread.start();
+                break;
+            }
+            default:
+                break;
+        }
     }
 
-
-    @Override
-    public void setCaptureProperty(CaptureProperty captureProperty) {
-        this.captureProperty = captureProperty;
+    public void StopCapture() {
+        statusBarCtrl.configButton.setDisable(false);
+        cnif.handle.close();
+        cnif.dumper.close();
     }
 
-    @Override
+    public String getStatus() {
+        return status.getText();
+    }
+
+    public void setStatus(String status) {
+        this.status.setText(status);
+    }
+
+    public CNIF getCnif() {
+        return cnif;
+    }
+
+    public void setCnif(CNIF cnif) {
+        this.cnif = cnif;
+    }
+
+    public StatusBar getStatusBarCtrl() {
+        return statusBarCtrl;
+    }
+
+    public void setStatusBarCtrl(StatusBar statusBarCtrl) {
+        this.statusBarCtrl = statusBarCtrl;
+    }
+
+    public FilterBar getFilterBarCtrl() {
+        return filterBarCtrl;
+    }
+
+    public void setFilterBarCtrl(FilterBar filterBarCtrl) {
+        this.filterBarCtrl = filterBarCtrl;
+    }
+
+    public ToolBar getToolBarCtrl() {
+        return toolBarCtrl;
+    }
+
+    public void setToolBarCtrl(ToolBar toolBarCtrl) {
+        this.toolBarCtrl = toolBarCtrl;
+    }
+
+    public MenuBar getMenuBarCtrl() {
+        return menuBarCtrl;
+    }
+
+    public void setMenuBarCtrl(MenuBar menuBarCtrl) {
+        this.menuBarCtrl = menuBarCtrl;
+    }
+
+    public NIFList getNifListCtrl() {
+        return nifListCtrl;
+    }
+
+    public void setNifListCtrl(NIFList nifListCtrl) {
+        this.nifListCtrl = nifListCtrl;
+    }
+
+    public FileList getFileListCtrl() {
+        return fileListCtrl;
+    }
+
+    public void setFileListCtrl(FileList fileListCtrl) {
+        this.fileListCtrl = fileListCtrl;
+    }
+
+    public SplitPane getBrowserPane() {
+        return browserPane;
+    }
+
+    public VBox getCenterBox() {
+        return centerBox;
+    }
+
+    public VBox getTopBox() {
+        return topBox;
+    }
+
+    public BorderPane getPane() {
+        return pane;
+    }
+
+    public PacketData getPacketDataCtrl() {
+        return packetDataCtrl;
+    }
+
+    public void setPacketDataCtrl(PacketData packetDataCtrl) {
+        this.packetDataCtrl = packetDataCtrl;
+    }
+
+    public PacketHeader getPacketHeaderCtrl() {
+        return packetHeaderCtrl;
+    }
+
+    public void setPacketHeaderCtrl(PacketHeader packetHeaderCtrl) {
+        this.packetHeaderCtrl = packetHeaderCtrl;
+    }
+
+    public PacketList getPacketListCtrl() {
+        return packetListCtrl;
+    }
+
+    public void setPacketListCtrl(PacketList packetListCtrl) {
+        this.packetListCtrl = packetListCtrl;
+    }
+
+    public String getNifName() {
+        return nifName;
+    }
+
+    public void setNifName(String nifName) {
+        this.nifName = nifName;
+    }
+
+    public String getPcapFile() {
+        return pcapFile;
+    }
+
+    public void setPcapFile(String pcapFile) {
+        this.pcapFile = pcapFile;
+    }
+
     public CaptureProperty getCaptureProperty() {
         return captureProperty;
     }
 
-    @Override
+    public void setCaptureProperty(CaptureProperty captureProperty) {
+        this.captureProperty = captureProperty;
+    }
+
+    public FilterProperty getFilterProperty() {
+        return filterProperty;
+    }
+
     public void setFilterProperty(FilterProperty filterProperty) {
         this.filterProperty = filterProperty;
     }
 
     @Override
-    public FilterProperty getFilterProperty() {
-        return filterProperty;
+    public String getType() {
+        return type;
     }
 
+    @Override
+    public void setType(String type) {
+        this.type = type;
+    }
 
     @Override
     public void close(Event event) {
@@ -99,33 +307,11 @@ public class IndexView implements View{
         }
     }
 
-    @Override
-    public void setNifName(String nifName) {
-        this.nifName = nifName;
-    }
-
-    @Override
-    public String getNifName() {
-        return nifName;
-    }
-
-    @Override
-    public String getPcapFile() {
-        return pcapFile;
-    }
-
-    @Override
-    public void setPcapFile(String pcapFile) {
-        this.pcapFile = pcapFile;
-    }
-
-    @Override
-    public String getFilterExpression() {
-        return filterProperty.getExpression();
-    }
-
-    @Override
-    public void setFilterExpression(String filterExpression) {
-        filterProperty.setExpression(filterExpression);
+    public void clearBrowser() {
+        this.getPacketListCtrl().getPacketTable().getItems().clear();
+//        indexView.getPacketHeaderCtrl().getHeaderTree() // clean tree
+        this.getPacketDataCtrl().getIndexList().getItems().clear();
+        this.getPacketDataCtrl().getHexArea().setText("");
+        this.getPacketDataCtrl().getTxtArea().setText("");
     }
 }

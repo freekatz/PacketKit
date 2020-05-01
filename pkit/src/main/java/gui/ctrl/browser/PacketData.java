@@ -6,7 +6,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 
-public class BrowserPacketData {
+public class PacketData {
     View view;
 
     @FXML
@@ -22,7 +22,7 @@ public class BrowserPacketData {
     TextArea txtArea;
 
 
-    public BrowserPacketData() {
+    public PacketData() {
     }
 
     public void initialize() {

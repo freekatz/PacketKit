@@ -128,7 +128,6 @@ public class Ipv4PPacket implements PPacket{
 
     @Override
     public void CraftBuilder() {
-        System.out.println(this.srcAddr+this.dstAddr);
         this.builder.version(IpVersion.getInstance(this.version))
                 .ihl(this.ihl)
                 .totalLength(this.totalLength)

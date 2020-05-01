@@ -1,7 +1,6 @@
 package gui.ctrl;
 
-import gui.ctrl.bar.CaptureToolBar;
-import gui.ctrl.bar.IndexStatusBar;
+import gui.ctrl.bar.StatusBar;
 import gui.model.CaptureProperty;
 import gui.model.Property;
 import gui.model.SettingProperty;
@@ -17,9 +16,9 @@ import javafx.util.StringConverter;
 import util.FileHandle;
 import util.ViewHandle;
 
-public class CaptureConfigView {
+public class CaptureConfigView implements View{
 
-    IndexStatusBar indexStatusBar;
+    StatusBar statusBar;
 
     @FXML
     TableView<Property> configTable;
@@ -164,8 +163,8 @@ public class CaptureConfigView {
 
     }
 
-    public void setIndexStatusBar(IndexStatusBar bar) {
-        this.indexStatusBar = bar;
+    public void setStatusBar(StatusBar bar) {
+        this.statusBar = bar;
     }
 
 
@@ -203,7 +202,7 @@ public class CaptureConfigView {
 
     @FXML
     private void OkButtonOnClicked(Event event) {
-        indexStatusBar.UpdateContextMenu();
+        statusBar.UpdateContextMenu();
         Stage stage = (Stage)((Button)(event).getSource()).getScene().getWindow();
         stage.close();
         // apply 过滤器
@@ -219,4 +218,18 @@ public class CaptureConfigView {
     private void HelpButtonOnClicked() {
     }
 
+    @Override
+    public String getType() {
+        return null;
+    }
+
+    @Override
+    public void setType(String type) {
+
+    }
+
+    @Override
+    public void close(Event event) {
+
+    }
 }

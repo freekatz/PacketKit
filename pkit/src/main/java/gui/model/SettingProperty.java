@@ -24,6 +24,7 @@ public class SettingProperty {
 
     public static int maxPcapFileHistory = 40;
 
+    // json 为每个文件定制
     public static String ioLineChartJson = "pkit/src/main/java/web/api/ioLineChart.json";
     public static String ioLineChartPath = "pkit/src/main/java/web/app/ioLineChart.html";
 
@@ -35,4 +36,7 @@ public class SettingProperty {
 
     public static String ipv6StatBarChartJson = "pkit/src/main/java/web/api/ipv6StatBarChart.json";
     public static String ipv6StatBarChartPath = "pkit/src/main/java/web/app/ipv6StatBarChart.html";
+
+    public static String analysisWelcomePath = "pkit/src/main/java/web/app/analysisWelcome.html";
+
 }

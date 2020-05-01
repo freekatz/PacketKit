@@ -7,25 +7,10 @@ import javafx.event.Event;
 
 public interface View {
 
-    void setCaptureProperty(CaptureProperty captureProperty);
+    String getType();
 
-    CaptureProperty getCaptureProperty();
-
-    void setFilterProperty(FilterProperty filterProperty);
-
-    FilterProperty getFilterProperty();
+    void setType(String type);
 
     void close(Event event);
 
-    String getNifName();
-
-    void setNifName(String nifName);
-
-    String getPcapFile();
-
-    void setPcapFile(String pcapFile);
-
-    String getFilterExpression();
-
-    void setFilterExpression(String filterExpression);
 }

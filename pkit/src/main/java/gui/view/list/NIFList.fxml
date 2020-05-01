@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckMenuItem?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.RadioMenuItem?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="230.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ctrl.list.IndexNIFList">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="230.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ctrl.list.NIFList">
    <children>
       <Button fx:id="captureButton" layoutX="39.0" layoutY="14.0" mnemonicParsing="false" onAction="#CaptureButtonOnClicked" prefHeight="40.0" prefWidth="70.0" text="Capture" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="0.0" />
       <ListView fx:id="nifList" layoutY="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="45.0" />
       <MenuButton fx:id="displayMenu" layoutX="595.0" layoutY="14.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="80.0" text="Display" AnchorPane.bottomAnchor="185.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="20.0">
         <items>
-            <CheckMenuItem fx:id="allCheckItem" mnemonicParsing="false" text="All" />
-            <CheckMenuItem fx:id="loopbackCheckItem" mnemonicParsing="false" selected="true" text="LoopBack" />
-            <CheckMenuItem fx:id="upCheckItem" mnemonicParsing="false" selected="true" text="Up" />
-            <CheckMenuItem fx:id="runningCheckItem" mnemonicParsing="false" selected="true" text="Running" />
-            <CheckMenuItem fx:id="localCheckItem" mnemonicParsing="false" selected="true" text="Local" />
+            <RadioMenuItem fx:id="allItem" mnemonicParsing="false" text="All" />
+            <RadioMenuItem fx:id="loopbackItem" mnemonicParsing="false" text="LoopBack" />
+            <RadioMenuItem fx:id="upItem" mnemonicParsing="false" text="Up" />
+            <RadioMenuItem fx:id="runningItem" mnemonicParsing="false" text="Running" />
+            <RadioMenuItem fx:id="localItem" mnemonicParsing="false" text="Local" />
         </items>
       </MenuButton>
    </children>

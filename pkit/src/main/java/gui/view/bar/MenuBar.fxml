@@ -7,7 +7,7 @@
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="25.0" prefWidth="339.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ctrl.bar.CaptureMenuBar">
+<AnchorPane prefHeight="25.0" prefWidth="339.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ctrl.bar.MenuBar">
    <children>
       <MenuBar layoutX="7.0" layoutY="1.0" prefHeight="25.0" prefWidth="343.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <menus>
@@ -123,30 +123,7 @@
             <Menu mnemonicParsing="false" text="Tool">
               <items>
                 <MenuItem mnemonicParsing="false" text="Send" />
-                  <Menu mnemonicParsing="false" text="Traffic">
-                    <items>
-                        <MenuItem fx:id="nifStatItem" mnemonicParsing="false" onAction="#NifStatItemOnClicked" text="NIF Statistic" />
-                      <MenuItem fx:id="ioItem" mnemonicParsing="false" onAction="#IoItemOnClicked" text="IO LineChart" />
-                      <MenuItem fx:id="protocolItem" mnemonicParsing="false" onAction="#ProtocolItemOnClicked" text="Protocol PieChart" />
-                        <MenuItem fx:id="ipv4StatItem" mnemonicParsing="false" onAction="#Ipv4StatItemOnClicked" text="IPv4 Statistic" />
-                        <MenuItem fx:id="ipv6StatItem" mnemonicParsing="false" onAction="#Ipv6StatItemOnClicked" text="IPv6 Statistic" />
-                    </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="Communication">
-                    <items>
-                      <MenuItem mnemonicParsing="false" text="Action 1" />
-                    </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="Relation">
-                    <items>
-                      <MenuItem mnemonicParsing="false" text="Action 1" />
-                    </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="Description">
-                    <items>
-                      <MenuItem mnemonicParsing="false" text="Action 1" />
-                    </items>
-                  </Menu>
+                  <MenuItem fx:id="analysisItem" mnemonicParsing="false" onAction="#AnalysisItemOnClicked" text="Analysis" />
               </items>
             </Menu>
           <Menu mnemonicParsing="false" text="Help">

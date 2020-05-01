@@ -5,9 +5,9 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="30.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="538.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ctrl.bar.CaptureToolBar">
+<AnchorPane maxHeight="-Infinity" maxWidth="571.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="571.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ctrl.bar.ToolBar">
    <children>
-      <ToolBar layoutY="7.0" maxWidth="30.0" prefHeight="30.0" prefWidth="843.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <ToolBar fx:id="toolBar" layoutY="7.0" maxWidth="622.0" prefHeight="30.0" prefWidth="581.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-10.0" AnchorPane.topAnchor="0.0">
         <items>
           <Button fx:id="startButton" mnemonicParsing="false" onAction="#StartButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
             <Button fx:id="stopButton" mnemonicParsing="false" onAction="#StopButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
@@ -29,6 +29,8 @@
             <Button fx:id="jumpLastButton" mnemonicParsing="false" onAction="#JumpLastButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
             <Separator orientation="VERTICAL" prefHeight="200.0" />
             <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#ForwardButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
+            <Separator orientation="VERTICAL" prefHeight="200.0" />
+            <Button fx:id="analysisButton" mnemonicParsing="false" onAction="#AnalysisButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
         </items>
       </ToolBar>
    </children>

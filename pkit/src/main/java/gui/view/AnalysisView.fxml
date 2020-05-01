@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane minHeight="500.0" minWidth="1000.0" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ctrl.AnalysisView">
+   <children>
+      <SplitPane dividerPositions="0.17735470941883769" prefHeight="160.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <items>
+            <AnchorPane fx:id="menuPane" prefHeight="500.0" prefWidth="200.0" />
+            <AnchorPane fx:id="chartPane" prefHeight="500.0" prefWidth="800.0" />
+         </items></SplitPane>
+   </children>
+</AnchorPane>
