@@ -3,6 +3,7 @@ package gui.ctrl.bar;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import gui.ctrl.AboutView;
 import gui.ctrl.AnalysisView;
 import gui.ctrl.IndexView;
 import gui.ctrl.View;
@@ -28,7 +29,7 @@ import util.ViewHandle;
 import java.io.File;
 import java.io.IOException;
 
-public class MenuBar {
+public class CaptureMenuBar {
     View view;
 
     @FXML
@@ -59,13 +60,13 @@ public class MenuBar {
     MenuItem saveItem;
 
     @FXML
-    MenuItem preferenceItem;
+    MenuItem settingItem;
 
     @FXML
     MenuItem quitItem;
 
     /*
-    View
+    Tool
      */
 
     @FXML
@@ -75,16 +76,10 @@ public class MenuBar {
     MenuItem analysisItem;
 
     @FXML
-    MenuItem contentItem;
-
-    @FXML
     MenuItem websiteItem;
 
     @FXML
     MenuItem qaItem;
-
-    @FXML
-    MenuItem bbsItem;
 
     @FXML
     MenuItem sampleItem;
@@ -98,9 +93,10 @@ public class MenuBar {
     @FXML
     MenuItem aboutItem;
 
-    public MenuBar() {}
+    public CaptureMenuBar() {}
 
     public void initialize() {
+
         recentMenu.getItems().add(new SeparatorMenuItem());
         ViewHandle.InitializePcapFileMenu(SettingProperty.pcapFileHistory, recentMenu);
 
@@ -126,19 +122,6 @@ public class MenuBar {
         this.view = view;
     }
 
-
-    private void StartCaptureOffline(String pcapFile) {
-        String type = view.getType();
-        IndexView indexView = (IndexView) view;
-        if (type.equals("index")) {
-            indexView.setType("capture");
-            indexView.setNifName(null);
-            indexView.setPcapFile(pcapFile);
-            ViewHandle.InitializeCenter(indexView);
-        }
-        indexView.StartCapture("offline");
-
-    }
 
     @FXML
     private void OpenItemOnClicked() {
@@ -182,38 +165,63 @@ public class MenuBar {
     }
 
     @FXML
-    private void MergeItemOnClicked() {
+    private void CloseItemOnClicked() {
+        String type = view.getType();
+        if (type.equals("index"))
+            return;
         IndexView indexView = (IndexView) view;
         indexView.clearBrowser();
         indexView.setPcapFile(null);
         indexView.setType("index");
         ViewHandle.InitializeCenter(indexView);
-    }
 
-    @FXML
-    private void CloseItemOnClicked() {
-
+        indexView.getCaptureToolBarCtrl().InitializeButtonStatus();
     }
 
     @FXML
     private void SaveItemOnClicked() {
-
+        String type = view.getType();
+        if (type.equals("index"))
+            return;
+        // new task and new stage to save
+        Stage stage = new Stage();
+        FileChooser fileChooser = new FileChooser();
+        // setting
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("PCAP files", "*.pcap"),
+                new FileChooser.ExtensionFilter("PCAPNG files", "*.pcapng"),
+                new FileChooser.ExtensionFilter("CAP files", "*.cap")
+        );
+        IndexView indexView = (IndexView) view;
+        fileChooser.setInitialFileName(indexView.getPcapFile().split("/")[indexView.getPcapFile().split("/").length-1]);
+        File file = fileChooser.showSaveDialog(stage);
+        if (file==null) return;
+        indexView.setSavePath(file.getAbsolutePath());
+        indexView.StartCapture("save");
     }
 
     @FXML
-    private void PreferenceItemOnClicked() {
+    private void SettingItemOnClicked() {
+        try {
+            FXMLLoader loader = ViewHandle.GetLoader("gui/view/SettingView.fxml");
+            AnchorPane managerPane = loader.load();
+            Stage stage = new Stage();
+            stage.initStyle(StageStyle.DECORATED);
+            stage.initModality(Modality.APPLICATION_MODAL);
 
+            Scene scene = new Scene(managerPane);
+            stage.setScene(scene);
+
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
     private void QuitItemOnClicked() {
         Platform.exit();
     }
-
-    /*
-    View
-     */
-
 
     @FXML
     private void AnalysisItemOnClicked() {
@@ -238,12 +246,23 @@ public class MenuBar {
 
     @FXML
     private void SendItemOnClicked() {
+        try {
+            FXMLLoader loader = ViewHandle.GetLoader("gui/view/SendView.fxml");
+            AnchorPane managerPane = loader.load();
+            Stage stage = new Stage();
+            stage.initStyle(StageStyle.DECORATED);
+            stage.initModality(Modality.WINDOW_MODAL);
 
-    }
+            Scene scene = new Scene(managerPane);
+            stage.setScene(scene);
 
-    @FXML
-    private void ContentItemOnClicked() {
+            AnalysisView analysisView = loader.getController();
+            analysisView.setView(view);
 
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -252,11 +271,6 @@ public class MenuBar {
     }
     @FXML
     private void QAItemOnClicked() {
-
-    }
-
-    @FXML
-    private void BBSItemOnClicked() {
 
     }
 
@@ -277,7 +291,20 @@ public class MenuBar {
 
     @FXML
     private void AboutItemOnClicked() {
+        try {
+            FXMLLoader loader = ViewHandle.GetLoader("gui/view/AboutView.fxml");
+            AnchorPane managerPane = loader.load();
+            Stage stage = new Stage();
+            stage.initStyle(StageStyle.DECORATED);
+            stage.initModality(Modality.WINDOW_MODAL);
 
+            Scene scene = new Scene(managerPane);
+            stage.setScene(scene);
+
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public MenuItem getAboutItem() {
@@ -312,14 +339,6 @@ public class MenuBar {
         this.sampleItem = sampleItem;
     }
 
-    public MenuItem getBbsItem() {
-        return bbsItem;
-    }
-
-    public void setBbsItem(MenuItem bbsItem) {
-        this.bbsItem = bbsItem;
-    }
-
     public MenuItem getQaItem() {
         return qaItem;
     }
@@ -334,14 +353,6 @@ public class MenuBar {
 
     public void setWebsiteItem(MenuItem websiteItem) {
         this.websiteItem = websiteItem;
-    }
-
-    public MenuItem getContentItem() {
-        return contentItem;
-    }
-
-    public void setContentItem(MenuItem contentItem) {
-        this.contentItem = contentItem;
     }
 
     public MenuItem getAnalysisItem() {
@@ -360,12 +371,12 @@ public class MenuBar {
         this.sendItem = sendItem;
     }
 
-    public MenuItem getPreferenceItem() {
-        return preferenceItem;
+    public MenuItem getSettingItem() {
+        return settingItem;
     }
 
-    public void setPreferenceItem(MenuItem preferenceItem) {
-        this.preferenceItem = preferenceItem;
+    public void setSettingItem(MenuItem settingItem) {
+        this.settingItem = settingItem;
     }
 
     public MenuItem getQuitItem() {

@@ -11,6 +11,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Side;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -65,8 +66,21 @@ public class FilterBar {
         filterBox.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
-                if (keyEvent.getCode()==KeyCode.ENTER)
-                    ApplyButtonOnClicked();
+                if (keyEvent.getCode()==KeyCode.ENTER) {
+                    String type = view.getType();
+                    IndexView indexView = (IndexView) view;
+                    // 添加历史记录
+                    if (filterBox.getValue()==null)
+                        filterBox.setValue("");
+                    if (!filterBox.getValue().equals(""))
+                        FileHandle.AddHistory(SettingProperty.filterHistory, filterBox.getValue(), FilterHistoryProperty.class);
+                    ViewHandle.InitializeFilterComboBox(SettingProperty.filterHistory, filterBox);
+                    indexView.getFilterProperty().setExpression(filterBox.getValue());
+                    if (type.equals("capture")) {
+                        indexView.clearBrowser();
+                        indexView.StartCapture("apply");
+                    }
+                }
             }
         });
 

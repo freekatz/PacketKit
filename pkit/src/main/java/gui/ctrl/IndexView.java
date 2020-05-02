@@ -1,9 +1,9 @@
 package gui.ctrl;
 
+import gui.ctrl.bar.CaptureToolBar;
 import gui.ctrl.bar.FilterBar;
-import gui.ctrl.bar.MenuBar;
-import gui.ctrl.bar.StatusBar;
-import gui.ctrl.bar.ToolBar;
+import gui.ctrl.bar.CaptureMenuBar;
+import gui.ctrl.bar.CaptureStatusBar;
 import gui.ctrl.browser.PacketData;
 import gui.ctrl.browser.PacketHeader;
 import gui.ctrl.browser.PacketList;
@@ -14,7 +14,6 @@ import gui.model.FilterProperty;
 import gui.model.SettingProperty;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -23,9 +22,12 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import util.*;
+import util.job.AnalysisJob;
+import util.job.OfflineJob;
+import util.job.OnlineJob;
+import util.job.SaveJob;
 import util.nif.CNIF;
 
-import java.io.IOException;
 import java.util.Objects;
 
 public class IndexView implements View{
@@ -33,6 +35,7 @@ public class IndexView implements View{
     private CaptureProperty captureProperty;
     private String pcapFile;
     private String nifName;
+    private String savePath;
 
     private FileList fileListCtrl;
     private NIFList nifListCtrl;
@@ -41,10 +44,10 @@ public class IndexView implements View{
     private PacketHeader packetHeaderCtrl;
     private PacketData packetDataCtrl;
 
-    private MenuBar menuBarCtrl;
-    private ToolBar toolBarCtrl;
+    private CaptureMenuBar captureMenuBarCtrl;
+    private CaptureToolBar captureToolBarCtrl;
     private FilterBar filterBarCtrl;
-    private StatusBar statusBarCtrl;
+    private CaptureStatusBar captureStatusBarCtrl;
 
     private Label status;
 
@@ -75,32 +78,32 @@ public class IndexView implements View{
         ViewHandle.InitializeCenter(this);
         ViewHandle.InitializeBottom(this);
 
-        status = statusBarCtrl.statusLabel;
+        status = captureStatusBarCtrl.statusLabel;
 
         status.setText("ready");
     }
 
     public void StartCapture(String opt) {
-        statusBarCtrl.configButton.setDisable(true);
+        captureStatusBarCtrl.configButton.setDisable(true);
         // button logic
         if (!opt.equals("analysis")) {
             if (pcapFile != null) {
                 for (int i = 0; i < 5; i++)
-                    toolBarCtrl.getToolBar().getItems().get(i).setDisable(true);
+                    captureToolBarCtrl.getToolBar().getItems().get(i).setDisable(true);
                 for (int i = 6; i < 9; i++)
-                    toolBarCtrl.getToolBar().getItems().get(i).setDisable(false);
+                    captureToolBarCtrl.getToolBar().getItems().get(i).setDisable(false);
 
                 for (int i = 2; i < 4; i++)
-                    menuBarCtrl.getFileMenu().getItems().get(i).setDisable(false);
+                    captureMenuBarCtrl.getFileMenu().getItems().get(i).setDisable(false);
             } else {
-                toolBarCtrl.getToolBar().getItems().get(0).setDisable(true);
-                toolBarCtrl.getToolBar().getItems().get(1).setDisable(false);
-                toolBarCtrl.getToolBar().getItems().get(2).setDisable(false);
+                captureToolBarCtrl.getToolBar().getItems().get(0).setDisable(true);
+                captureToolBarCtrl.getToolBar().getItems().get(1).setDisable(false);
+                captureToolBarCtrl.getToolBar().getItems().get(2).setDisable(false);
                 for (int i = 3; i < 9; i++)
-                    toolBarCtrl.getToolBar().getItems().get(i).setDisable(true);
+                    captureToolBarCtrl.getToolBar().getItems().get(i).setDisable(true);
 
                 for (int i = 0; i < 5; i++)
-                    menuBarCtrl.getFileMenu().getItems().get(i).setDisable(true);
+                    captureMenuBarCtrl.getFileMenu().getItems().get(i).setDisable(true);
 
             }
         }
@@ -130,7 +133,6 @@ public class IndexView implements View{
                     path = fileListCtrl.getFileList().getSelectionModel().getSelectedItem().replaceAll("\\(.*?\\)", "");
                 else
                     path = Objects.requireNonNullElseGet(pcapFile, () -> SettingProperty.tempPcapFolder + "/tmp.pcapng");
-                System.out.println(path);
                 AnalysisJob analysisJob = new AnalysisJob(path);
                 Thread thread = new Thread(analysisJob);
                 thread.start();
@@ -138,12 +140,17 @@ public class IndexView implements View{
             }
             case "apply": {
                 status.setText("apply");
-                String path;
-                path = Objects.requireNonNullElseGet(pcapFile, () -> SettingProperty.tempPcapFolder + "/tmp.pcapng");
+                String path = Objects.requireNonNullElseGet(pcapFile, () -> SettingProperty.tempPcapFolder + "/tmp.pcapng");
                 OfflineJob offlineJob = new OfflineJob(this, path);
                 Thread thread = new Thread(offlineJob);
                 thread.start();
                 break;
+            }
+            case "save": {
+                String path = Objects.requireNonNullElseGet(pcapFile, () -> SettingProperty.tempPcapFolder + "/tmp.pcapng");
+                SaveJob saveJob = new SaveJob(this, path, savePath, filterProperty.getExpression());
+                Thread thread = new Thread(saveJob);
+                thread.start();
             }
             default:
                 break;
@@ -151,9 +158,17 @@ public class IndexView implements View{
     }
 
     public void StopCapture() {
-        statusBarCtrl.configButton.setDisable(false);
+        captureStatusBarCtrl.configButton.setDisable(false);
         cnif.handle.close();
         cnif.dumper.close();
+    }
+
+    public String getSavePath() {
+        return savePath;
+    }
+
+    public void setSavePath(String savePath) {
+        this.savePath = savePath;
     }
 
     public String getStatus() {
@@ -172,12 +187,12 @@ public class IndexView implements View{
         this.cnif = cnif;
     }
 
-    public StatusBar getStatusBarCtrl() {
-        return statusBarCtrl;
+    public CaptureStatusBar getCaptureStatusBarCtrl() {
+        return captureStatusBarCtrl;
     }
 
-    public void setStatusBarCtrl(StatusBar statusBarCtrl) {
-        this.statusBarCtrl = statusBarCtrl;
+    public void setCaptureStatusBarCtrl(CaptureStatusBar captureStatusBarCtrl) {
+        this.captureStatusBarCtrl = captureStatusBarCtrl;
     }
 
     public FilterBar getFilterBarCtrl() {
@@ -188,20 +203,20 @@ public class IndexView implements View{
         this.filterBarCtrl = filterBarCtrl;
     }
 
-    public ToolBar getToolBarCtrl() {
-        return toolBarCtrl;
+    public CaptureToolBar getCaptureToolBarCtrl() {
+        return captureToolBarCtrl;
     }
 
-    public void setToolBarCtrl(ToolBar toolBarCtrl) {
-        this.toolBarCtrl = toolBarCtrl;
+    public void setCaptureToolBarCtrl(CaptureToolBar captureToolBarCtrl) {
+        this.captureToolBarCtrl = captureToolBarCtrl;
     }
 
-    public MenuBar getMenuBarCtrl() {
-        return menuBarCtrl;
+    public CaptureMenuBar getCaptureMenuBarCtrl() {
+        return captureMenuBarCtrl;
     }
 
-    public void setMenuBarCtrl(MenuBar menuBarCtrl) {
-        this.menuBarCtrl = menuBarCtrl;
+    public void setCaptureMenuBarCtrl(CaptureMenuBar captureMenuBarCtrl) {
+        this.captureMenuBarCtrl = captureMenuBarCtrl;
     }
 
     public NIFList getNifListCtrl() {

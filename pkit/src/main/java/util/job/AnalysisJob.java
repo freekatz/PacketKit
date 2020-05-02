@@ -1,4 +1,4 @@
-package util;
+package util.job;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import gui.model.SettingProperty;
@@ -11,6 +11,7 @@ import gui.model.browser.PacketProperty;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.PcapPacket;
+import util.PacketHandle;
 import util.nif.CNIF;
 
 import java.io.EOFException;

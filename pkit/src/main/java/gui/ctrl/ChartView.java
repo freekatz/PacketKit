@@ -1,6 +1,6 @@
 package gui.ctrl;
 
-import gui.ctrl.bar.MenuBar;
+import gui.ctrl.bar.CaptureMenuBar;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.layout.AnchorPane;
@@ -12,7 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class ChartView implements View{
-    MenuBar menuBar;
+    CaptureMenuBar captureMenuBar;
     String path;
 
     WebView webView = new WebView();
@@ -40,8 +40,8 @@ public class ChartView implements View{
         }
     }
 
-    public void setMenuBar(MenuBar menuBar) {
-        this.menuBar = menuBar;
+    public void setCaptureMenuBar(CaptureMenuBar captureMenuBar) {
+        this.captureMenuBar = captureMenuBar;
     }
 
     @Override

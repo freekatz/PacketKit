@@ -1,6 +1,6 @@
 package gui.ctrl;
 
-import gui.ctrl.bar.StatusBar;
+import gui.ctrl.bar.CaptureStatusBar;
 import gui.model.CaptureProperty;
 import gui.model.Property;
 import gui.model.SettingProperty;
@@ -18,7 +18,7 @@ import util.ViewHandle;
 
 public class CaptureConfigView implements View{
 
-    StatusBar statusBar;
+    CaptureStatusBar captureStatusBar;
 
     @FXML
     TableView<Property> configTable;
@@ -163,8 +163,8 @@ public class CaptureConfigView implements View{
 
     }
 
-    public void setStatusBar(StatusBar bar) {
-        this.statusBar = bar;
+    public void setCaptureStatusBar(CaptureStatusBar bar) {
+        this.captureStatusBar = bar;
     }
 
 
@@ -202,7 +202,7 @@ public class CaptureConfigView implements View{
 
     @FXML
     private void OkButtonOnClicked(Event event) {
-        statusBar.UpdateContextMenu();
+        captureStatusBar.UpdateContextMenu();
         Stage stage = (Stage)((Button)(event).getSource()).getScene().getWindow();
         stage.close();
         // apply 过滤器

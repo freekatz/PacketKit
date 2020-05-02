@@ -22,7 +22,7 @@ import util.ViewHandle;
 import java.io.IOException;
 import java.util.List;
 
-public class StatusBar {
+public class CaptureStatusBar {
     View view;
     int selectIndex;
 
@@ -36,7 +36,7 @@ public class StatusBar {
     MenuItem managerItem;
 
 
-    public StatusBar() {}
+    public CaptureStatusBar() {}
 
     public void initialize() {
         configMenu = new ContextMenu();
@@ -60,7 +60,7 @@ public class StatusBar {
                     stage.setScene(scene);
 
                     CaptureConfigView captureConfigView = loader.getController();
-                    captureConfigView.setStatusBar(self());
+                    captureConfigView.setCaptureStatusBar(self());
 
                     stage.show();
                 } catch (IOException e) {
@@ -78,7 +78,7 @@ public class StatusBar {
 
     }
 
-    private StatusBar self() {
+    private CaptureStatusBar self() {
         return this;
     }
 

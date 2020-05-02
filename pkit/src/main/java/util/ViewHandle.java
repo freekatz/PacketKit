@@ -3,14 +3,11 @@ package util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.intellij.vcs.log.Hash;
-import gui.ctrl.AnalysisView;
 import gui.ctrl.IndexView;
-import gui.ctrl.ChartView;
+import gui.ctrl.bar.CaptureToolBar;
 import gui.ctrl.bar.FilterBar;
-import gui.ctrl.bar.MenuBar;
-import gui.ctrl.bar.StatusBar;
-import gui.ctrl.bar.ToolBar;
+import gui.ctrl.bar.CaptureMenuBar;
+import gui.ctrl.bar.CaptureStatusBar;
 import gui.ctrl.View;
 import gui.ctrl.browser.PacketData;
 import gui.ctrl.browser.PacketHeader;
@@ -24,22 +21,17 @@ import gui.model.history.PcapFileHistoryProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.Pcaps;
 
 import java.io.*;
 import java.net.URL;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 public class ViewHandle {
@@ -56,18 +48,18 @@ public class ViewHandle {
         IndexView indexView = (IndexView) view;
         VBox box = indexView.getTopBox();
         try {
-            FXMLLoader menuBarLoader = ViewHandle.GetLoader("gui/view/bar/MenuBar.fxml");
+            FXMLLoader menuBarLoader = ViewHandle.GetLoader("gui/view/bar/CaptureMenuBar.fxml");
             AnchorPane menuBarPane = menuBarLoader.load();
             menuBarPane.setMaxWidth(Double.MAX_VALUE);
-            MenuBar menuBar = menuBarLoader.getController();
-            menuBar.setView(view);
-            indexView.setMenuBarCtrl(menuBar);
-            FXMLLoader toolBarLoader = ViewHandle.GetLoader("gui/view/bar/ToolBar.fxml");
+            CaptureMenuBar captureMenuBar = menuBarLoader.getController();
+            captureMenuBar.setView(view);
+            indexView.setCaptureMenuBarCtrl(captureMenuBar);
+            FXMLLoader toolBarLoader = ViewHandle.GetLoader("gui/view/bar/CaptureToolBar.fxml");
             AnchorPane toolBarPane = toolBarLoader.load();
             toolBarPane.setMaxWidth(Double.MAX_VALUE);
-            ToolBar toolBar = toolBarLoader.getController();
-            toolBar.setView(view);
-            indexView.setToolBarCtrl(toolBar);
+            CaptureToolBar captureToolBar = toolBarLoader.getController();
+            captureToolBar.setView(view);
+            indexView.setCaptureToolBarCtrl(captureToolBar);
             FXMLLoader filterBarLoader = ViewHandle.GetLoader("gui/view/bar/FilterBar.fxml");
             AnchorPane filterBarPane = filterBarLoader.load();
             filterBarPane.setMaxWidth(Double.MAX_VALUE);
@@ -147,14 +139,14 @@ public class ViewHandle {
         IndexView indexView = (IndexView) view;
         BorderPane pane = indexView.getPane();
         try {
-            FXMLLoader statusBarLoader = ViewHandle.GetLoader("gui/view/bar/StatusBar.fxml");
+            FXMLLoader statusBarLoader = ViewHandle.GetLoader("gui/view/bar/CaptureStatusBar.fxml");
             AnchorPane statusBatPane = statusBarLoader.load();
             statusBatPane.setMaxWidth(Double.MAX_VALUE);
-            StatusBar statusBar = statusBarLoader.getController();
-            statusBar.setView(view);
+            CaptureStatusBar captureStatusBar = statusBarLoader.getController();
+            captureStatusBar.setView(view);
             pane.setBottom(statusBatPane);
             pane.getBottom().setLayoutX(0);
-            indexView.setStatusBarCtrl(statusBarLoader.getController());
+            indexView.setCaptureStatusBarCtrl(statusBarLoader.getController());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -171,11 +163,14 @@ public class ViewHandle {
             ObservableList<String> ob = FXCollections.observableArrayList();
             int num = 0;
             for (String f : hashSet) {
-                System.out.println(f);
                 if (num < SettingProperty.maxPcapFileHistory) {
                     File file1 = new File(f);
                     FileInputStream fis1 = new FileInputStream(file1);
-                    ob.add(f + "(" + fis1.available() + " Bytes)");
+                    String item;
+                    if (fis1.available()/1024==0)
+                        item = f + "(" + ((double)fis1.available())/1024 + " KB)";
+                    else item = f + "(" + fis1.available()/1024 + " KB)";
+                    ob.add(item);
                     num ++;
                 }
             }
@@ -200,10 +195,14 @@ public class ViewHandle {
                 if (num < SettingProperty.maxPcapFileHistory) {
                     File file1 = new File(f);
                     FileInputStream fis1 = new FileInputStream(file1);
-                    RadioMenuItem item = new RadioMenuItem(f + "(" + fis1.available() + " Bytes)");
-                    item.setToggleGroup(group);
-                    item.setSelected(false);
-                    menu.getItems().add(item);
+                    String item;
+                    if (fis1.available()/1024==0)
+                        item = f + "(" + ((double)fis1.available())/1024 + " KB)";
+                    else item = f + "(" + fis1.available()/1024 + " KB)";
+                    RadioMenuItem menuItem = new RadioMenuItem(item);
+                    menuItem.setToggleGroup(group);
+                    menuItem.setSelected(false);
+                    menu.getItems().add(menuItem);
                     num ++;
                 }
             }
@@ -294,6 +293,11 @@ public class ViewHandle {
             e.printStackTrace();
         }
 
+        return null;
+    }
+
+    public static TreeView<String> InitializeHeaderTreeTable(Property property) {
+        // todo
         return null;
     }
 }

@@ -1,4 +1,4 @@
-package util;
+package util.job;
 
 import gui.ctrl.IndexView;
 import gui.model.CaptureProperty;
@@ -6,14 +6,12 @@ import gui.model.Property;
 import gui.model.browser.PacketInfoProperty;
 import gui.model.browser.PacketProperty;
 import javafx.concurrent.Task;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import org.pcap4j.core.BpfProgram;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.PcapPacket;
+import util.PacketHandle;
 import util.nif.CNIF;
 
 import java.io.EOFException;
@@ -29,7 +27,7 @@ public class OnlineJob extends Task<PacketProperty> {
     IndexView indexView;
     CaptureProperty captureProperty;
     TableView<Property> packetTable;
-    TreeView<Property> headerTree;
+    TreeTableView<String> headerTreeTable;
     ListView<String> indexList;
     TextArea hexArea;
     TextArea txtArea;
@@ -41,7 +39,7 @@ public class OnlineJob extends Task<PacketProperty> {
         captureProperty = indexView.getCaptureProperty();
 
         packetTable = indexView.getPacketListCtrl().getPacketTable();
-        headerTree = indexView.getPacketHeaderCtrl().getHeaderTree();
+        headerTreeTable = indexView.getPacketHeaderCtrl().getHeaderTreeTable();
         indexList = indexView.getPacketDataCtrl().getIndexList();
         hexArea = indexView.getPacketDataCtrl().getHexArea();
         txtArea = indexView.getPacketDataCtrl().getTxtArea();
@@ -88,11 +86,11 @@ public class OnlineJob extends Task<PacketProperty> {
 
         cnif.dumper.close();
         cnif.handle.close();
-        indexView.getToolBarCtrl().getToolBar().getItems().get(0).setDisable(false);
-        indexView.getToolBarCtrl().getToolBar().getItems().get(1).setDisable(true);
-        indexView.getToolBarCtrl().getToolBar().getItems().get(2).setDisable(false);
-        indexView.getToolBarCtrl().getToolBar().getItems().get(5).setDisable(false);
-        indexView.getStatusBarCtrl().configButton.setDisable(false);
+        indexView.getCaptureToolBarCtrl().getToolBar().getItems().get(0).setDisable(false);
+        indexView.getCaptureToolBarCtrl().getToolBar().getItems().get(1).setDisable(true);
+        indexView.getCaptureToolBarCtrl().getToolBar().getItems().get(2).setDisable(false);
+        indexView.getCaptureToolBarCtrl().getToolBar().getItems().get(5).setDisable(false);
+        indexView.getCaptureStatusBarCtrl().configButton.setDisable(false);
         return null;
     }
 

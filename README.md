@@ -233,11 +233,7 @@
 
 [@OpenJFX.IO](openjfx.io)
 
-[@Spring Projects](https://github.com/spring-projects/spring-boot)
-
-[@Vue.js](https://vuejs.org/)
-
-[@ECharts.js](https://www.echartsjs.com/)
+[@HighCharts](https://www.highcharts.com.cn/)
 
 ## 版权许可
 

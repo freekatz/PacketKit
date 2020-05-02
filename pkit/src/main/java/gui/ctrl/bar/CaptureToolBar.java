@@ -10,6 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -23,11 +24,11 @@ import util.ViewHandle;
 import java.io.File;
 import java.io.IOException;
 
-public class ToolBar {
+public class CaptureToolBar {
     View view;
 
     @FXML
-    javafx.scene.control.ToolBar toolBar;
+    ToolBar toolBar;
 
     @FXML
     Button startButton;
@@ -63,7 +64,7 @@ public class ToolBar {
     Button analysisButton;
 
 
-    public ToolBar() {}
+    public CaptureToolBar() {}
 
     public void initialize() {
         this.InitializeButton();
@@ -121,7 +122,6 @@ public class ToolBar {
         restartButton.setDisable(false);
         returnButton.setDisable(true);
 
-        String type = view.getType();
         IndexView indexView = (IndexView) view;
 
         indexView.clearBrowser();
@@ -171,7 +171,7 @@ public class ToolBar {
         ViewHandle.InitializeCenter(indexView);
 
         for (int i = 0; i < 5; i++)
-            indexView.getMenuBarCtrl().getFileMenu().getItems().get(i).setDisable(false);
+            indexView.getCaptureMenuBarCtrl().getFileMenu().getItems().get(i).setDisable(false);
     }
 
     @FXML
@@ -208,11 +208,11 @@ public class ToolBar {
         String type = view.getType();
         IndexView indexView = (IndexView) view;
         ViewHandle.InitializePcapFileList(SettingProperty.pcapFileHistory, indexView.getFileListCtrl().getFileList());
-        ViewHandle.InitializePcapFileMenu(SettingProperty.pcapFileHistory, indexView.getMenuBarCtrl().getRecentMenu());
+        ViewHandle.InitializePcapFileMenu(SettingProperty.pcapFileHistory, indexView.getCaptureMenuBarCtrl().getRecentMenu());
         indexView.setPcapFile(file.getAbsolutePath());
         indexView.setNifName(null);
-        for (int i = 2; i < indexView.getMenuBarCtrl().getRecentMenu().getItems().size(); i++) {
-            RadioMenuItem item = (RadioMenuItem) indexView.getMenuBarCtrl().getRecentMenu().getItems().get(i);
+        for (int i = 2; i < indexView.getCaptureMenuBarCtrl().getRecentMenu().getItems().size(); i++) {
+            RadioMenuItem item = (RadioMenuItem) indexView.getCaptureMenuBarCtrl().getRecentMenu().getItems().get(i);
             if (item.getText().contains(file.getAbsolutePath()))
                 item.setSelected(true);
         }
@@ -227,7 +227,22 @@ public class ToolBar {
 
     @FXML
     private void SaveButtonOnClicked() {
-        // new task and new stage to save
+        String type = view.getType();
+        if (type.equals("index"))
+            return;
+        Stage stage = new Stage();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("PCAP files", "*.pcap"),
+                new FileChooser.ExtensionFilter("PCAPNG files", "*.pcapng"),
+                new FileChooser.ExtensionFilter("CAP files", "*.cap")
+        );
+        IndexView indexView = (IndexView) view;
+        fileChooser.setInitialFileName(indexView.getPcapFile().split("/")[indexView.getPcapFile().split("/").length-1]);
+        File file = fileChooser.showSaveDialog(stage);
+        if (file==null) return;
+        indexView.setSavePath(file.getAbsolutePath());
+        indexView.StartCapture("save");
     }
 
     @FXML
@@ -249,48 +264,11 @@ public class ToolBar {
         indexView.StartCapture("offline");
     }
 
-    @FXML
-    private void JumpButtonOnClicked() {
-        // new stage
-        // table auto roll
-    }
-
-    @FXML
-    private void JumpNextButtonOnClicked() {
-        IndexView indexView = (IndexView) view;
-        indexView.getPacketListCtrl().getPacketTable().getSelectionModel().select(
-                indexView.getPacketListCtrl().getPacketTable().getSelectionModel().getSelectedIndex()+1
-        );
-    }
-
-    @FXML
-    private void JumpPreviousButtonOnClicked() {
-        IndexView indexView = (IndexView) view;
-        indexView.getPacketListCtrl().getPacketTable().getSelectionModel().select(
-                indexView.getPacketListCtrl().getPacketTable().getSelectionModel().getSelectedIndex()-1
-        );
-    }
-
-    @FXML
-    private void JumpFirstButtonOnClicked() {
-        IndexView indexView = (IndexView) view;
-        indexView.getPacketListCtrl().getPacketTable().getSelectionModel().select(0);
-    }
-
-    @FXML
-    private void JumpLastButtonOnClicked() {
-        IndexView indexView = (IndexView) view;
-        indexView.getPacketListCtrl().getPacketTable().getSelectionModel().select(
-                indexView.getPacketListCtrl().getPacketTable().getItems().size()-1
-        );
-    }
 
     @FXML
     private void ForwardButtonOnClicked() {
-        // only table has packet, enabled
+        // only table has packet, enabled todo
         IndexView indexView = (IndexView) view;
-        if (indexView.getPacketListCtrl()!=null)
-            System.out.println("forward");
     }
 
     @FXML
@@ -314,7 +292,7 @@ public class ToolBar {
         }
     }
 
-    public javafx.scene.control.ToolBar getToolBar() {
+    public ToolBar getToolBar() {
         return toolBar;
     }
 

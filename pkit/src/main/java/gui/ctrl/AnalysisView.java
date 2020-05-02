@@ -40,6 +40,9 @@ public class AnalysisView implements View{
 
     public void initialize() {
 
+        /*
+        create menu
+        */
         AnalysisMenuProperty menuProperty = new AnalysisMenuProperty();
         LinkedHashMap<String, String> traffic = new LinkedHashMap<>();
         traffic.put("NIF Statistic", "NIF Statistic1");
