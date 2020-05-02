@@ -10,9 +10,9 @@ public class SettingProperty {
 
     public static String tempPcapFolder = "pkit/src/main/res/temp";
 
-    public static String pcapFileHistory = "pkit/src/main/res/history/pcap.txt";
+    public static String pcapFileHistory = "pkit/src/main/res/history/pcap.json";
 
-    public static String filterHistory = "pkit/src/main/res/history/filter.txt";
+    public static String filterHistory = "pkit/src/main/res/history/filter.json";
 
     public static String iconFolder1 = "/icon/16x16";
 

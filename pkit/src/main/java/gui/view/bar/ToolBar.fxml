@@ -5,28 +5,20 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="571.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="571.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ctrl.bar.ToolBar">
+<AnchorPane maxHeight="-Infinity" maxWidth="622.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="622.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ctrl.bar.ToolBar">
    <children>
       <ToolBar fx:id="toolBar" layoutY="7.0" maxWidth="622.0" prefHeight="30.0" prefWidth="581.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-10.0" AnchorPane.topAnchor="0.0">
         <items>
           <Button fx:id="startButton" mnemonicParsing="false" onAction="#StartButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
             <Button fx:id="stopButton" mnemonicParsing="false" onAction="#StopButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
             <Button fx:id="restartButton" mnemonicParsing="false" onAction="#RestartButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
+            <Button fx:id="returnButton" mnemonicParsing="false" onAction="#ReturnButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
             <Button fx:id="configButton" mnemonicParsing="false" onAction="#ConfigButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
             <Separator orientation="VERTICAL" prefHeight="200.0" />
             <Button fx:id="openButton" mnemonicParsing="false" onAction="#OpenButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
             <Button fx:id="saveButton" mnemonicParsing="false" onAction="#SaveButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
             <Button fx:id="closeButton" mnemonicParsing="false" onAction="#CloseButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
             <Button fx:id="reloadButton" mnemonicParsing="false" onAction="#ReloadButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
-            <Separator orientation="VERTICAL" prefHeight="200.0" />
-            <Button fx:id="searchButton" mnemonicParsing="false" onAction="#SearchButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
-            <Button fx:id="searchNextButton" mnemonicParsing="false" onAction="#SearchNextButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
-            <Button fx:id="searchPreviousButton" mnemonicParsing="false" onAction="#SearchPreviousButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
-            <Button fx:id="jumpButton" mnemonicParsing="false" onAction="#JumpButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
-            <Button fx:id="jumpNextButton" mnemonicParsing="false" onAction="#JumpNextButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
-            <Button fx:id="jumpPreviousButton" mnemonicParsing="false" onAction="#JumpPreviousButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
-            <Button fx:id="jumpFirstButton" mnemonicParsing="false" onAction="#JumpFirstButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
-            <Button fx:id="jumpLastButton" mnemonicParsing="false" onAction="#JumpLastButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
             <Separator orientation="VERTICAL" prefHeight="200.0" />
             <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#ForwardButtonOnClicked" prefHeight="25.0" prefWidth="25.0" />
             <Separator orientation="VERTICAL" prefHeight="200.0" />

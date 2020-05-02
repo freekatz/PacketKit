@@ -11,60 +11,23 @@
    <children>
       <MenuBar layoutX="7.0" layoutY="1.0" prefHeight="25.0" prefWidth="343.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <menus>
-          <Menu mnemonicParsing="false" text="File">
+          <Menu fx:id="fileMenu" mnemonicParsing="false" text="File">
             <items>
-              <MenuItem mnemonicParsing="false" text="Open" />
-                  <Menu mnemonicParsing="false" text="Open Recent">
+              <MenuItem fx:id="openItem" mnemonicParsing="false" onAction="#OpenItemOnClicked" text="Open" />
+                  <Menu fx:id="recentMenu" mnemonicParsing="false" text="Open Recent">
                      <items>
-                        <MenuItem mnemonicParsing="false" text="Not Found" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem mnemonicParsing="false" text="Clear History" />
+                        <MenuItem fx:id="clearItem" mnemonicParsing="false" onAction="#ClearItemOnClicked" text="Clear History" />
                      </items>
                   </Menu>
-                  <MenuItem mnemonicParsing="false" text="Merge" />
-                  <MenuItem mnemonicParsing="false" text="Close" />
+                  <MenuItem fx:id="closeItem" mnemonicParsing="false" onAction="#CloseItemOnClicked" text="Close" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="Save" />
-                  <MenuItem mnemonicParsing="false" text="Save as" />
+                  <MenuItem fx:id="saveItem" mnemonicParsing="false" onAction="#SaveItemOnClicked" text="Save" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="Export Specified Packet" />
-                  <Menu mnemonicParsing="false" text="Export Parse Result">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="As CSV" />
-                        <MenuItem mnemonicParsing="false" text="As JSON" />
-                        <MenuItem mnemonicParsing="false" text="As XML" />
-                     </items>
-                  </Menu>
-                  <MenuItem mnemonicParsing="false" text="Export Analysis Result" />
-                  <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="Quit" />
+                  <MenuItem fx:id="quitItem" mnemonicParsing="false" onAction="#QuitItemOnClicked" text="Quit" />
+                  <MenuItem fx:id="preferenceItem" mnemonicParsing="false" onAction="#PreferenceItemOnClicked" text="Preference" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Edit">
-            <items>
-                  <Menu mnemonicParsing="false" text="Copy">
-                    <items>
-                      <MenuItem mnemonicParsing="false" text="As Plain Text" />
-                        <MenuItem mnemonicParsing="false" text="As CSV" />
-                        <MenuItem mnemonicParsing="false" text="As JSON" />
-                    </items>
-                  </Menu>
-              <MenuItem mnemonicParsing="false" text="Search" />
-                  <MenuItem mnemonicParsing="false" text="Search Next" />
-                  <MenuItem mnemonicParsing="false" text="Search Previous" />
-                  <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="Mark/Unmark Packet(s)" />
-                  <MenuItem mnemonicParsing="false" text="Mark/Unmark All Display" />
-                  <MenuItem mnemonicParsing="false" text="Next Mark" />
-                  <MenuItem mnemonicParsing="false" text="Previous Mark" />
-                  <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="Ingore/Uningore Packet(s)" />
-                  <MenuItem mnemonicParsing="false" text="Ingore/Uningore All Display" />
-                  <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="Preference" />
-            </items>
-          </Menu>
-            <Menu mnemonicParsing="false" text="View">
+            <Menu fx:id="viewMenu" mnemonicParsing="false" text="View">
                <items>
                   <CheckMenuItem mnemonicParsing="false" text="ToolBar" />
                   <CheckMenuItem mnemonicParsing="false" text="FilterBar" />
@@ -74,72 +37,29 @@
                   <CheckMenuItem mnemonicParsing="false" text="Header" />
                   <CheckMenuItem mnemonicParsing="false" text="Byte" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="Fold/Unfold Child Tree" />
-                  <MenuItem mnemonicParsing="false" text="Fold/Unfold All" />
-                  <SeparatorMenuItem mnemonicParsing="false" />
-                  <CheckMenuItem mnemonicParsing="false" text="Coloring" />
-                  <Menu mnemonicParsing="false" text="Coloring Config">
-                    <items>
-                      <MenuItem mnemonicParsing="false" text="Default" />
-                    </items>
-                  </Menu>
-                  <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="Reset" />
-                  <MenuItem mnemonicParsing="false" text="Adjust" />
-                  <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="Open in New Window" />
                   <MenuItem mnemonicParsing="false" text="Reload" />
                </items>
             </Menu>
-            <Menu mnemonicParsing="false" text="Jump">
+            <Menu fx:id="toolMenu" mnemonicParsing="false" text="Tool">
               <items>
-                <MenuItem mnemonicParsing="false" text="Jump to" />
-                  <MenuItem mnemonicParsing="false" text="Next" />
-                  <MenuItem mnemonicParsing="false" text="Previous" />
-                  <MenuItem mnemonicParsing="false" text="First" />
-                  <MenuItem mnemonicParsing="false" text="Last" />
-                  <SeparatorMenuItem mnemonicParsing="false" />
-                  <CheckMenuItem mnemonicParsing="false" text="Auto Roll to New" />
-              </items>
-            </Menu>
-            <Menu mnemonicParsing="false" text="Capture">
-              <items>
-                  <Menu mnemonicParsing="false" text="Config">
-                    <items>
-                      <MenuItem mnemonicParsing="false" text="Default" />
-                    </items>
-                  </Menu>
-                <MenuItem mnemonicParsing="false" text="Begin" />
-                  <MenuItem mnemonicParsing="false" text="Stop" />
-                  <MenuItem mnemonicParsing="false" text="Restart" />
-                  <Menu mnemonicParsing="false" text="Filter">
-                    <items>
-                      <MenuItem mnemonicParsing="false" text="Default" />
-                    </items>
-                  </Menu>
-                  <MenuItem mnemonicParsing="false" text="Refresh NIF List" />
-              </items>
-            </Menu>
-            <Menu mnemonicParsing="false" text="Tool">
-              <items>
-                <MenuItem mnemonicParsing="false" text="Send" />
+                <MenuItem fx:id="sendItem" mnemonicParsing="false" onAction="#SendItemOnClicked" text="Send" />
                   <MenuItem fx:id="analysisItem" mnemonicParsing="false" onAction="#AnalysisItemOnClicked" text="Analysis" />
               </items>
             </Menu>
-          <Menu mnemonicParsing="false" text="Help">
+          <Menu fx:id="helpMenu" mnemonicParsing="false" text="Help">
                <items>
-                  <MenuItem mnemonicParsing="false" text="Content" />
+                  <MenuItem fx:id="contentItem" mnemonicParsing="false" onAction="#ContentItemOnClicked" text="Content" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="Website" />
-                  <MenuItem mnemonicParsing="false" text="Q&amp;A" />
+                  <MenuItem fx:id="websiteItem" mnemonicParsing="false" onAction="#WebsiteItemOnClicked" text="Website" />
+                  <MenuItem fx:id="qaItem" mnemonicParsing="false" onAction="#QAItemOnClicked" text="Q&amp;A" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="BBS" />
-                  <MenuItem mnemonicParsing="false" text="Sample" />
+                  <MenuItem fx:id="bbsItem" mnemonicParsing="false" onAction="#BBSItemOnClicked" text="BBS" />
+                  <MenuItem fx:id="sampleItem" mnemonicParsing="false" onAction="#SampleItemOnClicked" text="Sample" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="Download" />
-                  <MenuItem mnemonicParsing="false" text="Check for Update" />
+                  <MenuItem fx:id="downloadItem" mnemonicParsing="false" onAction="#DownloadItemOnClicked" text="Download" />
+                  <MenuItem fx:id="cfuItem" mnemonicParsing="false" onAction="#CfUItemOnClicked" text="Check for Update" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="About" />
+                  <MenuItem fx:id="aboutItem" mnemonicParsing="false" onAction="#AboutItemOnClicked" text="About" />
                </items>
           </Menu>
         </menus>

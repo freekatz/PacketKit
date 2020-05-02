@@ -5,6 +5,7 @@ import gui.ctrl.IndexView;
 import gui.ctrl.View;
 import gui.model.FilterProperty;
 import gui.model.SettingProperty;
+import gui.model.history.FilterHistoryProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -110,7 +111,7 @@ public class FilterBar {
     public void UpdateContextMenu() {
         configMenu.getItems().remove(2, configMenu.getItems().size());
         ToggleGroup group = new ToggleGroup();
-        List<FilterProperty> list = FileHandle.ReadJson(SettingProperty.filterConfig, FilterProperty.class);
+        List<FilterProperty> list = FileHandle.ReadConfig(SettingProperty.filterConfig, FilterProperty.class);
         assert list != null;
         list.forEach(p -> {
             RadioMenuItem item = new RadioMenuItem(p.getName()
@@ -146,7 +147,7 @@ public class FilterBar {
             selectIndex = 2;
             RadioMenuItem item = (RadioMenuItem) configMenu.getItems().get(selectIndex);
             item.setSelected(true);
-            List<FilterProperty> list = FileHandle.ReadJson(SettingProperty.filterConfig, FilterProperty.class);
+            List<FilterProperty> list = FileHandle.ReadConfig(SettingProperty.filterConfig, FilterProperty.class);
             assert list != null;
             for (FilterProperty property : list) {
                 if (item.getText().contains(property.getName())) {
@@ -188,7 +189,7 @@ public class FilterBar {
         if (filterBox.getValue()==null)
             filterBox.setValue("");
         if (!filterBox.getValue().equals(""))
-            FileHandle.AddLine(SettingProperty.filterHistory, filterBox.getValue());
+            FileHandle.AddHistory(SettingProperty.filterHistory, filterBox.getValue(), FilterHistoryProperty.class);
         ViewHandle.InitializeFilterComboBox(SettingProperty.filterHistory, filterBox);
         indexView.getFilterProperty().setExpression(filterBox.getValue());
         if (type.equals("capture")) {

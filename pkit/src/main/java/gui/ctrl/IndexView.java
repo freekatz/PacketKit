@@ -83,19 +83,26 @@ public class IndexView implements View{
     public void StartCapture(String opt) {
         statusBarCtrl.configButton.setDisable(true);
         // button logic
-        for (int i=8; i<16; i++)
-            toolBarCtrl.getToolBar().getItems().get(i).setDisable(true);
-        if (pcapFile!=null) {
-            for (int i=0; i<4; i++)
-                toolBarCtrl.getToolBar().getItems().get(i).setDisable(true);
-            for (int i=5; i<9; i++)
-                toolBarCtrl.getToolBar().getItems().get(i).setDisable(false);
-        } else {
-            toolBarCtrl.getToolBar().getItems().get(0).setDisable(true);
-            for (int i=1; i<3; i++)
-                toolBarCtrl.getToolBar().getItems().get(i).setDisable(false);
-            for (int i=5; i<9; i++)
-                toolBarCtrl.getToolBar().getItems().get(i).setDisable(true);
+        if (!opt.equals("analysis")) {
+            if (pcapFile != null) {
+                for (int i = 0; i < 5; i++)
+                    toolBarCtrl.getToolBar().getItems().get(i).setDisable(true);
+                for (int i = 6; i < 9; i++)
+                    toolBarCtrl.getToolBar().getItems().get(i).setDisable(false);
+
+                for (int i = 2; i < 4; i++)
+                    menuBarCtrl.getFileMenu().getItems().get(i).setDisable(false);
+            } else {
+                toolBarCtrl.getToolBar().getItems().get(0).setDisable(true);
+                toolBarCtrl.getToolBar().getItems().get(1).setDisable(false);
+                toolBarCtrl.getToolBar().getItems().get(2).setDisable(false);
+                for (int i = 3; i < 9; i++)
+                    toolBarCtrl.getToolBar().getItems().get(i).setDisable(true);
+
+                for (int i = 0; i < 5; i++)
+                    menuBarCtrl.getFileMenu().getItems().get(i).setDisable(true);
+
+            }
         }
         // capture ctrl
         switch (opt) {

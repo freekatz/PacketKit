@@ -86,7 +86,7 @@ public class StatusBar {
         // 为每个菜单行为添加行为：读取配置
         configMenu.getItems().remove(2, configMenu.getItems().size());
         ToggleGroup group = new ToggleGroup();
-        List<CaptureProperty> list = FileHandle.ReadJson(SettingProperty.captureConfig, CaptureProperty.class);
+        List<CaptureProperty> list = FileHandle.ReadConfig(SettingProperty.captureConfig, CaptureProperty.class);
         assert list!=null;
         list.forEach(p -> {
             RadioMenuItem item = new RadioMenuItem(p.getName());
@@ -121,7 +121,7 @@ public class StatusBar {
             RadioMenuItem item = (RadioMenuItem) configMenu.getItems().get(selectIndex);
             item.setSelected(true);
             configButton.setText(item.getText());
-            List<CaptureProperty> list = FileHandle.ReadJson(SettingProperty.captureConfig, CaptureProperty.class);
+            List<CaptureProperty> list = FileHandle.ReadConfig(SettingProperty.captureConfig, CaptureProperty.class);
             assert list != null;
             for (CaptureProperty property : list) {
                 if (item.getText().contains(property.getName())) {

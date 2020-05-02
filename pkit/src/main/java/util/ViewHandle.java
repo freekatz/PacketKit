@@ -3,6 +3,7 @@ package util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.intellij.vcs.log.Hash;
 import gui.ctrl.AnalysisView;
 import gui.ctrl.IndexView;
 import gui.ctrl.ChartView;
@@ -18,6 +19,8 @@ import gui.ctrl.list.FileList;
 import gui.ctrl.list.NIFList;
 import gui.model.Property;
 import gui.model.SettingProperty;
+import gui.model.history.FilterHistoryProperty;
+import gui.model.history.PcapFileHistoryProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
@@ -35,6 +38,7 @@ import org.pcap4j.core.Pcaps;
 
 import java.io.*;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -156,51 +160,74 @@ public class ViewHandle {
         }
     }
 
-    public static void InitializeList(String path, ListView<String> list) {
-        File file = new File(path);
+    public static void InitializePcapFileList(String path, ListView<String> list) {
+
+        JsonMapper mapper = new JsonMapper();
         try {
-            FileInputStream fis = new FileInputStream(file);
-            BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+            PcapFileHistoryProperty property = mapper.readValue(new File(path), PcapFileHistoryProperty.class);
+            HashSet<String> hashSet;
+            hashSet = property.getHistory();
+
             ObservableList<String> ob = FXCollections.observableArrayList();
-            String str = null;
             int num = 0;
-            while((str = br.readLine()) != null && num < SettingProperty.maxPcapFileHistory)
-            {
-                File file1 = new File(str);
-                FileInputStream fis1 = new FileInputStream(file1);
-                if (!ob.contains(str + "(" + fis1.available()/1024 + "KB)")) {
-                    ob.add(str + "(" + fis1.available()/1024 + "KB)");
+            for (String f : hashSet) {
+                System.out.println(f);
+                if (num < SettingProperty.maxPcapFileHistory) {
+                    File file1 = new File(f);
+                    FileInputStream fis1 = new FileInputStream(file1);
+                    ob.add(f + "(" + fis1.available() + " Bytes)");
                     num ++;
                 }
-
             }
             list.setItems(ob);
-            fis.close();
-            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void InitializePcapFileMenu(String path, Menu menu) {
+
+        menu.getItems().remove(2,menu.getItems().size());
+        JsonMapper mapper = new JsonMapper();
+        try {
+            PcapFileHistoryProperty property = mapper.readValue(new File(path), PcapFileHistoryProperty.class);
+            HashSet<String> hashSet;
+            hashSet = property.getHistory();
+
+            int num = 0;
+            ToggleGroup group = new ToggleGroup();
+            for (String f : hashSet) {
+                if (num < SettingProperty.maxPcapFileHistory) {
+                    File file1 = new File(f);
+                    FileInputStream fis1 = new FileInputStream(file1);
+                    RadioMenuItem item = new RadioMenuItem(f + "(" + fis1.available() + " Bytes)");
+                    item.setToggleGroup(group);
+                    item.setSelected(false);
+                    menu.getItems().add(item);
+                    num ++;
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public static void InitializeFilterComboBox(String path, ComboBox<String> box) {
-        File file = new File(path);
+        JsonMapper mapper = new JsonMapper();
         try {
-            FileInputStream fis = new FileInputStream(file);
-            BufferedReader br = new BufferedReader(new InputStreamReader(fis));
-            ObservableList<String> ob = FXCollections.observableArrayList();
-            String str = null;
-            int num = 0;
-            while((str = br.readLine()) != null && num < SettingProperty.maxFilterHistory)
-            {
-                if (!ob.contains(str)) {
-                    ob.add(str);
-                    num ++;
-                }
+            FilterHistoryProperty property = mapper.readValue(new File(path), FilterHistoryProperty.class);
+            HashSet<String> hashSet;
+            hashSet = property.getHistory();
 
+            ObservableList<String> ob = FXCollections.observableArrayList();
+            int num = 0;
+            for (String f : hashSet) {
+                if (num < SettingProperty.maxFilterHistory) {
+                    ob.add(f);
+                    num++;
+                }
             }
             box.setItems(ob);
-            fis.close();
-            br.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -237,7 +264,7 @@ public class ViewHandle {
     }
 
     public static void UpdateConfigTable(String configPath, Property property, TableView<Property> table) {
-        List<Property> list = FileHandle.ReadJson(configPath, property.getClass());
+        List<Property> list = FileHandle.ReadConfig(configPath, property.getClass());
 
         assert list != null;
         list.forEach(p -> {

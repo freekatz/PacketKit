@@ -4,10 +4,12 @@ import gui.ctrl.AnalysisView;
 import gui.ctrl.IndexView;
 import gui.ctrl.View;
 import gui.model.SettingProperty;
+import gui.model.history.PcapFileHistoryProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.RadioMenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -37,6 +39,9 @@ public class ToolBar {
     Button restartButton;
 
     @FXML
+    Button returnButton;
+
+    @FXML
     Button configButton;
 
     @FXML
@@ -50,30 +55,6 @@ public class ToolBar {
 
     @FXML
     Button reloadButton;
-
-    @FXML
-    Button searchButton;
-
-    @FXML
-    Button searchNextButton;
-
-    @FXML
-    Button searchPreviousButton;
-
-    @FXML
-    Button jumpButton;
-
-    @FXML
-    Button jumpNextButton;
-
-    @FXML
-    Button jumpPreviousButton;
-
-    @FXML
-    Button jumpFirstButton;
-
-    @FXML
-    Button jumpLastButton;
 
     @FXML
     Button forwardButton;
@@ -95,6 +76,8 @@ public class ToolBar {
         stopButton.setGraphic(new ImageView(stopImage));
         Image restartImage = new Image(getClass().getResourceAsStream(SettingProperty.iconFolder1 + "/x-capture-restart.png"));
         restartButton.setGraphic(new ImageView(restartImage));
+        Image returnImage = new Image(getClass().getResourceAsStream(SettingProperty.iconFolder1 + "/x-capture-start.png"));
+        returnButton.setGraphic(new ImageView(returnImage));
         Image configImage = new Image(getClass().getResourceAsStream(SettingProperty.iconFolder1 + "/x-capture-options.png"));
         configButton.setGraphic(new ImageView(configImage));
         Image openImage = new Image(getClass().getResourceAsStream(SettingProperty.iconFolder1 + "/x-capture-start.png"));
@@ -105,46 +88,30 @@ public class ToolBar {
         closeButton.setGraphic(new ImageView(closeImage));
         Image reloadImage = new Image(getClass().getResourceAsStream(SettingProperty.iconFolder1 + "/x-capture-file-reload.png"));
         reloadButton.setGraphic(new ImageView(reloadImage));
-        Image searchImage = new Image(getClass().getResourceAsStream(SettingProperty.iconFolder1 + "/edit-find.template.png"));
-        searchButton.setGraphic(new ImageView(searchImage));
-        Image searchNextImage = new Image(getClass().getResourceAsStream(SettingProperty.iconFolder1 + "/x-capture-start.png"));
-        searchNextButton.setGraphic(new ImageView(searchNextImage));
-        Image searchPreviousImage = new Image(getClass().getResourceAsStream(SettingProperty.iconFolder1 + "/x-capture-start.png"));
-        searchPreviousButton.setGraphic(new ImageView(searchPreviousImage));
-        Image jumpImage = new Image(getClass().getResourceAsStream(SettingProperty.iconFolder1 + "/go-jump.png"));
-        jumpButton.setGraphic(new ImageView(jumpImage));
-        Image jumpNextImage = new Image(getClass().getResourceAsStream(SettingProperty.iconFolder1 + "/go-next.png"));
-        jumpNextButton.setGraphic(new ImageView(jumpNextImage));
-        Image jumpPreviousImage = new Image(getClass().getResourceAsStream(SettingProperty.iconFolder1 + "/go-previous.png"));
-        jumpPreviousButton.setGraphic(new ImageView(jumpPreviousImage));
-        Image jumpFirstImage = new Image(getClass().getResourceAsStream(SettingProperty.iconFolder1 + "/go-first.png"));
-        jumpFirstButton.setGraphic(new ImageView(jumpFirstImage));
-        Image jumpLastImage = new Image(getClass().getResourceAsStream(SettingProperty.iconFolder1 + "/go-last.png"));
-        jumpLastButton.setGraphic(new ImageView(jumpLastImage));
         Image forwardImage = new Image(getClass().getResourceAsStream(SettingProperty.iconFolder1 + "/x-capture-start.png"));
         forwardButton.setGraphic(new ImageView(forwardImage));
+        Image analysisImage = new Image(getClass().getResourceAsStream(SettingProperty.iconFolder1 + "/x-capture-start.png"));
+        analysisButton.setGraphic(new ImageView(analysisImage));
 
+        InitializeButtonStatus();
+    }
+
+    public void setView(View view) {
+        this.view = view;
+    }
+
+    public void InitializeButtonStatus() {
         startButton.setDisable(false);
         stopButton.setDisable(true);
         restartButton.setDisable(true);
+        returnButton.setDisable(true);
         configButton.setDisable(false);
         openButton.setDisable(false);
         saveButton.setDisable(true);
         closeButton.setDisable(true);
         reloadButton.setDisable(true);
-        searchButton.setDisable(true);
-        searchNextButton.setDisable(true);
-        searchPreviousButton.setDisable(true);
-        jumpButton.setDisable(true);
-        jumpNextButton.setDisable(true);
-        jumpPreviousButton.setDisable(true);
-        jumpFirstButton.setDisable(true);
-        jumpLastButton.setDisable(true);
         forwardButton.setDisable(false);
-    }
-
-    public void setView(View view) {
-        this.view = view;
+        analysisButton.setDisable(false);
     }
 
     @FXML
@@ -152,6 +119,7 @@ public class ToolBar {
         startButton.setDisable(true);
         stopButton.setDisable(false);
         restartButton.setDisable(false);
+        returnButton.setDisable(true);
 
         String type = view.getType();
         IndexView indexView = (IndexView) view;
@@ -166,6 +134,7 @@ public class ToolBar {
         startButton.setDisable(false);
         stopButton.setDisable(true);
         restartButton.setDisable(false);
+        returnButton.setDisable(false);
         saveButton.setDisable(false);
 
         IndexView indexView = (IndexView) view;
@@ -173,6 +142,7 @@ public class ToolBar {
         if (indexView.getPacketListCtrl().getPacketTable().getItems().size()==0) {
             indexView.setType("index");
             ViewHandle.InitializeCenter(indexView);
+            ReturnButtonOnClicked();
         }
     }
 
@@ -181,10 +151,27 @@ public class ToolBar {
         startButton.setDisable(true);
         stopButton.setDisable(false);
         restartButton.setDisable(false);
+        returnButton.setDisable(true);
 
         IndexView indexView = (IndexView) view;
         indexView.clearBrowser();
         indexView.StartCapture("online");
+    }
+
+
+    @FXML
+    private void ReturnButtonOnClicked() {
+        InitializeButtonStatus();
+
+
+        IndexView indexView = (IndexView) view;
+        indexView.clearBrowser();
+        indexView.setNifName(null);
+        indexView.setType("index");
+        ViewHandle.InitializeCenter(indexView);
+
+        for (int i = 0; i < 5; i++)
+            indexView.getMenuBarCtrl().getFileMenu().getItems().get(i).setDisable(false);
     }
 
     @FXML
@@ -217,11 +204,18 @@ public class ToolBar {
         );
         File file = fileChooser.showOpenDialog(stage);
         if (file==null) return;
-        FileHandle.AddLine(SettingProperty.pcapFileHistory, file.getAbsolutePath());
+        FileHandle.AddHistory(SettingProperty.pcapFileHistory, file.getAbsolutePath(), PcapFileHistoryProperty.class);
         String type = view.getType();
         IndexView indexView = (IndexView) view;
+        ViewHandle.InitializePcapFileList(SettingProperty.pcapFileHistory, indexView.getFileListCtrl().getFileList());
+        ViewHandle.InitializePcapFileMenu(SettingProperty.pcapFileHistory, indexView.getMenuBarCtrl().getRecentMenu());
         indexView.setPcapFile(file.getAbsolutePath());
         indexView.setNifName(null);
+        for (int i = 2; i < indexView.getMenuBarCtrl().getRecentMenu().getItems().size(); i++) {
+            RadioMenuItem item = (RadioMenuItem) indexView.getMenuBarCtrl().getRecentMenu().getItems().get(i);
+            if (item.getText().contains(file.getAbsolutePath()))
+                item.setSelected(true);
+        }
         if (type.equals("index")) {
             indexView.setType("capture");
             ViewHandle.InitializeCenter(indexView);
@@ -229,7 +223,6 @@ public class ToolBar {
 
         indexView.clearBrowser();
         indexView.StartCapture("offline");
-        // start capture
     }
 
     @FXML
@@ -241,6 +234,11 @@ public class ToolBar {
     private void CloseButtonOnClicked() {
         IndexView indexView = (IndexView) view;
         indexView.clearBrowser();
+        indexView.setPcapFile(null);
+        indexView.setType("index");
+        ViewHandle.InitializeCenter(indexView);
+
+        InitializeButtonStatus();
 
     }
 
@@ -249,20 +247,6 @@ public class ToolBar {
         IndexView indexView = (IndexView) view;
         indexView.clearBrowser();
         indexView.StartCapture("offline");
-    }
-
-    @FXML
-    private void SearchButtonOnClicked() {
-        // search button logic
-    }
-
-    @FXML
-    private void SearchNextButtonOnClicked() {
-
-    }
-    @FXML
-    private void SearchPreviousButtonOnClicked() {
-
     }
 
     @FXML
