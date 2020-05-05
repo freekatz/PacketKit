@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Ipv4PPacket implements PPacket{
-    private IpV4Packet.Builder builder;
+    private IpV4Packet.Builder builder = new IpV4Packet.Builder();
     private PcapHandle pcapHandle;
     private JsonMapper jsonMapper;
     private PcapDumper dumper;
@@ -40,7 +40,7 @@ public class Ipv4PPacket implements PPacket{
     private String srcAddr;
     private String dstAddr;
 //    private ArrayList<String> options;
-    private byte[] padding;
+//    private byte[] padding;
 
     @Override
     public Packet.Builder builder() {
@@ -50,16 +50,15 @@ public class Ipv4PPacket implements PPacket{
 
     @Override
     public String name() {
-        return this.name;
+        return "IPv4";
     }
 
     @Override
     public void Initial() {
-        this.builder = new IpV4Packet.Builder();
         this.packetPath = "tmp/";
         this.configPath = "tmp/";
 
-        this.name = "ipv4";
+        this.name = "IPv4";
         this.length = 20;
         this.version = IpVersion.IPV4.value();
         this.ihl = 0;
@@ -78,12 +77,24 @@ public class Ipv4PPacket implements PPacket{
 //        this.options = new ArrayList<>();
 //        options.add(IpV4OptionType.TRACEROUTE.value());
 
-        this.padding = new byte[0];
+//        this.padding = new byte[0];
     }
 
     @Override
     public void Parse(PcapPacket pcapPacket) {
         IpV4Packet.IpV4Header header = pcapPacket.get(IpV4Packet.class).getHeader();
+        ParseHandle(header);
+    }
+
+    @Override
+    public void Parse(Packet packet) {
+        IpV4Packet.IpV4Header header = packet.get(IpV4Packet.class).getHeader();
+        ParseHandle(header);
+    }
+
+    @Override
+    public void ParseHandle(Packet.Header packetHeader) {
+        IpV4Packet.IpV4Header header = (IpV4Packet.IpV4Header) packetHeader;
         this.length = header.length();
         this.version = header.getVersion().value();
         this.ihl = header.getIhl();
@@ -104,7 +115,7 @@ public class Ipv4PPacket implements PPacket{
 //            options.add(opt.getType().value());
 //        });
 //        this.options = options;
-        this.padding = header.getPadding();
+//        this.padding = header.getPadding();
     }
 
     private String flag() {
@@ -154,7 +165,7 @@ public class Ipv4PPacket implements PPacket{
             e.printStackTrace();
         }
 
-        this.builder.padding(this.padding);
+//        this.builder.padding(this.padding);
 
         // todo ipv4 option（种类太多）
 //        ArrayList<IpV4Packet.IpV4Option> options = new ArrayList<>();
@@ -164,7 +175,8 @@ public class Ipv4PPacket implements PPacket{
 //        });
 //        this.builder.options()
 
-        this.builder.correctLengthAtBuild(true)
+        this.builder.paddingAtBuild(true)
+                .correctLengthAtBuild(true)
                 .correctChecksumAtBuild(true);
 
 
@@ -191,13 +203,13 @@ public class Ipv4PPacket implements PPacket{
         this.jsonMapper.writeValue(new File(this.configPath+filename+".json"), this);
     }
 
-    public byte[] getPadding() {
-        return padding;
-    }
-
-    public void setPadding(byte[] padding) {
-        this.padding = padding;
-    }
+//    public byte[] getPadding() {
+//        return padding;
+//    }
+//
+//    public void setPadding(byte[] padding) {
+//        this.padding = padding;
+//    }
 
 //    public ArrayList<String> getOptions() {
 //        return options;
@@ -328,10 +340,10 @@ public class Ipv4PPacket implements PPacket{
     }
 
     public String getName() {
-        return name;
+        return "IPv4";
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = "IPv4";
     }
 }

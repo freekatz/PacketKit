@@ -1,18 +1,14 @@
 package util;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import gui.model.FilterProperty;
 import gui.model.Property;
-import gui.model.SettingProperty;
+import gui.model.history.CapturePcapFileHistoryProperty;
 import gui.model.history.FilterHistoryProperty;
-import gui.model.history.PcapFileHistoryProperty;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 public class FileHandle {
@@ -39,8 +35,8 @@ public class FileHandle {
                 property.getHistory().add(history);
                 mapper.writeValue(new File(path), property);
             }
-            else if (clazz.equals(PcapFileHistoryProperty.class)) {
-                PcapFileHistoryProperty property = mapper.readValue(new File(path), PcapFileHistoryProperty.class);
+            else if (clazz.equals(CapturePcapFileHistoryProperty.class)) {
+                CapturePcapFileHistoryProperty property = mapper.readValue(new File(path), CapturePcapFileHistoryProperty.class);
                 property.getHistory().add(history);
                 mapper.writeValue(new File(path), property);
             }
@@ -59,8 +55,8 @@ public class FileHandle {
                 property.getHistory().remove(history);
                 mapper.writeValue(new File(path), property);
             }
-            else if (clazz.equals(PcapFileHistoryProperty.class)) {
-                PcapFileHistoryProperty property = mapper.readValue(new File(path), PcapFileHistoryProperty.class);
+            else if (clazz.equals(CapturePcapFileHistoryProperty.class)) {
+                CapturePcapFileHistoryProperty property = mapper.readValue(new File(path), CapturePcapFileHistoryProperty.class);
                 property.getHistory().remove(history);
                 mapper.writeValue(new File(path), property);
             }

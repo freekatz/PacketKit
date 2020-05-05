@@ -1,9 +1,9 @@
 package gui.ctrl.bar;
 
-import gui.ctrl.CaptureConfigView;
+import gui.ctrl.config.CaptureConfigView;
 import gui.ctrl.IndexView;
 import gui.ctrl.View;
-import gui.model.CaptureProperty;
+import gui.model.config.CaptureProperty;
 import gui.model.SettingProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -17,12 +17,13 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import util.FileHandle;
-import util.ViewHandle;
 
 import java.io.IOException;
 import java.util.List;
 
 public class CaptureStatusBar {
+    SettingProperty settingProperty = new SettingProperty();
+
     View view;
     int selectIndex;
 
@@ -39,6 +40,7 @@ public class CaptureStatusBar {
     public CaptureStatusBar() {}
 
     public void initialize() {
+        configButton.setTooltip(new Tooltip("select or manage the capture config"));
         configMenu = new ContextMenu();
         managerItem = new MenuItem();
         this.InitialContextMenu();
@@ -50,8 +52,8 @@ public class CaptureStatusBar {
             @Override
             public void handle(ActionEvent actionEvent) {
                 try {
-                    FXMLLoader loader = ViewHandle.GetLoader("gui/view/CaptureConfigView.fxml");
-                    AnchorPane managerPane = loader.load();
+                    FXMLLoader loader = new FXMLLoader();
+                    AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream("view/config/CaptureConfigView.fxml"));
                     Stage stage = new Stage();
                     stage.initStyle(StageStyle.DECORATED);
                     stage.initModality(Modality.APPLICATION_MODAL);
@@ -86,7 +88,7 @@ public class CaptureStatusBar {
         // 为每个菜单行为添加行为：读取配置
         configMenu.getItems().remove(2, configMenu.getItems().size());
         ToggleGroup group = new ToggleGroup();
-        List<CaptureProperty> list = FileHandle.ReadConfig(SettingProperty.captureConfig, CaptureProperty.class);
+        List<CaptureProperty> list = FileHandle.ReadConfig(settingProperty.captureConfig, CaptureProperty.class);
         assert list!=null;
         list.forEach(p -> {
             RadioMenuItem item = new RadioMenuItem(p.getName());
@@ -121,7 +123,7 @@ public class CaptureStatusBar {
             RadioMenuItem item = (RadioMenuItem) configMenu.getItems().get(selectIndex);
             item.setSelected(true);
             configButton.setText(item.getText());
-            List<CaptureProperty> list = FileHandle.ReadConfig(SettingProperty.captureConfig, CaptureProperty.class);
+            List<CaptureProperty> list = FileHandle.ReadConfig(settingProperty.captureConfig, CaptureProperty.class);
             assert list != null;
             for (CaptureProperty property : list) {
                 if (item.getText().contains(property.getName())) {

@@ -1,5 +1,6 @@
-package gui.model;
+package gui.model.config;
 
+import gui.model.Property;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 

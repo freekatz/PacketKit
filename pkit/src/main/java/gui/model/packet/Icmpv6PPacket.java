@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class Icmpv6PPacket implements PPacket {
-    private IcmpV6EchoRequestPacket.Builder builder;
+    private IcmpV6EchoRequestPacket.Builder builder = new IcmpV6EchoRequestPacket.Builder();
     private PcapHandle pcapHandle;
     private JsonMapper jsonMapper;
     private PcapDumper dumper;
@@ -28,7 +28,7 @@ public class Icmpv6PPacket implements PPacket {
 
     @Override
     public String name() {
-        return this.name;
+        return "ICMPv6";
     }
 
     @Override
@@ -38,6 +38,16 @@ public class Icmpv6PPacket implements PPacket {
 
     @Override
     public void Parse(PcapPacket pcapPacket) {
+
+    }
+
+    @Override
+    public void Parse(Packet packet) {
+
+    }
+
+    @Override
+    public void ParseHandle(Packet.Header packetHeader) {
 
     }
 

@@ -1,7 +1,8 @@
-package gui.ctrl;
+package gui.ctrl.config;
 
+import gui.ctrl.View;
 import gui.ctrl.bar.FilterBar;
-import gui.model.FilterProperty;
+import gui.model.config.FilterProperty;
 import gui.model.Property;
 import gui.model.SettingProperty;
 import javafx.event.Event;
@@ -14,9 +15,7 @@ import javafx.util.StringConverter;
 import util.FileHandle;
 import util.ViewHandle;
 
-import java.net.URL;
-
-public class FilterConfigView implements View{
+public class FilterConfigView implements View {
     SettingProperty settingProperty = new SettingProperty();
 
     FilterBar filterBar;

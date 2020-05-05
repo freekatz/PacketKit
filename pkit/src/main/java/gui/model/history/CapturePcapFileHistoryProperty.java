@@ -6,12 +6,12 @@ import javafx.beans.property.SimpleStringProperty;
 
 import java.util.HashSet;
 
-public class PcapFileHistoryProperty implements Property {
+public class CapturePcapFileHistoryProperty implements Property {
     SimpleObjectProperty<HashSet<String>> history = new SimpleObjectProperty<>(this, "history");
     SimpleStringProperty name = new SimpleStringProperty(this, "name");
 
 
-    public PcapFileHistoryProperty() {
+    public CapturePcapFileHistoryProperty() {
         HashSet<String> history = new HashSet<>();
         this.history.setValue(history);
     }
@@ -30,7 +30,7 @@ public class PcapFileHistoryProperty implements Property {
 
     @Override
     public String getName() {
-        return "pcapFileHistory";
+        return "capturePcapFileHistory";
     }
 
     public SimpleStringProperty nameProperty() {

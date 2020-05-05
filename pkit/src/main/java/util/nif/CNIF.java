@@ -1,10 +1,12 @@
 package util.nif;
 
+import gui.model.config.CaptureProperty;
 import javafx.scene.control.TableView;
 import gui.model.*;
 import org.pcap4j.core.*;
 
 public class CNIF implements NIF {
+    SettingProperty settingProperty = new SettingProperty();
     private PcapHandle.Builder builder;  // 网卡构建对象, 通过 builder 设置网卡操作相关的字段
     private String pcapPath;
     private TableView<Property> table;
@@ -53,7 +55,8 @@ public class CNIF implements NIF {
 
         try {
             this.handle = this.builder.build();
-            this.dumper = this.handle.dumpOpen(SettingProperty.tempPcapFolder + "/tmp.pcapng");
+            // todo 路径错误，解决方案
+            this.dumper = this.handle.dumpOpen("res/temp/tmp.pcapng");
         } catch (NotOpenException e) {
             e.printStackTrace();
         }

@@ -1,10 +1,12 @@
 package core;
 
+import gui.model.packet.ArpPPacket;
 import gui.model.packet.EthernetPPacket;
 import gui.model.packet.Ipv4PPacket;
 import gui.model.packet.UdpPPacket;
 import org.pcap4j.core.*;
 import org.pcap4j.packet.*;
+import org.pcap4j.packet.namednumber.EtherType;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -25,7 +27,7 @@ public class PacketTest {
 //        util.JsonHandle jsonHandle = new util.JsonHandle();
 //        jsonHandle.Object2Json(new File("tmp/ph.json"), packetHandle);
 
-        // ARP Test
+//         ARP Test
 //        ArpPPacket arpPPacket = new ArpPPacket();
 //        arpPPacket.Initial();
 //        arpPPacket.CraftBuilder();

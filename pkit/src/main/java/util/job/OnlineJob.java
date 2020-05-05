@@ -1,7 +1,7 @@
 package util.job;
 
 import gui.ctrl.IndexView;
-import gui.model.CaptureProperty;
+import gui.model.config.CaptureProperty;
 import gui.model.Property;
 import gui.model.browser.PacketInfoProperty;
 import gui.model.browser.PacketProperty;
@@ -27,10 +27,6 @@ public class OnlineJob extends Task<PacketProperty> {
     IndexView indexView;
     CaptureProperty captureProperty;
     TableView<Property> packetTable;
-    TreeTableView<String> headerTreeTable;
-    ListView<String> indexList;
-    TextArea hexArea;
-    TextArea txtArea;
 
     public OnlineJob(IndexView indexView) {
         this.indexView = indexView;
@@ -39,19 +35,19 @@ public class OnlineJob extends Task<PacketProperty> {
         captureProperty = indexView.getCaptureProperty();
 
         packetTable = indexView.getPacketListCtrl().getPacketTable();
-        headerTreeTable = indexView.getPacketHeaderCtrl().getHeaderTreeTable();
-        indexList = indexView.getPacketDataCtrl().getIndexList();
-        hexArea = indexView.getPacketDataCtrl().getHexArea();
-        txtArea = indexView.getPacketDataCtrl().getTxtArea();
     }
 
     @Override
     protected void updateValue(PacketProperty packetProperty) {
         super.updateValue(packetProperty);
         if (packetProperty!=null) {
-            // add signal in index view to control the refresh buffer
+            indexView.packetPropertyArrayList.add(packetProperty);
+            if (indexView.packetPropertyArrayList.size()==1) {
+                BrowserJob job = new BrowserJob(packetProperty, indexView);
+                Thread thread = new Thread(job);
+                thread.start();
+            }
             packetTable.getItems().add(packetProperty.getInfo());
-            // header and data
         }
 
     }
@@ -65,17 +61,15 @@ public class OnlineJob extends Task<PacketProperty> {
             loop = true;
         while (loop || num < captureProperty.getCount()) {
             try {
-                System.out.println(indexView.getFilterProperty().getExpression());
                 BpfProgram bpfProgram = cnif.handle.compileFilter(indexView.getFilterProperty().getExpression(), BpfProgram.BpfCompileMode.OPTIMIZE, (Inet4Address) InetAddress.getByName("255.255.255.255"));
                 PcapPacket packet = cnif.handle.getNextPacketEx();
                 cnif.dumper.dump(packet);
                 num++;
                 if (bpfProgram.applyFilter(packet)) {
                     // 对符合过滤器的包进行处理
-                    PacketInfoProperty packetInfoProperty = PacketHandle.InfoPipeline(packet);
+                    PacketProperty packetProperty = PacketHandle.Pipeline(packet);
+                    PacketInfoProperty packetInfoProperty = packetProperty.getInfo();
                     packetInfoProperty.setNo(num);
-                    PacketProperty packetProperty = new PacketProperty();
-                    packetProperty.setInfo(packetInfoProperty);
                     this.updateValue(packetProperty);
                 }
             } catch (EOFException | PcapNativeException | TimeoutException | UnknownHostException ignored) {
@@ -89,6 +83,7 @@ public class OnlineJob extends Task<PacketProperty> {
         indexView.getCaptureToolBarCtrl().getToolBar().getItems().get(0).setDisable(false);
         indexView.getCaptureToolBarCtrl().getToolBar().getItems().get(1).setDisable(true);
         indexView.getCaptureToolBarCtrl().getToolBar().getItems().get(2).setDisable(false);
+        indexView.getCaptureToolBarCtrl().getToolBar().getItems().get(4).setDisable(false);
         indexView.getCaptureToolBarCtrl().getToolBar().getItems().get(5).setDisable(false);
         indexView.getCaptureStatusBarCtrl().configButton.setDisable(false);
         return null;

@@ -1,10 +1,7 @@
 package gui.model.analysis;
 
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ProtocolPieProperty {

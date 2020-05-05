@@ -2,41 +2,45 @@ package gui.model;
 
 public class SettingProperty {
 
-    public static String captureConfig = "pkit/src/main/res/config/capture.json";
+    public String captureConfig = "res/config/capture.json";
 
-    public static String sendConfig = "pkit/src/main/res/config/send.json";
+    public String sendConfig = "res/config/send.json";
 
-    public static String filterConfig = "pkit/src/main/res/config/filter.json";
+    public String filterConfig = "res/config/filter.json";
 
-    public static String tempPcapFolder = "pkit/src/main/res/temp";
+    public String tempPcapFolder = "res/temp";
 
-    public static String pcapFileHistory = "pkit/src/main/res/history/pcap.json";
+    public String capturePcapFileHistory = "res/history/capturePcap.json";
 
-    public static String filterHistory = "pkit/src/main/res/history/filter.json";
+    public String sendPcapFileHistory = "res/history/sendPcap.json";
 
-    public static String iconFolder1 = "/icon/16x16";
+    public String filterHistory = "res/history/filter.json";
 
-    public static String iconFolder2 = "/icon/24x14";
+    public String captureIconFolder = "/icon/capture";
 
-    public static String iconFolder3 = "/icon/14x14";
+    public String filterIconFolder = "/icon/filter";
 
-    public static int maxFilterHistory = 20;
+    public String sendIconFolder = "/icon/send";
 
-    public static int maxPcapFileHistory = 40;
+    public String packetTemplatePath = "res/packet/template.pcap";
+
+    public int maxFilterHistory = 20;
+
+    public int maxPcapFileHistory = 40;
 
     // json 为每个文件定制
-    public static String ioLineChartJson = "pkit/src/main/java/web/api/ioLineChart.json";
-    public static String ioLineChartPath = "pkit/src/main/java/web/app/ioLineChart.html";
+    public String ioLineChartJson = "res/web/api/ioLineChart.json";
+    public String ioLineChartPath = "res/web/app/ioLineChart.html";
 
-    public static String protocolPieChartJson = "pkit/src/main/java/web/api/protocolPieChart.json";
-    public static String protocolPieChartPath = "pkit/src/main/java/web/app/protocolPieChart.html";
+    public String protocolPieChartJson = "res/web/api/protocolPieChart.json";
+    public String protocolPieChartPath = "res/web/app/protocolPieChart.html";
 
-    public static String ipv4StatBarChartJson = "pkit/src/main/java/web/api/ipv4StatBarChart.json";
-    public static String ipv4StatBarChartPath = "pkit/src/main/java/web/app/ipv4StatBarChart.html";
+    public String ipv4StatBarChartJson = "res/web/api/ipv4StatBarChart.json";
+    public String ipv4StatBarChartPath = "res/web/app/ipv4StatBarChart.html";
 
-    public static String ipv6StatBarChartJson = "pkit/src/main/java/web/api/ipv6StatBarChart.json";
-    public static String ipv6StatBarChartPath = "pkit/src/main/java/web/app/ipv6StatBarChart.html";
+    public String ipv6StatBarChartJson = "res/web/api/ipv6StatBarChart.json";
+    public String ipv6StatBarChartPath = "res/web/app/ipv6StatBarChart.html";
 
-    public static String analysisWelcomePath = "pkit/src/main/java/web/app/analysisWelcome.html";
+    public String analysisWelcomePath = "res/web/app/analysisWelcome.html";
 
 }

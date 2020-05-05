@@ -9,9 +9,10 @@ import gui.ctrl.browser.PacketHeader;
 import gui.ctrl.browser.PacketList;
 import gui.ctrl.list.FileList;
 import gui.ctrl.list.NIFList;
-import gui.model.CaptureProperty;
-import gui.model.FilterProperty;
+import gui.model.config.CaptureProperty;
+import gui.model.config.FilterProperty;
 import gui.model.SettingProperty;
+import gui.model.browser.PacketProperty;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Orientation;
@@ -28,9 +29,11 @@ import util.job.OnlineJob;
 import util.job.SaveJob;
 import util.nif.CNIF;
 
-import java.util.Objects;
+import java.util.ArrayList;
 
 public class IndexView implements View{
+    SettingProperty settingProperty = new SettingProperty();
+
     private FilterProperty filterProperty;
     private CaptureProperty captureProperty;
     private String pcapFile;
@@ -55,6 +58,8 @@ public class IndexView implements View{
 
     private CNIF cnif;
 
+    public ArrayList<PacketProperty> packetPropertyArrayList = new ArrayList<>();
+
     @FXML
     BorderPane pane;
 
@@ -74,9 +79,9 @@ public class IndexView implements View{
         // init two config and set statusbar
         browserPane.setOrientation(Orientation.VERTICAL);
 
-        ViewHandle.InitializeTop(this);
-        ViewHandle.InitializeCenter(this);
-        ViewHandle.InitializeBottom(this);
+        ViewHandle.InitializeCaptureTop(this);
+        ViewHandle.InitializeCaptureCenter(this);
+        ViewHandle.InitializeCaptureBottom(this);
 
         status = captureStatusBarCtrl.statusLabel;
 
@@ -84,13 +89,20 @@ public class IndexView implements View{
     }
 
     public void StartCapture(String opt) {
-        captureStatusBarCtrl.configButton.setDisable(true);
-        // button logic
-        if (!opt.equals("analysis")) {
+        // todo button 改为 item
+        packetHeaderCtrl.setEdit(false);
+        if (opt.equals("online")||opt.equals("offline")) {
+            packetPropertyArrayList.clear();
+            packetHeaderCtrl.getRoot().getChildren().clear();
+
+            captureToolBarCtrl.getToolBar().getItems().get(13).setDisable(false);
+            captureMenuBarCtrl.getAnalysisItem().setDisable(false);
+
             if (pcapFile != null) {
                 for (int i = 0; i < 5; i++)
                     captureToolBarCtrl.getToolBar().getItems().get(i).setDisable(true);
-                for (int i = 6; i < 9; i++)
+                // TODO: 2020/5/4 不要忘记分割条也算一个 item
+                for (int i = 6; i < 10; i++)
                     captureToolBarCtrl.getToolBar().getItems().get(i).setDisable(false);
 
                 for (int i = 2; i < 4; i++)
@@ -132,7 +144,9 @@ public class IndexView implements View{
                 else if (fileListCtrl.getFileList().getSelectionModel().getSelectedItem()!=null && type.equals("index"))
                     path = fileListCtrl.getFileList().getSelectionModel().getSelectedItem().replaceAll("\\(.*?\\)", "");
                 else
-                    path = Objects.requireNonNullElseGet(pcapFile, () -> SettingProperty.tempPcapFolder + "/tmp.pcapng");
+                    if (pcapFile!=null)
+                        path = pcapFile;
+                    else path = settingProperty.tempPcapFolder + "/tmp.pcapng";
                 AnalysisJob analysisJob = new AnalysisJob(path);
                 Thread thread = new Thread(analysisJob);
                 thread.start();
@@ -140,14 +154,20 @@ public class IndexView implements View{
             }
             case "apply": {
                 status.setText("apply");
-                String path = Objects.requireNonNullElseGet(pcapFile, () -> SettingProperty.tempPcapFolder + "/tmp.pcapng");
+                String path;
+                if (pcapFile!=null)
+                    path = pcapFile;
+                else path = settingProperty.tempPcapFolder + "/tmp.pcapng";
                 OfflineJob offlineJob = new OfflineJob(this, path);
                 Thread thread = new Thread(offlineJob);
                 thread.start();
                 break;
             }
             case "save": {
-                String path = Objects.requireNonNullElseGet(pcapFile, () -> SettingProperty.tempPcapFolder + "/tmp.pcapng");
+                String path;
+                if (pcapFile!=null)
+                    path = pcapFile;
+                else path = settingProperty.tempPcapFolder + "/tmp.pcapng";
                 SaveJob saveJob = new SaveJob(this, path, savePath, filterProperty.getExpression());
                 Thread thread = new Thread(saveJob);
                 thread.start();
@@ -314,7 +334,15 @@ public class IndexView implements View{
 
     @Override
     public void setType(String type) {
+        // TODO: 2020/5/3 将界面类型切换涉及的界面元素更改都放到这里
         this.type = type;
+        if (type.equals("capture")) {
+            captureStatusBarCtrl.configButton.setDisable(true);
+        }
+        else {
+            captureMenuBarCtrl.getAnalysisItem().setDisable(true);
+            captureStatusBarCtrl.configButton.setDisable(false);
+        }
     }
 
     @Override
@@ -330,10 +358,9 @@ public class IndexView implements View{
     }
 
     public void clearBrowser() {
+        packetPropertyArrayList.clear();
         this.getPacketListCtrl().getPacketTable().getItems().clear();
-//        indexView.getPacketHeaderCtrl().getHeaderTree() // clean tree
-        this.getPacketDataCtrl().getIndexList().getItems().clear();
-        this.getPacketDataCtrl().getHexArea().setText("");
-        this.getPacketDataCtrl().getTxtArea().setText("");
+        this.getPacketHeaderCtrl().getHeaderTreeTable().getRoot().getChildren().clear(); // clean tree
+        this.getPacketDataCtrl().getDataArea().getItems().clear();
     }
 }

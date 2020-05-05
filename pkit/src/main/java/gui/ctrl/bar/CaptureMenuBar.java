@@ -1,42 +1,43 @@
 package gui.ctrl.bar;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import gui.ctrl.AboutView;
 import gui.ctrl.AnalysisView;
 import gui.ctrl.IndexView;
+import gui.ctrl.SendView;
 import gui.ctrl.View;
 import gui.model.SettingProperty;
-import gui.model.history.PcapFileHistoryProperty;
+import gui.model.browser.PacketProperty;
+import gui.model.history.CapturePcapFileHistoryProperty;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.pcap4j.core.PcapNetworkInterface;
 import util.FileHandle;
 import util.ViewHandle;
+import util.job.BrowserJob;
 
 import java.io.File;
 import java.io.IOException;
 
 public class CaptureMenuBar {
+    SettingProperty settingProperty = new SettingProperty();
+
     View view;
 
     @FXML
     Menu fileMenu;
-
-    @FXML
-    Menu viewMenu;
 
     @FXML
     Menu toolMenu;
@@ -98,7 +99,7 @@ public class CaptureMenuBar {
     public void initialize() {
 
         recentMenu.getItems().add(new SeparatorMenuItem());
-        ViewHandle.InitializePcapFileMenu(SettingProperty.pcapFileHistory, recentMenu);
+        ViewHandle.InitializeCapturePcapFileMenu(settingProperty.capturePcapFileHistory, recentMenu);
 
         for (int i = 2; i < recentMenu.getItems().size(); i++) {
             RadioMenuItem item = (RadioMenuItem) recentMenu.getItems().get(i);
@@ -110,11 +111,18 @@ public class CaptureMenuBar {
                         indexView.setNifName(null);
                         String pattern = "\\(.*?\\)";
                         indexView.setPcapFile(item.getText().replaceAll(pattern, ""));
+                        if (indexView.getType().equals("index")) {
+                            indexView.setType("capture");
+                            ViewHandle.InitializeCaptureCenter(indexView);
+                        }
+                        indexView.clearBrowser();
                         indexView.StartCapture("offline");
                     }
                 }
             });
         }
+
+        analysisItem.setDisable(true);
 
     }
 
@@ -126,6 +134,7 @@ public class CaptureMenuBar {
     @FXML
     private void OpenItemOnClicked() {
         Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
         FileChooser fileChooser = new FileChooser();
         // setting
         fileChooser.getExtensionFilters().addAll(
@@ -135,14 +144,14 @@ public class CaptureMenuBar {
         );
         File file = fileChooser.showOpenDialog(stage);
         if (file==null) return;
-        FileHandle.AddHistory(SettingProperty.pcapFileHistory, file.getAbsolutePath(), PcapFileHistoryProperty.class);
+        FileHandle.AddHistory(settingProperty.capturePcapFileHistory, file.getAbsolutePath(), CapturePcapFileHistoryProperty.class);
         String type = view.getType();
         IndexView indexView = (IndexView) view;
         indexView.setPcapFile(file.getAbsolutePath());
         indexView.setNifName(null);
         if (type.equals("index")) {
             indexView.setType("capture");
-            ViewHandle.InitializeCenter(indexView);
+            ViewHandle.InitializeCaptureCenter(indexView);
         }
 
         indexView.clearBrowser();
@@ -152,9 +161,9 @@ public class CaptureMenuBar {
     @FXML
     private void ClearItemOnClicked() {
         JsonMapper mapper = new JsonMapper();
-        PcapFileHistoryProperty property = new PcapFileHistoryProperty();
+        CapturePcapFileHistoryProperty property = new CapturePcapFileHistoryProperty();
         try {
-            mapper.writeValue(new File(SettingProperty.pcapFileHistory), property);
+            mapper.writeValue(new File(settingProperty.capturePcapFileHistory), property);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -173,7 +182,7 @@ public class CaptureMenuBar {
         indexView.clearBrowser();
         indexView.setPcapFile(null);
         indexView.setType("index");
-        ViewHandle.InitializeCenter(indexView);
+        ViewHandle.InitializeCaptureCenter(indexView);
 
         indexView.getCaptureToolBarCtrl().InitializeButtonStatus();
     }
@@ -185,6 +194,7 @@ public class CaptureMenuBar {
             return;
         // new task and new stage to save
         Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
         FileChooser fileChooser = new FileChooser();
         // setting
         fileChooser.getExtensionFilters().addAll(
@@ -203,8 +213,8 @@ public class CaptureMenuBar {
     @FXML
     private void SettingItemOnClicked() {
         try {
-            FXMLLoader loader = ViewHandle.GetLoader("gui/view/SettingView.fxml");
-            AnchorPane managerPane = loader.load();
+            FXMLLoader loader = new FXMLLoader();
+            AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream("view/SettingView.fxml"));
             Stage stage = new Stage();
             stage.initStyle(StageStyle.DECORATED);
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -226,8 +236,8 @@ public class CaptureMenuBar {
     @FXML
     private void AnalysisItemOnClicked() {
         try {
-            FXMLLoader loader = ViewHandle.GetLoader("gui/view/AnalysisView.fxml");
-            AnchorPane managerPane = loader.load();
+            FXMLLoader loader = new FXMLLoader();
+            AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream("view/AnalysisView.fxml"));
             Stage stage = new Stage();
             stage.initStyle(StageStyle.DECORATED);
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -246,9 +256,15 @@ public class CaptureMenuBar {
 
     @FXML
     private void SendItemOnClicked() {
+        IndexView indexView = (IndexView) view;
+        String nifName;
+        if (indexView.getNifName()==null)
+            nifName = ((PcapNetworkInterface)ViewHandle.GetPcapNIFList().get(0)).getName();
+        else nifName = indexView.getNifName();
+
         try {
-            FXMLLoader loader = ViewHandle.GetLoader("gui/view/SendView.fxml");
-            AnchorPane managerPane = loader.load();
+            FXMLLoader loader = new FXMLLoader();
+            AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream("view/SendView.fxml"));
             Stage stage = new Stage();
             stage.initStyle(StageStyle.DECORATED);
             stage.initModality(Modality.WINDOW_MODAL);
@@ -256,8 +272,23 @@ public class CaptureMenuBar {
             Scene scene = new Scene(managerPane);
             stage.setScene(scene);
 
-            AnalysisView analysisView = loader.getController();
-            analysisView.setView(view);
+            SendView sendView = loader.getController();
+            if (view.getType().equals("capture")) {
+                if (indexView.getPacketListCtrl().getPacketTable().getSelectionModel().getSelectedItem() != null) {
+                    PacketProperty packetProperty = indexView.packetPropertyArrayList.get(indexView.getPacketListCtrl().getPacketTable().getSelectionModel().getSelectedIndex());
+                    sendView.setPacketProperty(packetProperty);
+                    sendView.packetPropertyArrayList.add(packetProperty);
+                    sendView.getPacketListCtrl().getPacketTable().getItems().add(packetProperty.getInfo());
+                    // 第一个包初始化
+                    BrowserJob job = new BrowserJob(packetProperty, sendView);
+                    Thread thread = new Thread(job);
+                    thread.start();
+                }
+            }
+
+            sendView.setNifName(nifName);
+
+            sendView.setIndexView(indexView);
 
             stage.show();
         } catch (IOException e) {
@@ -292,8 +323,8 @@ public class CaptureMenuBar {
     @FXML
     private void AboutItemOnClicked() {
         try {
-            FXMLLoader loader = ViewHandle.GetLoader("gui/view/AboutView.fxml");
-            AnchorPane managerPane = loader.load();
+            FXMLLoader loader = new FXMLLoader();
+            AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream("view/AboutView.fxml"));
             Stage stage = new Stage();
             stage.initStyle(StageStyle.DECORATED);
             stage.initModality(Modality.WINDOW_MODAL);
@@ -445,14 +476,6 @@ public class CaptureMenuBar {
 
     public void setToolMenu(Menu toolMenu) {
         this.toolMenu = toolMenu;
-    }
-
-    public Menu getViewMenu() {
-        return viewMenu;
-    }
-
-    public void setViewMenu(Menu viewMenu) {
-        this.viewMenu = viewMenu;
     }
 
     public Menu getFileMenu() {

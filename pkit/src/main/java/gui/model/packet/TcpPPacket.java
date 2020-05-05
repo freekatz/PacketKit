@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TcpPPacket implements PPacket{
-    private TcpPacket.Builder builder;
+    private TcpPacket.Builder builder = new TcpPacket.Builder();
     private PcapHandle pcapHandle;
     private JsonMapper jsonMapper;
     private PcapDumper dumper;
@@ -38,7 +38,7 @@ public class TcpPPacket implements PPacket{
     private long checksum;
     private long urgentPointer;
 //    private ArrayList<String> options;
-    private byte[] padding;
+//    private byte[] padding;
 
     @Override
     public Packet.Builder builder() {
@@ -48,16 +48,15 @@ public class TcpPPacket implements PPacket{
 
     @Override
     public String name() {
-        return this.name;
+        return "TCP";
     }
 
     @Override
     public void Initial() {
-        this.builder = new TcpPacket.Builder();
         this.packetPath = "tmp/";
         this.configPath = "tmp/";
 
-        this.name = "tcp";
+        this.name = "TCP";
         this.srcPort = 1080;
         this.dstPort = 80;
         this.sequenceNumber = 1;
@@ -73,12 +72,24 @@ public class TcpPPacket implements PPacket{
         this.window = 10000;
         this.checksum = 0;
         this.urgentPointer = 0;
-        this.padding = new byte[0];
+//        this.padding = new byte[0];
     }
 
     @Override
     public void Parse(PcapPacket pcapPacket) {
         TcpPacket.TcpHeader header = pcapPacket.get(TcpPacket.class).getHeader();
+        ParseHandle(header);
+    }
+
+    @Override
+    public void Parse(Packet packet) {
+        TcpPacket.TcpHeader header = packet.get(TcpPacket.class).getHeader();
+        ParseHandle(header);
+    }
+
+    @Override
+    public void ParseHandle(Packet.Header packetHeader) {
+        TcpPacket.TcpHeader header = (TcpPacket.TcpHeader) packetHeader;
         this.length = header.length();
         this.srcPort = header.getSrcPort().valueAsInt();
         this.dstPort = header.getDstPort().valueAsInt();
@@ -99,7 +110,7 @@ public class TcpPPacket implements PPacket{
 //        header.getOptions().forEach(opt -> {
 //            options.add(opt.getKind().value());
 //        });
-        this.padding = header.getPadding();
+//        this.padding = header.getPadding();
     }
 
     private String flag() {
@@ -145,7 +156,8 @@ public class TcpPPacket implements PPacket{
                 .window((short)this.window)
                 .checksum((short)this.checksum)
                 .urgentPointer((short)this.urgentPointer)
-                .padding(this.padding)
+                .paddingAtBuild(true)
+//                .padding(this.padding)
                 .correctLengthAtBuild(true)
                 .correctChecksumAtBuild(true);
 
@@ -174,13 +186,13 @@ public class TcpPPacket implements PPacket{
     }
 
 
-    public byte[] getPadding() {
-        return padding;
-    }
-
-    public void setPadding(byte[] padding) {
-        this.padding = padding;
-    }
+//    public byte[] getPadding() {
+//        return padding;
+//    }
+//
+//    public void setPadding(byte[] padding) {
+//        this.padding = padding;
+//    }
 
 //    public ArrayList<String> getOptions() {
 //        return options;
@@ -319,10 +331,10 @@ public class TcpPPacket implements PPacket{
     }
 
     public String getName() {
-        return name;
+        return "TCP";
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = "TCP";
     }
 }

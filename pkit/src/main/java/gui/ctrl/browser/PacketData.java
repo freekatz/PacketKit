@@ -2,9 +2,11 @@ package gui.ctrl.browser;
 
 import gui.ctrl.View;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 
 public class PacketData {
     View view;
@@ -13,35 +15,22 @@ public class PacketData {
     BorderPane pane;
 
     @FXML
-    ListView<String> indexList;
-
-    @FXML
-    TextArea hexArea;
-
-    @FXML
-    TextArea txtArea;
+    ListView<HBox> dataArea;
 
 
     public PacketData() {
     }
 
     public void initialize() {
-
+        dataArea.setPadding(Insets.EMPTY);
     }
 
     public void setView(View view) {
         this.view = view;
     }
 
-    public ListView<String> getIndexList() {
-        return indexList;
+    public ListView<HBox> getDataArea() {
+        return dataArea;
     }
 
-    public TextArea getTxtArea() {
-        return txtArea;
-    }
-
-    public TextArea getHexArea() {
-        return hexArea;
-    }
 }

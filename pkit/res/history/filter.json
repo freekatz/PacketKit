@@ -1,1 +1,1 @@
-{"history":["tcp","udp","ip","dst ff:ff:ff:ff:ff:ff","arp"],"name":"filterHistory"}
+{"history":["tcp","udp","ip dst 127.0.0.1","ipv4","ip","dns","udp ","dst ff:ff:ff:ff:ff:ff","eth dst 00:00:00:00:00:01","arp","DHCP","DHC"],"name":"filterHistory"}

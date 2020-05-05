@@ -17,10 +17,12 @@ import util.nif.CNIF;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
 
 public class AnalysisJob implements Runnable {
+    SettingProperty settingProperty = new SettingProperty();
 
     CNIF cnif;
 
@@ -38,16 +40,15 @@ public class AnalysisJob implements Runnable {
 
     public AnalysisJob (String pcapFile) {
         cnif = new CNIF(pcapFile);
-        System.out.println(pcapFile);
     }
 
     private void save() {
         JsonMapper mapper = new JsonMapper();
         try {
-            mapper.writeValue(new File(SettingProperty.ioLineChartJson), ioLineProperty);
-            mapper.writeValue(new File(SettingProperty.protocolPieChartJson), protocolPieProperty);
-            mapper.writeValue(new File(SettingProperty.ipv4StatBarChartJson), ipv4StatBarProperty);
-            mapper.writeValue(new File(SettingProperty.ipv6StatBarChartJson), ipv6StatBarProperty);
+            mapper.writeValue(new File(settingProperty.ioLineChartJson), ioLineProperty);
+            mapper.writeValue(new File(settingProperty.protocolPieChartJson), protocolPieProperty);
+            mapper.writeValue(new File(settingProperty.ipv4StatBarChartJson), ipv4StatBarProperty);
+            mapper.writeValue(new File(settingProperty.ipv6StatBarChartJson), ipv6StatBarProperty);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -60,10 +61,9 @@ public class AnalysisJob implements Runnable {
             try {
                 PcapPacket packet = cnif.handle.getNextPacketEx();
 
-                PacketInfoProperty packetInfoProperty = PacketHandle.InfoPipeline(packet);
-                packetInfoProperty.setNo(num + 1);
-                PacketProperty packetProperty = new PacketProperty();
-                packetProperty.setInfo(packetInfoProperty);
+                PacketProperty packetProperty = PacketHandle.Pipeline(packet);
+                PacketInfoProperty packetInfoProperty = packetProperty.getInfo();
+                packetInfoProperty.setNo(num);
 
                 num++;
                 // analysis
@@ -107,7 +107,8 @@ public class AnalysisJob implements Runnable {
                         double n = ipv4StatBarProperty.getData().get(ip);
                         ipv4StatBarProperty.getData().put(ip, n + ((double) packet.getOriginalLength()) / 1024);
                     }
-                } else {
+                } else if (packetInfoProperty.getSrc().split(":").length>6){
+
                     if (!ipv6StatBarProperty.getData().containsKey(packetInfoProperty.getSrc()))
                         ipv6StatBarProperty.getData().put(packetInfoProperty.getSrc(), ((double) packet.getOriginalLength()) / 1024);
                     else {

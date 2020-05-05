@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class UdpPPacket implements PPacket {
-    private UdpPacket.Builder builder;
+    private UdpPacket.Builder builder = new UdpPacket.Builder();;
     private PcapHandle pcapHandle;
     private JsonMapper jsonMapper;
     private PcapDumper dumper;
@@ -33,16 +33,15 @@ public class UdpPPacket implements PPacket {
 
     @Override
     public String name() {
-        return this.name;
+        return "UDP";
     }
 
     @Override
     public void Initial() {
-        this.builder = new UdpPacket.Builder();
         this.packetPath = "tmp/";
         this.configPath = "tmp/";
 
-        this.name = "udp";
+        this.name = "UDP";
         this.length = 8;
         this.srcPort = 53;
         this.dstPort = 53;
@@ -53,6 +52,18 @@ public class UdpPPacket implements PPacket {
     @Override
     public void Parse(PcapPacket pcapPacket) {
         UdpPacket.UdpHeader header = pcapPacket.get(UdpPacket.class).getHeader();
+        ParseHandle(header);
+    }
+
+    @Override
+    public void Parse(Packet packet) {
+        UdpPacket.UdpHeader header = packet.get(UdpPacket.class).getHeader();
+        ParseHandle(header);
+    }
+
+    @Override
+    public void ParseHandle(Packet.Header packetHeader) {
+        UdpPacket.UdpHeader header = (UdpPacket.UdpHeader) packetHeader;
         this.length = header.length();
         this.srcPort = header.getSrcPort().valueAsInt();
         this.dstPort = header.getDstPort().valueAsInt();
@@ -139,10 +150,10 @@ public class UdpPPacket implements PPacket {
     }
 
     public String getName() {
-        return name;
+        return "UDP";
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = "UDP";
     }
 }

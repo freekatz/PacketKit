@@ -13,7 +13,7 @@ import java.io.IOException;
 
 // todo 改正 DNS
 public class DnsPPacket implements PPacket{
-    private DnsPacket.Builder builder;
+    private DnsPacket.Builder builder = new DnsPacket.Builder();
     private PcapHandle pcapHandle;
     private JsonMapper jsonMapper;
     private PcapDumper dumper;
@@ -49,11 +49,10 @@ public class DnsPPacket implements PPacket{
 
     @Override
     public void Initial() {
-        this.builder = new DnsPacket.Builder();
         this.packetPath = "tmp/";
         this.configPath = "tmp/";
 
-        this.name = "dns";
+        this.name = "DNS";
         this.length = 12;
         this.id = 0x0001;
         this.response = false;
@@ -89,12 +88,24 @@ public class DnsPPacket implements PPacket{
 
     @Override
     public String name() {
-        return this.name;
+        return "DNS";
     }
 
     @Override
     public void Parse(PcapPacket pcapPacket) {
         DnsPacket.DnsHeader header = pcapPacket.get(DnsPacket.class).getHeader();
+        ParseHandle(header);
+    }
+
+    @Override
+    public void Parse(Packet packet) {
+        DnsPacket.DnsHeader header = packet.get(DnsPacket.class).getHeader();
+        ParseHandle(header);
+    }
+
+    @Override
+    public void ParseHandle(Packet.Header packetHeader) {
+        DnsPacket.DnsHeader header = (DnsPacket.DnsHeader) packetHeader;
         this.length = header.length();
         this.id = header.getId();
         this.response = header.isResponse();
@@ -116,6 +127,7 @@ public class DnsPPacket implements PPacket{
 //        this.authorities = new ArrayList<>(header.getAuthorities());
 //        this.additionalInfo = new ArrayList<>(header.getAdditionalInfo());
     }
+
 
     @Override
     public String description() {
@@ -329,10 +341,10 @@ public class DnsPPacket implements PPacket{
     }
 
     public String getName() {
-        return name;
+        return "DNS";
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = "DNS";
     }
 }

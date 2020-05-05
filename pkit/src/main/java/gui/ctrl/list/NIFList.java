@@ -60,6 +60,9 @@ public class NIFList {
 
     // add filter tf
     public void initialize() {
+
+        captureButton.setTooltip(new Tooltip("start capture"));
+
         allItem.setSelected(true);
         localItem.setSelected(false);
         upItem.setSelected(false);
@@ -120,7 +123,7 @@ public class NIFList {
                 if (label.getText().equals(name))
                     indexView.setNifName(label.getId());
             }
-            ViewHandle.InitializeCenter(indexView);
+            ViewHandle.InitializeCaptureCenter(indexView);
         }
         indexView.StartCapture("online");
     }

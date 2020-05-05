@@ -16,7 +16,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class ArpPPacket implements PPacket{
-    private ArpPacket.Builder builder;
+    private ArpPacket.Builder builder = new ArpPacket.Builder();
     private PcapHandle pcapHandle;
     private JsonMapper jsonMapper;
     private PcapDumper dumper;
@@ -42,16 +42,15 @@ public class ArpPPacket implements PPacket{
 
     @Override
     public String name() {
-        return this.name;
+        return "ARP";
     }
 
     @Override
     public void Initial() {
-        this.builder = new ArpPacket.Builder();
         this.packetPath = "tmp/";
         this.configPath = "tmp/";
 
-        this.name = "arp";
+        this.name = "ARP";
         this.length = 28;
         this.hardwareType = ArpHardwareType.ETHERNET.value();
         this.protocolType = EtherType.IPV4.value();
@@ -67,6 +66,18 @@ public class ArpPPacket implements PPacket{
     @Override
     public void Parse(PcapPacket pcapPacket) {
         ArpPacket.ArpHeader header = pcapPacket.get(ArpPacket.class).getHeader();
+        ParseHandle(header);
+    }
+
+    @Override
+    public void Parse(Packet packet) {
+        ArpPacket.ArpHeader header = packet.get(ArpPacket.class).getHeader();
+        ParseHandle(header);
+    }
+
+    @Override
+    public void ParseHandle(Packet.Header packetHeader) {
+        ArpPacket.ArpHeader header = (ArpPacket.ArpHeader) packetHeader;
         this.length = header.length();
         this.hardwareType = header.getHardwareType().value();
         this.protocolType = header.getProtocolType().value();
@@ -215,10 +226,10 @@ public class ArpPPacket implements PPacket{
     }
 
     public String getName() {
-        return name;
+        return "ARP";
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = "ARP";
     }
 }

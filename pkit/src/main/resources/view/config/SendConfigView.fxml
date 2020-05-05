@@ -1,14 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="$CONTROLLER_NAME$"
-            prefHeight="400.0" prefWidth="600.0">
 
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ctrl.config.SendConfigView">
+    <children>
+        <TableView fx:id="configTable" editable="true" layoutX="31.0" layoutY="40.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+        <HBox layoutY="323.0" prefHeight="30.0" prefWidth="115.0" spacing="10.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="10.0">
+            <children>
+                <Button fx:id="addButton" mnemonicParsing="false" onAction="#AddButtonOnClicked" prefHeight="25.0" prefWidth="25.0" text="A" />
+                <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#DeleteButtonOnClicked" prefHeight="25.0" prefWidth="25.0" text="D" />
+                <Button fx:id="copyButton" mnemonicParsing="false" onAction="#CopyButtonOnClicked" prefHeight="25.0" prefWidth="25.0" text="C" />
+            </children>
+        </HBox>
+        <HBox layoutX="400.0" layoutY="300.0" prefHeight="30.0" prefWidth="200.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
+            <children>
+                <Button fx:id="okButton" mnemonicParsing="false" onAction="#OkButtonOnClicked" prefHeight="25.0" prefWidth="55.0" text="Ok" />
+                <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#CancelButtonOnClicked" prefHeight="25.0" prefWidth="55.0" text="Cancel" />
+                <Button fx:id="helpButton" mnemonicParsing="false" onAction="#HelpButtonOnClicked" prefHeight="25.0" prefWidth="55.0" text="Help" />
+            </children>
+        </HBox>
+    </children>
 </AnchorPane>

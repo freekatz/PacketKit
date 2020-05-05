@@ -2,10 +2,7 @@ package core;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import gui.model.FilterProperty;
-import gui.model.Property;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import gui.model.config.FilterProperty;
 
 import java.io.File;
 import java.io.IOException;

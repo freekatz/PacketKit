@@ -1,6 +1,7 @@
 package util.job;
 
 import gui.ctrl.IndexView;
+import gui.ctrl.View;
 import gui.model.browser.PacketInfoProperty;
 import gui.model.browser.PacketProperty;
 import org.pcap4j.core.BpfProgram;
@@ -20,18 +21,18 @@ public class SaveJob implements Runnable{
 
     CNIF cnif;
 
-    IndexView indexView;
+    View view;
     String pcapFile;
     String savePath;
     String filterExpression;
 
-    public SaveJob(IndexView indexView, String path, String savePath, String filterExpression) {
-        this.indexView = indexView;
+    public SaveJob(View view, String path, String savePath, String filterExpression) {
+        this.view = view;
         this.pcapFile = path;
         this.savePath = savePath;
         this.filterExpression = filterExpression;
 
-        cnif = new CNIF(indexView.getPcapFile());
+        cnif = new CNIF(path);
 
         try {
             cnif.dumper = cnif.handle.dumpOpen(savePath);

@@ -3,15 +3,17 @@ package gui.ctrl.list;
 import gui.ctrl.IndexView;
 import gui.ctrl.View;
 import gui.model.SettingProperty;
-import gui.model.history.PcapFileHistoryProperty;
+import gui.model.history.CapturePcapFileHistoryProperty;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import util.FileHandle;
 import util.ViewHandle;
@@ -20,6 +22,8 @@ import java.io.File;
 
 
 public class FileList {
+    SettingProperty settingProperty = new SettingProperty();
+
     View view;
 
     @FXML
@@ -31,7 +35,9 @@ public class FileList {
     public FileList() {}
 
     public void initialize() {
-        ViewHandle.InitializePcapFileList(SettingProperty.pcapFileHistory, fileList);
+        openButton.setTooltip(new Tooltip("open the pcap file"));
+
+        ViewHandle.InitializePcapFileList(settingProperty.capturePcapFileHistory, fileList);
 
         fileList.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -78,7 +84,7 @@ public class FileList {
             indexView.setType("capture");
             indexView.setNifName(null);
             indexView.setPcapFile(pcapFile);
-            ViewHandle.InitializeCenter(indexView);
+            ViewHandle.InitializeCaptureCenter(indexView);
         }
         indexView.StartCapture("offline");
 
@@ -87,6 +93,7 @@ public class FileList {
     @FXML
     private void OpenButtonOnClicked() {
         Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
         FileChooser fileChooser = new FileChooser();
         // setting
         fileChooser.getExtensionFilters().addAll(
@@ -96,10 +103,10 @@ public class FileList {
         );
         File file = fileChooser.showOpenDialog(stage);
         if (file==null) return;
-        FileHandle.AddHistory(SettingProperty.pcapFileHistory, file.getAbsolutePath(), PcapFileHistoryProperty.class);
+        FileHandle.AddHistory(settingProperty.capturePcapFileHistory, file.getAbsolutePath(), CapturePcapFileHistoryProperty.class);
         IndexView indexView = (IndexView) view;
-        ViewHandle.InitializePcapFileList(SettingProperty.pcapFileHistory, indexView.getFileListCtrl().getFileList());
-        ViewHandle.InitializePcapFileMenu(SettingProperty.pcapFileHistory, indexView.getCaptureMenuBarCtrl().getRecentMenu());
+        ViewHandle.InitializePcapFileList(settingProperty.capturePcapFileHistory, indexView.getFileListCtrl().getFileList());
+        ViewHandle.InitializeCapturePcapFileMenu(settingProperty.capturePcapFileHistory, indexView.getCaptureMenuBarCtrl().getRecentMenu());
         StartCapture(file.getAbsolutePath());
     }
 }

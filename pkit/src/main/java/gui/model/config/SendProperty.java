@@ -1,10 +1,10 @@
-package gui.model.nif;
+package gui.model.config;
 
 import gui.model.Property;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
-public class SendProperty implements Property {
+public class SendProperty implements Property, Cloneable {
     private final SimpleStringProperty name = new SimpleStringProperty(this, "name");
     private final SimpleStringProperty comment = new SimpleStringProperty(this, "comment");
     private final SimpleIntegerProperty count = new SimpleIntegerProperty(this, "count");
@@ -69,5 +69,15 @@ public class SendProperty implements Property {
 
     public void setName(String name) {
         this.name.set(name);
+    }
+
+    @Override
+    public Property clone() {
+        try {
+            return (SendProperty) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

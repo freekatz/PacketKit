@@ -16,7 +16,7 @@ import java.net.Inet6Address;
 import java.net.UnknownHostException;
 
 public class Ipv6PPacket implements PPacket{
-    private IpV6Packet.Builder builder;
+    private IpV6Packet.Builder builder = new IpV6Packet.Builder();
     private PcapHandle pcapHandle;
     private JsonMapper jsonMapper;
     private PcapDumper dumper;
@@ -42,16 +42,15 @@ public class Ipv6PPacket implements PPacket{
 
     @Override
     public String name() {
-        return this.name;
+        return "IPv6";
     }
 
     @Override
     public void Initial() {
-        this.builder = new IpV6Packet.Builder();
         this.packetPath = "tmp/";
         this.configPath = "tmp/";
 
-        this.name = "ipv6";
+        this.name = "IPv6";
         this.length = 40;
         this.version = IpVersion.IPV6.value();
         this.trafficClass = 0;
@@ -66,7 +65,18 @@ public class Ipv6PPacket implements PPacket{
     @Override
     public void Parse(PcapPacket pcapPacket) {
         IpV6Packet.IpV6Header header = pcapPacket.get(IpV6Packet.class).getHeader();
-        header.getTrafficClass().value();
+        ParseHandle(header);
+    }
+
+    @Override
+    public void Parse(Packet packet) {
+        IpV6Packet.IpV6Header header = packet.get(IpV6Packet.class).getHeader();
+        ParseHandle(header);
+    }
+
+    @Override
+    public void ParseHandle(Packet.Header packetHeader) {
+        IpV6Packet.IpV6Header header = (IpV6Packet.IpV6Header) packetHeader;
         this.length = header.length();
         this.version = header.getVersion().value();
         this.trafficClass = header.getTrafficClass().value();
@@ -76,7 +86,6 @@ public class Ipv6PPacket implements PPacket{
         this.hopLimit = header.getHopLimit();
         this.srcAddr = header.getSrcAddr().getHostAddress();
         this.dstAddr = header.getDstAddr().getHostAddress();
-
     }
 
     @Override
@@ -197,12 +206,12 @@ public class Ipv6PPacket implements PPacket{
     public void setLength(int length) {
         this.length = length;
     }
-
     public String getName() {
-        return name;
+        return "IPv6";
     }
 
+
     public void setName(String name) {
-        this.name = name;
+        this.name = "IPv6";
     }
 }

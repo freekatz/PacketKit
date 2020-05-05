@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.HBox?>
 
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ctrl.CaptureConfigView">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ctrl.config.CaptureConfigView">
     <children>
         <TableView fx:id="configTable" editable="true" layoutX="31.0" layoutY="40.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
         <HBox layoutY="323.0" prefHeight="30.0" prefWidth="115.0" spacing="10.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="10.0">

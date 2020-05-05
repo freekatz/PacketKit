@@ -49,16 +49,16 @@ public class PacketProperty implements Property {
         this.info.set(info);
     }
 
+    @Override
+    public String getName() {
+        return name.get();
+    }
+
     public SimpleStringProperty nameProperty() {
         return name;
     }
 
     public void setName(String name) {
         this.name.set(name);
-    }
-
-    @Override
-    public String getName() {
-        return null;
     }
 }

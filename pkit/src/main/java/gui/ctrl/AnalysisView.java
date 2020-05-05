@@ -23,6 +23,8 @@ import java.net.URL;
 import java.util.LinkedHashMap;
 
 public class AnalysisView implements View{
+    SettingProperty settingProperty = new SettingProperty();
+
     View view;
     String path;
 
@@ -46,10 +48,10 @@ public class AnalysisView implements View{
         AnalysisMenuProperty menuProperty = new AnalysisMenuProperty();
         LinkedHashMap<String, String> traffic = new LinkedHashMap<>();
         traffic.put("NIF Statistic", "NIF Statistic1");
-        traffic.put("IO LineChart", SettingProperty.ioLineChartPath);
-        traffic.put("Protocol PieChart", SettingProperty.protocolPieChartPath);
-        traffic.put("IPv4 Statistic", SettingProperty.ipv4StatBarChartPath);
-        traffic.put("IPv6 Statistic", SettingProperty.ipv6StatBarChartPath);
+        traffic.put("IO LineChart", settingProperty.ioLineChartPath);
+        traffic.put("Protocol PieChart", settingProperty.protocolPieChartPath);
+        traffic.put("IPv4 Statistic", settingProperty.ipv4StatBarChartPath);
+        traffic.put("IPv6 Statistic", settingProperty.ipv6StatBarChartPath);
 
         LinkedHashMap<String, String> communication = new LinkedHashMap<>();
         LinkedHashMap<String, String> relation = new LinkedHashMap<>();
@@ -80,7 +82,7 @@ public class AnalysisView implements View{
         AnchorPane.setRightAnchor(webView, 0.0);
         AnchorPane.setBottomAnchor(webView, 0.0);
 
-        this.setPath(SettingProperty.analysisWelcomePath);
+        this.setPath(settingProperty.analysisWelcomePath);
 
         menuTree.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override

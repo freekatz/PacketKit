@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class EthernetPPacket implements PPacket{
-    private EthernetPacket.Builder builder;
+    private EthernetPacket.Builder builder = new EthernetPacket.Builder();
     private PcapHandle pcapHandle;
     private JsonMapper jsonMapper;
     private PcapDumper dumper;
@@ -33,16 +33,15 @@ public class EthernetPPacket implements PPacket{
 
     @Override
     public String name() {
-        return this.name;
+        return "Ethernet";
     }
 
     @Override
     public void Initial() {
-        this.builder = new EthernetPacket.Builder();
         this.packetPath = "tmp/";
         this.configPath = "tmp/";
 
-        this.name = "ethernet";
+        this.name = "Ethernet";
         this.length = 14;
         this.dstAddr = "ff:ff:ff:ff:ff:ff";
         this.srcAddr = "00:00:00:00:00:01";
@@ -52,6 +51,18 @@ public class EthernetPPacket implements PPacket{
     @Override
     public void Parse(PcapPacket pcapPacket) {
         EthernetPacket.EthernetHeader header = pcapPacket.get(EthernetPacket.class).getHeader();
+        ParseHandle(header);
+    }
+
+    @Override
+    public void Parse(Packet packet) {
+        EthernetPacket.EthernetHeader header = packet.get(EthernetPacket.class).getHeader();
+        ParseHandle(header);
+    }
+
+    @Override
+    public void ParseHandle(Packet.Header packetHeader) {
+        EthernetPacket.EthernetHeader header = (EthernetPacket.EthernetHeader) packetHeader;
         this.length = header.length();
         this.dstAddr = header.getDstAddr().toString();
         this.srcAddr = header.getSrcAddr().toString();
@@ -71,7 +82,6 @@ public class EthernetPPacket implements PPacket{
                 .dstAddr(MacAddress.getByName(this.dstAddr))
                 .srcAddr(MacAddress.getByName(this.srcAddr))
                 .type(EtherType.getInstance(this.type))
-                .payloadBuilder(builder)
                 .paddingAtBuild(true);
     }
 
@@ -130,10 +140,10 @@ public class EthernetPPacket implements PPacket{
     }
 
     public String getName() {
-        return name;
+        return "Ethernet";
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = "Ethernet";
     }
 }

@@ -1,7 +1,8 @@
-package gui.ctrl;
+package gui.ctrl.config;
 
+import gui.ctrl.View;
 import gui.ctrl.bar.CaptureStatusBar;
-import gui.model.CaptureProperty;
+import gui.model.config.CaptureProperty;
 import gui.model.Property;
 import gui.model.SettingProperty;
 import javafx.event.Event;
@@ -16,9 +17,7 @@ import javafx.util.StringConverter;
 import util.FileHandle;
 import util.ViewHandle;
 
-import java.net.URL;
-
-public class CaptureConfigView implements View{
+public class CaptureConfigView implements View {
     SettingProperty settingProperty = new SettingProperty();
 
     CaptureStatusBar captureStatusBar;

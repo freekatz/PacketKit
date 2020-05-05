@@ -1,10 +1,12 @@
 package gui.model.browser;
 
 import gui.model.Property;
+import gui.model.config.SendProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
-public class PacketInfoProperty implements Property {
+public class PacketInfoProperty implements Property, Cloneable {
+    SimpleStringProperty name = new SimpleStringProperty(this, "name");
     private final SimpleIntegerProperty no = new SimpleIntegerProperty(this, "no"); // 程序中自增
     private final SimpleStringProperty time = new SimpleStringProperty(this, "time"); // 程序中自增
     private final SimpleStringProperty src = new SimpleStringProperty(this, "src"); // 自适应，无ip时使用mac
@@ -98,20 +100,25 @@ public class PacketInfoProperty implements Property {
     }
 
     @Override
-    public String toString() {
-        return "PacketProperty{" +
-                "no=" + getNo() +
-                ", time=" + getTime() +
-                ", src=" + getSrc() +
-                ", dst=" + getDst() +
-                ", protocol=" + getProtocol() +
-                ", length=" + getLength() +
-                ", info=" + getInfo() +
-                '}';
+    public String getName() {
+        return name.get();
+    }
+
+    public SimpleStringProperty nameProperty() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name.set(name);
     }
 
     @Override
-    public String getName() {
+    public Property clone() {
+        try {
+            return (PacketInfoProperty) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 }
