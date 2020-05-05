@@ -15,6 +15,9 @@
 
 [![License](res/README/_license-mit-blue.svg)](https://opensource.org/licenses/MIT)
 
+
+# 注意：以下文档介绍已过期（不用往下读了），由于开发周期的问题，还没有更新
+
 ---
 
 ## 目录
