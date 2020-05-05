@@ -1,0 +1,126 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <link rel="icon" href="https://static.jianshukeji.com/hcode/images/favicon.ico">
+    <style>
+        #container {
+            background-color: white;
+            font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            width: 720px;
+            padding: 17px;
+            border-radius: 5px;
+            text-align: center;
+            position: fixed;
+            left: 5%;
+            top: 15%;
+            overflow: hidden;
+            z-index: 99999; }
+    </style>
+    <script src="https://code.highcharts.com.cn/jquery/jquery-1.8.3.min.js"></script>
+    <script src="https://code.highcharts.com.cn/highcharts/highcharts.js"></script>
+    <script src="https://code.highcharts.com.cn/highcharts/highcharts-3d.js"></script>
+    <script src="https://code.highcharts.com.cn/highcharts/modules/exporting.js"></script>
+    <script src="https://img.hcharts.cn/highcharts-plugins/highcharts-zh_CN.js"></script>
+</head>
+<body>
+<div id="container"></div>
+<<script>
+    $.getJSON('../api/protocolPieChart.json', function(data) {
+        chart = Highcharts.chart('container', {
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                options3d: {
+                    enabled: true,
+                    alpha: 45,
+                    beta: 0
+                }
+            },
+            title: {
+                text: '扇区突出演示'
+            },
+            tooltip: {
+                headerFormat: '{series.name}<br>',
+                pointFormat: '{point.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    depth: 35,
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                        style: {
+                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                        }
+                    },
+                    states: {
+                        hover: {
+                            enabled: false
+                        }
+                    },
+                    slicedOffset: 20,         // 突出间距
+                    // point: {                  // 每个扇区是数据点对象，所以事件应该写在 point 下面
+                    //     events: {
+                    //         // 鼠标滑过是，突出当前扇区
+                    //         mouseOver: function () {
+                    //             this.slice();
+                    //         },
+                    //         // 鼠标移出时，收回突出显示
+                    //         mouseOut: function () {
+                    //             this.slice();
+                    //         },
+                    //         // 默认是点击突出，这里屏蔽掉
+                    //         click: function () {
+                    //             return false;
+                    //         }
+                    //     }
+                    // }
+                }
+            },
+            credits: {
+                enabled: false,                    // 默认值，如果想去掉版权信息，设置为false即可
+                text: 'PKit',             // 显示的文字
+                href: 'http://github.com/1uvu/pkit',      // 链接地址
+                position: {                         // 位置设置
+                    align: 'left',
+                    x: 400,
+                    verticalAlign: 'bottom',
+                    y: -100
+                },
+                style: {                            // 样式设置
+                    cursor: 'pointer',
+                    color: 'red',
+                    fontSize: '30px'
+                }
+            },
+            series: [{
+                type: 'pie',
+                name: '浏览器访问量占比',
+                data: parseJson(data)
+            }]
+        });
+
+
+        function parseJson(data) {
+            var rtn = [];
+            for (let key in data.data) {
+                var item = []
+                item[0] = key;
+                item[1] = data.data[key];
+                // console.log(item);
+                rtn.push(item);
+            }
+
+            console.log(rtn);
+            return rtn;
+        }
+
+    });
+</script>
+</body>
+</html>

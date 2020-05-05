@@ -1,0 +1,110 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8"><link rel="icon" href="https://jscdn.com.cn/highcharts/images/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* css 代码  */
+    </style>
+    <script src="https://code.highcharts.com.cn/jquery/jquery-1.8.3.min.js"></script>
+    <script src="https://code.highcharts.com.cn/highstock/highstock.js"></script>
+    <script src="https://code.highcharts.com.cn/highstock/modules/data.js"></script>
+    <script src="https://code.highcharts.com.cn/highcharts/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com.cn/highcharts-plugins/highcharts-zh_CN.js"></script>
+</head>
+<body>
+<div id="container" style="height: 400px; min-width: 600px"></div>
+<script>
+    $.getJSON('http://localhost/io.json', function(data) {
+        chartView = Highcharts.stockChart('container', {
+            chartView: {
+                zoomType: 'xy'
+            },
+            rangeSelector: {
+                allButtonsEnabled: true,
+                buttons: [{
+                    type: 'minute',
+                    count: 2,
+                    text: '1m'
+                }, {
+                    type: 'minute',
+                    count: 10,
+                    text: '5m'
+                }, {
+                    type: 'minute',
+                    count: 30,
+                    text: '30m'
+                }, {
+                    type: 'hour',
+                    count: 1,
+                    text: '1h'
+                }, {
+                    type: 'all',
+                    text: 'All'
+                }]
+            },
+            title: {
+                text: 'IO 图'
+            },
+            yAxis: {
+                scrollbar: {
+                    enabled: true,
+                    showFull: false
+                }
+            },
+            tooltip: {
+                split: false
+            },
+            series: [
+                {
+                    data: data.data[0],
+                    pointStart: data.pointStart,
+                    pointInterval: data.pointInterval
+                }
+            ]
+        });
+
+        // requestData();
+        //
+        // function requestData() {
+        //     $.ajax({
+        //         url: 'http://localhost/io.json',
+        //         success: function(point) {
+        //             var l;
+        //             if (chartView.series[0].data.length>0) {
+        //                 l = chartView.series[0].data.length;
+        //             }
+        //             else {l = 0;}
+        //             if (l===point.data[0].length) {
+        //                 return;
+        //             }
+        //             var data = [];
+        //             var i;
+        //             for (i=l; i<point.data[0].length; i++) {
+        //                 // data[i-1][0] = date.ge;
+        //                 data[i-l] = point.data[0][i];
+        //             }
+        //             if (data.length===0)
+        //                 return;
+        //             console.log(data);
+        //
+        //             // 新增点操作
+        //             //具体的参数详见：https://api.hcharts.cn/highcharts#Series.addPoint
+        //             chartView.series[0].pointStart = point.pointStart;
+        //             chartView.series[0].pointInterval = chartView.series[0].pointInterval + point.pointInterval;
+        //             for (i=0; i<data.length; i++) {
+        //                 chartView.series[0].addPoint(data[i], false);
+        //             }
+        //             chartView.redraw();
+        //             // 一秒后继续调用本函数
+        //             setTimeout(requestData, 1000);
+        //         },
+        //         cache: false
+        //     });
+        // }
+    });
+
+
+</script>
+</body>
+</html>
