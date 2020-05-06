@@ -37,7 +37,7 @@ Packet Kit 是一个网络数据包工具箱，包括捕获、过滤、解析、
 
 目前阶段，Packet Kit 主要由三个模块构成：捕获、发送和分析，更多模块待日后添加
 
-[最新发行版本](#)
+[最新发行版本](https://github.com/1uvu/PacketKit/releases)
 
 ### 安装
 
