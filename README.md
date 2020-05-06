@@ -2,7 +2,7 @@
   <a href="https://github.com/1uvu/pkit" target="_blank">
     <img src="res/logo.png" alt="Packet Kit Logo" width=72 height=72>
   </a>
-  <h3 align="center">PKit(Packet Kit)</h3>
+  <h3 align="center">Packet Kit(PKit)</h3>
   <p align="center">
     一个强大的跨平台底层数据包工具箱
     <br>
