@@ -100,7 +100,9 @@ public class AnalysisJob implements Runnable {
                 //3. bar
                 if (packetInfoProperty.getSrc().contains(".")) {
                     String ip = packetInfoProperty.getSrc().split(":")[0];
-                    String port = packetInfoProperty.getSrc().split(":")[1];
+                    String port;
+                    if (!packetInfoProperty.getProtocol().contains("IP"))
+                        port = packetInfoProperty.getSrc().split(":")[1];
                     if (!ipv4StatBarProperty.getData().containsKey(ip))
                         ipv4StatBarProperty.getData().put(ip, ((double) packet.getOriginalLength()) / 1024);
                     else {

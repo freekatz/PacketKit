@@ -28,7 +28,7 @@ public class PacketList {
         packetTable.getColumns().get(3).setPrefWidth(200);
         packetTable.getColumns().get(4).setPrefWidth(150);
         packetTable.getColumns().get(5).setPrefWidth(100);
-        packetTable.getColumns().get(6).setPrefWidth(50);
+        packetTable.getColumns().get(6).setPrefWidth(80);
         packetTable.getColumns().get(7).setPrefWidth(600);
 
         packetTable.addEventHandler(MouseEvent.MOUSE_CLICKED, (event)-> {
