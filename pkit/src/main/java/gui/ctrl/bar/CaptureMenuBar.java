@@ -1,7 +1,7 @@
 package gui.ctrl.bar;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import gui.ctrl.AnalysisView;
+import gui.ctrl.single.AnalysisView;
 import gui.ctrl.IndexView;
 import gui.ctrl.SendView;
 import gui.ctrl.View;
@@ -214,7 +214,7 @@ public class CaptureMenuBar {
     private void SettingItemOnClicked() {
         try {
             FXMLLoader loader = new FXMLLoader();
-            AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream("view/SettingView.fxml"));
+            AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream("view/single/SettingView.fxml"));
             Stage stage = new Stage();
             stage.initStyle(StageStyle.DECORATED);
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -237,7 +237,7 @@ public class CaptureMenuBar {
     private void AnalysisItemOnClicked() {
         try {
             FXMLLoader loader = new FXMLLoader();
-            AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream("view/AnalysisView.fxml"));
+            AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream("view/single/AnalysisView.fxml"));
             Stage stage = new Stage();
             stage.initStyle(StageStyle.DECORATED);
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -324,7 +324,7 @@ public class CaptureMenuBar {
     private void AboutItemOnClicked() {
         try {
             FXMLLoader loader = new FXMLLoader();
-            AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream("view/AboutView.fxml"));
+            AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream("view/single/AboutView.fxml"));
             Stage stage = new Stage();
             stage.initStyle(StageStyle.DECORATED);
             stage.initModality(Modality.WINDOW_MODAL);

@@ -1,6 +1,0 @@
-将每一种协议存储为协议向量：每一种协议都搞成一个 map<protocol, next protocol vector>如 ipv4 类型协议指向
-
-todo 构造一个协议树！！！
-利用 jackson 的树模型实现协议树
-
-todo 自动获取 p4 支持的，自动生成配置，自动生成界面，自动构造包

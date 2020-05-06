@@ -1,5 +1,7 @@
-package gui.ctrl;
+package gui.ctrl.single;
 
+import gui.ctrl.IndexView;
+import gui.ctrl.View;
 import gui.model.AnalysisMenuProperty;
 import gui.model.SettingProperty;
 import javafx.event.Event;
@@ -22,7 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedHashMap;
 
-public class AnalysisView implements View{
+public class AnalysisView implements View {
     SettingProperty settingProperty = new SettingProperty();
 
     View view;

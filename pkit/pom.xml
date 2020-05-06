@@ -145,7 +145,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>Launch</mainClass>
+                            <mainClass>Launcher</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

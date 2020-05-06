@@ -1,6 +1,6 @@
 package gui.ctrl.bar;
 
-import gui.ctrl.AnalysisView;
+import gui.ctrl.single.AnalysisView;
 import gui.ctrl.IndexView;
 import gui.ctrl.SendView;
 import gui.ctrl.View;
@@ -337,7 +337,7 @@ public class CaptureToolBar {
 
         try {
             FXMLLoader loader = new FXMLLoader();
-            AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream("view/AnalysisView.fxml"));
+            AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream("view/single/AnalysisView.fxml"));
             Stage stage = new Stage();
             stage.initStyle(StageStyle.DECORATED);
             stage.initModality(Modality.APPLICATION_MODAL);

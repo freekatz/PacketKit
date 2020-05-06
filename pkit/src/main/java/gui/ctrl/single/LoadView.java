@@ -1,4 +1,4 @@
-package gui.ctrl;
+package gui.ctrl.single;
 
 public class LoadView {
 }

@@ -8,7 +8,7 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="gui.ctrl.LoadView"
+            fx:controller="gui.ctrl.single.LoadView"
             prefHeight="400.0" prefWidth="600.0">
 
 </AnchorPane>
