@@ -1,3 +1,4 @@
+
 <p align="center">
   <a href="https://github.com/1uvu/pkit" target="_blank">
     <img src="res/logo.png" alt="Packet Kit Logo" width=72 height=72>
@@ -12,11 +13,7 @@
   </p></p>
 
 
-
 [![License](res/README/_license-mit-blue.svg)](https://opensource.org/licenses/MIT)
-
-
-# 注意：以下文档介绍已过期（不用往下读了），由于开发周期的问题，还没有更新
 
 ---
 
