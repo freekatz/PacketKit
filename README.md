@@ -92,11 +92,10 @@ Packet Kit 已在以下平台进行过严格测试：
 
 **暂时没时间写，只列出大致的列表**
 
-- 需求分析
-- 架构设计
-- 系统设计
-- 代码规范
-- 使用文档
+- 软件工程（需求分析、架构设计、系统设计）
+- [项目结构](doc/project-structure.md)
+- [代码规范](doc/code-structure.md)
+- [使用文档](wiki)
 - [待办清单](doc/todo.md)
 - [已知 Bug](doc/bug.md)
 - 等等
