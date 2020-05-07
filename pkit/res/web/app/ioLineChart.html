@@ -7,15 +7,14 @@
         #container {
             background-color: white;
             font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            width: 720px;
-            padding: 17px;
-            border-radius: 5px;
-            text-align: center;
-            position: fixed;
-            left: 5%;
-            top: 15%;
-            overflow: hidden;
-            z-index: 99999; }
+            margin-right: 0;
+            margin-left: 0;
+            margin-bottom: 0;
+            margin-top: 0;
+            min-height: 600px;
+            min-width: 720px;
+            z-index: 99999;
+        }
     </style>
     <script src="https://code.highcharts.com.cn/jquery/jquery-1.8.3.min.js"></script>
     <script src="https://code.highcharts.com.cn/highstock/highstock.js"></script>
@@ -27,8 +26,8 @@
 <div id="container"></div>
 <script>
     $.getJSON('../api/ioLineChart.json', function(data) {
-        chartView = Highcharts.stockChart('container', {
-            chartView: {
+        chart = Highcharts.stockChart('container', {
+            chart: {
                 zoomType: 'xy'
             },
             rangeSelector: {
@@ -82,55 +81,30 @@
                     fontSize: '30px'
                 }
             },
+            plotOptions: {
+                bar: {
+                    dataLabels: {
+                        enabled: true,
+                        allowOverlap: true, // 默认是 false，即不允许数据标签重叠
+                        useHTML: true
+                    }
+                }
+            },
             series: [
                 {
-                    name: "发包数",
+                    name: "数据包数",
                     data: data.data[0],
                     pointStart: data.pointStart,
                     pointInterval: data.pointInterval
-                }
+                },
+                // {
+                //     name: "Byte 数",
+                //     data: data.data[1],
+                //     pointStart: data.pointStart,
+                //     pointInterval: data.pointInterval
+                // }
             ]
         });
-
-
-        // requestData();
-        //
-        // function requestData() {
-        //     $.ajax({
-        //         url: 'http://localhost/io.json',
-        //         success: function(point) {
-        //             var l;
-        //             if (chartView.series[0].data.length>0) {
-        //                 l = chartView.series[0].data.length;
-        //             }
-        //             else {l = 0;}
-        //             if (l===point.data[0].length) {
-        //                 return;
-        //             }
-        //             var data = [];
-        //             var i;
-        //             for (i=l; i<point.data[0].length; i++) {
-        //                 // data[i-1][0] = date.ge;
-        //                 data[i-l] = point.data[0][i];
-        //             }
-        //             if (data.length===0)
-        //                 return;
-        //             console.log(data);
-        //
-        //             // 新增点操作
-        //             //具体的参数详见：https://api.hcharts.cn/highcharts#Series.addPoint
-        //             chartView.series[0].pointStart = point.pointStart;
-        //             chartView.series[0].pointInterval = chartView.series[0].pointInterval + point.pointInterval;
-        //             for (i=0; i<data.length; i++) {
-        //                 chartView.series[0].addPoint(data[i], false);
-        //             }
-        //             chartView.redraw();
-        //             // 一秒后继续调用本函数
-        //             setTimeout(requestData, 1000);
-        //         },
-        //         cache: false
-        //     });
-        // }
     });
 
 

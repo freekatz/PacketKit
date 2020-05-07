@@ -56,7 +56,14 @@ public class AnalysisView implements View {
         traffic.put("IPv6 Statistic", settingProperty.ipv6StatBarChartPath);
 
         LinkedHashMap<String, String> communication = new LinkedHashMap<>();
+        communication.put("S2OSankeyChart", settingProperty.s2oSankeyChartPath);
+        communication.put("S2SankeyChart", settingProperty.s2sSankeyChartPath);
+        communication.put("O2SankeyChart", settingProperty.o2sSankeyChartPath);
+
         LinkedHashMap<String, String> relation = new LinkedHashMap<>();
+
+        relation.put("Network", settingProperty.networkChartPath);
+
         LinkedHashMap<String, String> description = new LinkedHashMap<>();
 
         menuProperty.setTraffic(traffic);

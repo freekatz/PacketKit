@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <link rel="icon" href="https://static.jianshukeji.com/hcode/images/favicon.ico">
+    <style>
+        #container {
+            background-color: white;
+            font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin-right: 0;
+            margin-left: 0;
+            margin-bottom: 0;
+            margin-top: 0;
+            min-height: 600px;
+            min-width: 720px;
+            z-index: 99999;
+        }
+    </style>
+    <script src="https://code.highcharts.com.cn/jquery/jquery-1.8.3.min.js"></script>
+    <script src="https://code.highcharts.com.cn/highcharts/highcharts.js"></script>
+    <script src="https://code.highcharts.com.cn/highcharts/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com.cn/highcharts/modules/oldie.js"></script>
+    <script src="https://code.highcharts.com.cn/highcharts/modules/networkgraph.js"></script>
+</head>
+<body>
+<div id="container"></div>
+<script>
+    $.getJSON('../api/networkChart.json', function(data) {
+        chart = Highcharts.chart('container', {
+            chart: {
+                type: 'networkgraph',
+                height: '100%'
+            },
+            title: {
+                text: '通联关系图'
+            },
+            plotOptions: {
+                networkgraph: {
+                    layoutAlgorithm: {
+                        enableSimulation: false,
+                        integration: 'verlet',
+                        linkLength: 150
+                    }
+
+                }
+            },
+            series: [{
+                marker: {
+                    radius: 20
+                },
+                keys: ['from', 'to', 'dataLabels.linkFormat'],
+                dataLabels: {
+                    allowOverlap: false,
+                    enabled: true,
+                    draggable: false,
+                    useHTML: true
+                },
+                data: parse(data.data),
+            }]
+        });
+
+        function parse(data) {
+
+            console.log(data);
+
+            var rtn = [];
+
+            for (var key in data) {
+                var s1 = key.split(":")[0];
+                var s2 = key.split(":")[1];
+                rtn.push([s1, s2, String(Math.floor(data[key]/1024*100)/100)+"KBytes"]);
+            }
+
+            console.log(rtn);
+            return rtn;
+        }
+    })
+</script>
+</body>
+</html>

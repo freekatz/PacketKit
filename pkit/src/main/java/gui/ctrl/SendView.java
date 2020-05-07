@@ -266,6 +266,9 @@ public class SendView implements View{
         sendToolBarCtrl.sendAllButton.setDisable(false);
         sendToolBarCtrl.forwardButton.setDisable(false);
         sendToolBarCtrl.forwardAllButton.setDisable(false);
+        sendToolBarCtrl.clearButton.setDisable(false);
+        sendToolBarCtrl.removeButton.setDisable(false);
+        sendToolBarCtrl.exportButton.setDisable(false);
     }
 
     public SplitPane getBrowserPane() {

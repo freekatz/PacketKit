@@ -14,10 +14,13 @@
     </properties>
 
     <dependencies>
+<!--        windows-->
+
+
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>11</version>
+            <version>11.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
@@ -27,7 +30,7 @@
 
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-media</artifactId>
+            <artifactId>javafx-fxml</artifactId>
             <version>11.0.2</version>
         </dependency>
 
@@ -35,19 +38,53 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
             <version>11.0.2</version>
+            <classifier>win</classifier>
         </dependency>
 
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-fxml</artifactId>
+            <artifactId>javafx-media</artifactId>
             <version>11.0.2</version>
+            <classifier>win</classifier>
         </dependency>
+
+<!--        linux-->
+
+
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.2</version>
-            <scope>test</scope>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>11.0.2</version>
+            <classifier>linux</classifier>
         </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-media</artifactId>
+            <version>11.0.2</version>
+            <classifier>linux</classifier>
+        </dependency>
+
+<!--        mac-->
+
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>11.0.2</version>
+            <classifier>mac</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-media</artifactId>
+            <version>11.0.2</version>
+            <classifier>mac</classifier>
+        </dependency>
+
+
+<!--        others-->
+
         <dependency>
             <groupId>org.pcap4j</groupId>
             <artifactId>pcap4j-core</artifactId>
@@ -77,11 +114,6 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
             <version>2.11.0.rc1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>19.0.0</version>
         </dependency>
     </dependencies>
     <build>
@@ -124,9 +156,12 @@
                         <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
                         <nonFilteredFileExtension>swf</nonFilteredFileExtension>
                         <nonFilteredFileExtension>data</nonFilteredFileExtension>
+<!--                        others-->
                     </nonFilteredFileExtensions>
                 </configuration>
             </plugin>
+
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -153,6 +188,7 @@
                     </descriptorRefs>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 </project>

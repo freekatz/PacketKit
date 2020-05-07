@@ -2,15 +2,13 @@ package util.job;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import gui.model.SettingProperty;
-import gui.model.analysis.IOLineProperty;
-import gui.model.analysis.Ipv4StatBarProperty;
-import gui.model.analysis.Ipv6StatBarProperty;
-import gui.model.analysis.ProtocolPieProperty;
+import gui.model.analysis.*;
 import gui.model.browser.PacketInfoProperty;
 import gui.model.browser.PacketProperty;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.PcapPacket;
+import util.ChartHandle;
 import util.PacketHandle;
 import util.nif.CNIF;
 
@@ -29,13 +27,17 @@ public class AnalysisJob implements Runnable {
     long time = 0;
     long second = 0;
     int pn = 0;
-    int bn = 0;
+//    int bn = 0;
     int dataLength = 0;
     IOLineProperty ioLineProperty;
 
     ProtocolPieProperty protocolPieProperty = new ProtocolPieProperty();
     Ipv4StatBarProperty ipv4StatBarProperty = new Ipv4StatBarProperty();
     Ipv6StatBarProperty ipv6StatBarProperty = new Ipv6StatBarProperty();
+    SankeyProperty s2oSankeyProperty = new SankeyProperty(); // sankey 1
+    SankeyProperty s2sSankeyProperty = new SankeyProperty(); // sankey 2
+    SankeyProperty o2sSankeyProperty = new SankeyProperty(); // sankey 3
+    SankeyProperty networkProperty = new SankeyProperty();
 
 
     public AnalysisJob (String pcapFile) {
@@ -49,6 +51,10 @@ public class AnalysisJob implements Runnable {
             mapper.writeValue(new File(settingProperty.protocolPieChartJson), protocolPieProperty);
             mapper.writeValue(new File(settingProperty.ipv4StatBarChartJson), ipv4StatBarProperty);
             mapper.writeValue(new File(settingProperty.ipv6StatBarChartJson), ipv6StatBarProperty);
+            mapper.writeValue(new File(settingProperty.s2oSankeyChartJson), s2oSankeyProperty);
+            mapper.writeValue(new File(settingProperty.s2sSankeyChartJson), s2sSankeyProperty);
+            mapper.writeValue(new File(settingProperty.o2sSankeyChartJson), o2sSankeyProperty);
+            mapper.writeValue(new File(settingProperty.networkChartJson), networkProperty);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -78,16 +84,16 @@ public class AnalysisJob implements Runnable {
                     ioLineProperty.setDataLength(dataLength);
                     time = packet.getTimestamp().toEpochMilli();
                     ioLineProperty.getData().get(0).add(pn);
-                    ioLineProperty.getData().get(1).add(bn);
+//                    ioLineProperty.getData().get(1).add(bn);
                     pn = 0;
-                    bn = 0;
+//                    bn = 0;
                     for (int i = 0; i < second; i++) {
                         ioLineProperty.getData().get(0).add(0);
                         ioLineProperty.getData().get(1).add(0);
                     }
                 }
                 pn++;
-                bn = bn + packet.getRawData().length;
+//                bn = bn + packet.getRawData().length;
 
                 // 2. pie
                 if (!protocolPieProperty.getData().containsKey(packetInfoProperty.getProtocol()))
@@ -99,15 +105,39 @@ public class AnalysisJob implements Runnable {
 
                 //3. bar
                 if (packetInfoProperty.getSrc().contains(".")) {
-                    String ip = packetInfoProperty.getSrc().split(":")[0];
-                    String port;
-                    if (!packetInfoProperty.getProtocol().contains("IP"))
-                        port = packetInfoProperty.getSrc().split(":")[1];
-                    if (!ipv4StatBarProperty.getData().containsKey(ip))
-                        ipv4StatBarProperty.getData().put(ip, ((double) packet.getOriginalLength()) / 1024);
+                    // todo 此处可以定义网段
+                    // communicate
+                    String[] s2oOpt = {"192.168.0.0", "255.255.0.0", "0.0.0.0", "0.0.0.0"};  // 源网段、目的网段
+
+                    ChartHandle.SankeyHandle(packetInfoProperty, s2oSankeyProperty, s2oOpt);
+
+                    String[] s2sOpt = {"192.168.0.0", "255.255.0.0", "192.168.0.0", "255.255.0.0"};
+
+                    ChartHandle.SankeyHandle(packetInfoProperty, s2sSankeyProperty, s2sOpt);
+
+                    String[] o2sOpt = {"0.0.0.0", "0.0.0.0", "192.168.0.0", "255.255.0.0"};
+
+                    ChartHandle.SankeyHandle(packetInfoProperty, o2sSankeyProperty, o2sOpt);
+
+                    // network
+                    String srcIp = packetInfoProperty.getSrc().split(":")[0];
+                    String dstIp = packetInfoProperty.getDst().split(":")[0];
+                    boolean ctrl;
+                    ctrl = !packetInfoProperty.getProtocol().contains("IP");
+                    if (ctrl) {
+
+                        if (networkProperty.getData().containsKey(srcIp+":"+dstIp))
+                            networkProperty.getData().put(srcIp+":"+dstIp, networkProperty.getData().get(srcIp+":"+dstIp)+packetInfoProperty.getLength());
+                        else networkProperty.getData().put(srcIp+":"+dstIp, packetInfoProperty.getLength());
+
+                    }
+
+
+                    if (!ipv4StatBarProperty.getData().containsKey(srcIp))
+                        ipv4StatBarProperty.getData().put(srcIp, ((double) packet.getOriginalLength()) / 1024);
                     else {
-                        double n = ipv4StatBarProperty.getData().get(ip);
-                        ipv4StatBarProperty.getData().put(ip, n + ((double) packet.getOriginalLength()) / 1024);
+                        double n = ipv4StatBarProperty.getData().get(srcIp);
+                        ipv4StatBarProperty.getData().put(srcIp, n + ((double) packet.getOriginalLength()) / 1024);
                     }
                 } else if (packetInfoProperty.getSrc().split(":").length>6){
 
@@ -120,7 +150,7 @@ public class AnalysisJob implements Runnable {
                 }
             } catch (EOFException e) {
                 ioLineProperty.getData().get(0).add(dataLength, pn);
-                ioLineProperty.getData().get(1).add(dataLength, bn);
+//                ioLineProperty.getData().get(1).add(dataLength, bn);
                 dataLength++;
 
                 int finalNum = num;

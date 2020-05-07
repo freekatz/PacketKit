@@ -280,6 +280,23 @@ public class PacketHandle {
         return ethernetPPacket.CraftPacket();
     }
 
+    public static boolean SameSubNet(String ipAddr1, String ipAddr2, String subnetMask) {
+        String[] mask = subnetMask.split("\\.");
+        String[] ip1 = ipAddr1.split("\\.");
+        String[] ip2 = ipAddr2.split("\\.");
+
+        for (int i = 0; i < mask.length; i++) {
+            if (Integer.parseInt(mask[i]) < 0 || Integer.parseInt(mask[i]) > 255
+                    || Integer.parseInt(ip1[i]) < 0 || Integer.parseInt(ip1[i]) > 255
+                    || Integer.parseInt(ip2[i]) < 0 || Integer.parseInt(ip2[i]) > 255) {
+                return true;
+            } else return (Integer.parseInt(mask[i]) & Integer.parseInt(ip1[i])) ==
+                    (Integer.parseInt(mask[i]) & Integer.parseInt(ip2[i]));
+        }
+
+        return true;
+    }
+
     public static String ShortIpv6Addr(String ipv6) {
         // 计算短ipv6地址
 

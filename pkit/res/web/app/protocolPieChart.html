@@ -8,15 +8,14 @@
         #container {
             background-color: white;
             font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            width: 720px;
-            padding: 17px;
-            border-radius: 5px;
-            text-align: center;
-            position: fixed;
-            left: 5%;
-            top: 15%;
-            overflow: hidden;
-            z-index: 99999; }
+            margin-right: 0;
+            margin-left: 0;
+            margin-bottom: 0;
+            margin-top: 0;
+            min-height: 600px;
+            min-width: 720px;
+            z-index: 99999;
+        }
     </style>
     <script src="https://code.highcharts.com.cn/jquery/jquery-1.8.3.min.js"></script>
     <script src="https://code.highcharts.com.cn/highcharts/highcharts.js"></script>
@@ -40,7 +39,7 @@
                 }
             },
             title: {
-                text: '扇区突出演示'
+                text: '协议饼状图'
             },
             tooltip: {
                 headerFormat: '{series.name}<br>',
@@ -58,6 +57,7 @@
                             color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
                         }
                     },
+                    showInLegend: true,
                     states: {
                         hover: {
                             enabled: false
@@ -100,7 +100,8 @@
             },
             series: [{
                 type: 'pie',
-                name: '浏览器访问量占比',
+                colorByPoint: true,
+                name: '协议占比',
                 data: parseJson(data)
             }]
         });
