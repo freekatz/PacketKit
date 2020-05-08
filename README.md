@@ -43,10 +43,11 @@ Packet Kit 已在以下平台进行过严格测试：
 
 - Window 7+
 - Linux（Ubuntu）
+- MacOS
 
 下载 jar 二进制文件，直接点击运行使用
 
-注：需要 Java Jdk11+ 以及 libpcap 和 npcap/winpcap 环境支持
+注：需要 Java Jdk11+ 以及 libpcap 和 npcap/winpcap 环境支持，另外，由于捕获底层数据包的需要，Linux 和 Mac 还需要赋予管理员权限
 
 ## 使用
 
