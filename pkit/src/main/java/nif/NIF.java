@@ -1,4 +1,4 @@
-package util.nif;
+package nif;
 
 import org.pcap4j.core.PcapNativeException;
 

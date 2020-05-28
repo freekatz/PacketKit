@@ -6,7 +6,6 @@ import gui.ctrl.config.SendConfigView;
 import gui.model.SettingProperty;
 import gui.model.history.CapturePcapFileHistoryProperty;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -21,14 +20,12 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import job.OfflineJob;
 import util.FileHandle;
-import util.PacketHandle;
 import util.ViewHandle;
-import util.job.OfflineJob;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 public class SendToolBar {
     SettingProperty settingProperty = new SettingProperty();
@@ -204,8 +201,9 @@ public class SendToolBar {
         sendView.packetPropertyArrayList.remove(index);
         sendView.getPacketHeaderCtrl().getRoot().getChildren().clear();
 
-        if (sendView.getPacketListCtrl().getPacketTable().getItems().size()==0)
-            removeButton.setDisable(true);
+        if (sendView.getPacketListCtrl().getPacketTable().getItems().size()==0) {
+            sendView.clearBrowser();
+        }
 
     }
 
@@ -298,7 +296,6 @@ public class SendToolBar {
             forwardButton.setDisable(false);
             forwardAllButton.setDisable(false);
         }
-        System.out.println(nifBox.getValue());
         sendView.setDstNifName(nifBox.getValue());
     }
 

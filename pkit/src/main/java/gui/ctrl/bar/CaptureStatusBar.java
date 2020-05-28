@@ -1,10 +1,10 @@
 package gui.ctrl.bar;
 
-import gui.ctrl.config.CaptureConfigView;
 import gui.ctrl.IndexView;
 import gui.ctrl.View;
-import gui.model.config.CaptureProperty;
+import gui.ctrl.config.CaptureConfigView;
 import gui.model.SettingProperty;
+import gui.model.config.CaptureProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;

@@ -1,17 +1,21 @@
-package util.job;
+package job;
 
 import gui.ctrl.SendView;
 import gui.model.config.SendProperty;
+import nif.SNIF;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapNativeException;
+import org.pcap4j.core.PcapNetworkInterface;
+import org.pcap4j.core.Pcaps;
+import org.pcap4j.packet.EthernetPacket;
 import org.pcap4j.packet.Packet;
+import org.pcap4j.util.MacAddress;
 import util.PacketHandle;
-import util.nif.SNIF;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-public class SendJob implements Runnable{
+public class ForwardJob implements Runnable {
 
     private final SNIF snif;
     private final SendProperty sendProperty;
@@ -22,20 +26,28 @@ public class SendJob implements Runnable{
 
     int retry;
 
-    public SendJob(SendView sendView, String opt) {
+    public ForwardJob(SendView sendView, String opt, String target) {
         this.sendView = sendView;
         this.opt = opt;
         this.snif = sendView.getSnif();
         this.sendProperty = sendView.getSendProperty();
+
         try {
             this.snif.load();
-            if (opt.equals("one"))
-                this.packet = PacketHandle.Restore(sendView.getPacketProperty());
+            PcapNetworkInterface nif = Pcaps.getDevByName(target);
+            if (opt.equals("one")) {
+                EthernetPacket.Builder builder = ((EthernetPacket)PacketHandle.Restore(sendView.getPacketProperty())).getBuilder();
+                builder.dstAddr((MacAddress) nif.getLinkLayerAddresses().get(0));
+                this.packet = builder.build();
+            }
             else {
                 packetArrayList = new ArrayList<>(sendView.packetPropertyArrayList.size());
                 sendView.packetPropertyArrayList.forEach(pp -> {
                     try {
-                        packetArrayList.add(PacketHandle.Restore(pp));
+                        EthernetPacket.Builder builder = ((EthernetPacket)PacketHandle.Restore(pp)).getBuilder();
+                        builder.dstAddr((MacAddress) nif.getLinkLayerAddresses().get(0));
+                        Packet packet = builder.build();
+                        packetArrayList.add(packet);
                     } catch (UnknownHostException e) {
                         e.printStackTrace();
                     }
@@ -49,6 +61,7 @@ public class SendJob implements Runnable{
     @Override
     public void run() {
         retry = 0;
+        System.out.println(packet);
         if (opt.equals("one")) {
             SendOne(packet);
         } else SendMulti();
@@ -60,7 +73,6 @@ public class SendJob implements Runnable{
     }
 
     private void SendOne(Packet packet) {
-        System.out.println(sendProperty.getCount());
         try {
             for (int i=0; i<sendProperty.getCount(); ++i) {
                 Thread.sleep(sendProperty.getTimeout());

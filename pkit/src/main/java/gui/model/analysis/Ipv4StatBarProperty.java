@@ -2,7 +2,6 @@ package gui.model.analysis;
 
 import javafx.beans.property.SimpleObjectProperty;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 public class Ipv4StatBarProperty {

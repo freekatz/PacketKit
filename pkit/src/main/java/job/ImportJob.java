@@ -1,4 +1,4 @@
-package util.job;
+package job;
 
 public class ImportJob {
 }

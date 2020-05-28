@@ -1,10 +1,10 @@
 package gui.ctrl.bar;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import gui.ctrl.single.AnalysisView;
 import gui.ctrl.IndexView;
 import gui.ctrl.SendView;
 import gui.ctrl.View;
+import gui.ctrl.single.AnalysisView;
 import gui.model.SettingProperty;
 import gui.model.browser.PacketProperty;
 import gui.model.history.CapturePcapFileHistoryProperty;
@@ -23,10 +23,10 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import job.BrowserJob;
 import org.pcap4j.core.PcapNetworkInterface;
 import util.FileHandle;
 import util.ViewHandle;
-import util.job.BrowserJob;
 
 import java.io.File;
 import java.io.IOException;

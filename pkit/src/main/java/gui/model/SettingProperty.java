@@ -32,8 +32,8 @@ public class SettingProperty {
 
     // todo: json 为每个文件定制
 
-    public String nifTableChartJson = "res/web/api/ipv6StatBarChart.json";
-    public String nifTableChartPath = "res/web/app/ipv6StatBarChart.html";
+//    public String nifStatTableChartJson = "res/web/api/nifStatTableChart.json";
+//    public String nifStatTableChartPath = "res/web/app/nifStatTableChart.html";
 
     public String ioLineChartJson = "res/web/api/ioLineChart.json";
     public String ioLineChartPath = "res/web/app/ioLineChart.html";

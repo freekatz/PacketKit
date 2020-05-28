@@ -1,6 +1,5 @@
 package gui.ctrl.browser;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -8,8 +7,6 @@ import gui.ctrl.SendView;
 import gui.ctrl.View;
 import gui.model.browser.FieldProperty;
 import gui.model.browser.PacketHeaderProperty;
-import gui.model.browser.PacketInfoProperty;
-import gui.model.browser.PacketProperty;
 import gui.model.packet.*;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -20,15 +17,10 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
-import org.pcap4j.core.PcapHandle;
-import org.pcap4j.core.PcapPacket;
 import org.pcap4j.packet.Packet;
 import util.PacketHandle;
 
-import java.io.DataInput;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.LinkedList;
 
 public class PacketHeader {
     View view;
@@ -185,7 +177,6 @@ public class PacketHeader {
                             }
 
                             js = mapper.writeValueAsString(node);
-                            System.out.println(js);
                             packetHeaderProperty.getHeader().set(i, (PPacket) mapper.readValue(js, clazz));
 
                             // // TODO: 2020/5/5  eth bug fix + packet to pcappacket

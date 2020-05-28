@@ -7,19 +7,15 @@ import gui.model.SettingProperty;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import util.ViewHandle;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedHashMap;
@@ -49,7 +45,7 @@ public class AnalysisView implements View {
         */
         AnalysisMenuProperty menuProperty = new AnalysisMenuProperty();
         LinkedHashMap<String, String> traffic = new LinkedHashMap<>();
-        traffic.put("NIF Statistic", "NIF Statistic1");
+//        traffic.put("NIF Statistic", settingProperty.nifStatTableChartPath);
         traffic.put("IO LineChart", settingProperty.ioLineChartPath);
         traffic.put("Protocol PieChart", settingProperty.protocolPieChartPath);
         traffic.put("IPv4 Statistic", settingProperty.ipv4StatBarChartPath);
@@ -64,12 +60,12 @@ public class AnalysisView implements View {
 
         relation.put("Network", settingProperty.networkChartPath);
 
-        LinkedHashMap<String, String> description = new LinkedHashMap<>();
+//        LinkedHashMap<String, String> description = new LinkedHashMap<>();
 
         menuProperty.setTraffic(traffic);
         menuProperty.setCommunication(communication);
         menuProperty.setRelation(relation);
-        menuProperty.setDescription(description);
+//        menuProperty.setDescription(description);
 
         menuTree = ViewHandle.InitializeMenuTree(menuProperty);
         assert menuTree != null;
@@ -106,8 +102,8 @@ public class AnalysisView implements View {
                     p = communication.get(name);
                 else if (relation.containsKey(name))
                     p = relation.get(name);
-                else if (description.containsKey(name))
-                    p = description.get(name);
+//                else if (description.containsKey(name))
+//                    p = description.get(name);
                 else return;
                 if (p.equals(path))
                     return;

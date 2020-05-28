@@ -2,9 +2,9 @@ package gui.ctrl.config;
 
 import gui.ctrl.View;
 import gui.ctrl.bar.CaptureStatusBar;
-import gui.model.config.CaptureProperty;
 import gui.model.Property;
 import gui.model.SettingProperty;
+import gui.model.config.CaptureProperty;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

@@ -1,6 +1,5 @@
 package gui.model.packet;
 
-import gui.model.browser.PacketProperty;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.PcapPacket;

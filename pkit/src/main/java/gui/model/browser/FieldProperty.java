@@ -1,7 +1,6 @@
 package gui.model.browser;
 
 import gui.model.Property;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 public class FieldProperty implements Property {

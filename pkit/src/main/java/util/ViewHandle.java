@@ -33,7 +33,8 @@ import org.pcap4j.core.Pcaps;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
 
 public class ViewHandle {
 
@@ -414,13 +415,16 @@ public class ViewHandle {
             JsonNode root = mapper.readTree(js);
             TreeItem<String> rootItem = new TreeItem<>(root.asText());
             root.fieldNames().forEachRemaining(field -> {
-                TreeItem<String> item = new TreeItem<>(field);
-                JsonNode node = root.path(field);
-                rootItem.getChildren().add(item);
-                node.fieldNames().forEachRemaining(f->{
-                    TreeItem<String> it = new TreeItem<>(f);
-                    item.getChildren().add(it);
-                });
+                if (!field.equals("name")) {
+                    TreeItem<String> item = new TreeItem<>(field);
+                    JsonNode node = root.path(field);
+                    rootItem.getChildren().add(item);
+                    node.fieldNames().forEachRemaining(f -> {
+                        TreeItem<String> it = new TreeItem<>(f);
+                        item.getChildren().add(it);
+
+                    });
+                }
             });
 
             return new TreeView<>(rootItem);

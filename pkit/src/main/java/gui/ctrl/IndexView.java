@@ -1,18 +1,18 @@
 package gui.ctrl;
 
-import gui.ctrl.bar.CaptureToolBar;
-import gui.ctrl.bar.FilterBar;
 import gui.ctrl.bar.CaptureMenuBar;
 import gui.ctrl.bar.CaptureStatusBar;
+import gui.ctrl.bar.CaptureToolBar;
+import gui.ctrl.bar.FilterBar;
 import gui.ctrl.browser.PacketData;
 import gui.ctrl.browser.PacketHeader;
 import gui.ctrl.browser.PacketList;
 import gui.ctrl.list.FileList;
 import gui.ctrl.list.NIFList;
-import gui.model.config.CaptureProperty;
-import gui.model.config.FilterProperty;
 import gui.model.SettingProperty;
 import gui.model.browser.PacketProperty;
+import gui.model.config.CaptureProperty;
+import gui.model.config.FilterProperty;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Orientation;
@@ -20,16 +20,18 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import util.*;
-import util.job.AnalysisJob;
-import util.job.OfflineJob;
-import util.job.OnlineJob;
-import util.job.SaveJob;
-import util.nif.CNIF;
+import job.AnalysisJob;
+import job.OfflineJob;
+import job.OnlineJob;
+import job.SaveJob;
+import nif.CNIF;
+import util.ViewHandle;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class IndexView implements View{
     SettingProperty settingProperty = new SettingProperty();
@@ -144,10 +146,11 @@ public class IndexView implements View{
                 else if (fileListCtrl.getFileList().getSelectionModel().getSelectedItem()!=null && type.equals("index"))
                     path = fileListCtrl.getFileList().getSelectionModel().getSelectedItem().replaceAll("\\(.*?\\)", "");
                 else
-                    if (pcapFile!=null)
-                        path = pcapFile;
-                    else path = settingProperty.tempPcapFolder + "/tmp.pcapng";
-                AnalysisJob analysisJob = new AnalysisJob(path);
+                    path = Objects.requireNonNullElseGet(pcapFile, () -> settingProperty.tempPcapFolder + "/tmp.pcapng");
+                AnalysisJob analysisJob;
+                if (this.cnif == null)
+                    analysisJob = new AnalysisJob(path, null);
+                else analysisJob = new AnalysisJob(path, this.cnif.handle);
                 Thread thread = new Thread(analysisJob);
                 thread.start();
                 break;

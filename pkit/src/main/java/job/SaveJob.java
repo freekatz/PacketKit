@@ -1,15 +1,11 @@
-package util.job;
+package job;
 
-import gui.ctrl.IndexView;
 import gui.ctrl.View;
-import gui.model.browser.PacketInfoProperty;
-import gui.model.browser.PacketProperty;
+import nif.CNIF;
 import org.pcap4j.core.BpfProgram;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.PcapPacket;
-import util.PacketHandle;
-import util.nif.CNIF;
 
 import java.io.EOFException;
 import java.net.Inet4Address;
@@ -17,7 +13,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeoutException;
 
-public class SaveJob implements Runnable{
+public class SaveJob implements Runnable {
 
     CNIF cnif;
 

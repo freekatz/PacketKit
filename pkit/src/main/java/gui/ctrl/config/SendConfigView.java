@@ -3,7 +3,6 @@ package gui.ctrl.config;
 import gui.ctrl.SendView;
 import gui.ctrl.View;
 import gui.ctrl.bar.SendStatusBar;
-import gui.model.config.CaptureProperty;
 import gui.model.Property;
 import gui.model.SettingProperty;
 import gui.model.config.SendProperty;
@@ -18,8 +17,6 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import util.FileHandle;
 import util.ViewHandle;
-
-import java.util.List;
 
 public class SendConfigView implements View {
 

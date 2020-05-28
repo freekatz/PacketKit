@@ -1,7 +1,6 @@
 package gui.model.browser;
 
 import gui.model.Property;
-import gui.model.config.FilterProperty;
 import gui.model.packet.PPacket;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;

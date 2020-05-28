@@ -1,20 +1,18 @@
-package util.job;
+package job;
 
 import gui.ctrl.IndexView;
 import gui.ctrl.SendView;
 import gui.model.Property;
-import gui.model.browser.FieldProperty;
 import gui.model.browser.PacketInfoProperty;
 import gui.model.browser.PacketProperty;
 import javafx.concurrent.Task;
-import javafx.scene.control.*;
+import javafx.scene.control.TableView;
+import nif.CNIF;
 import org.pcap4j.core.BpfProgram;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.PcapPacket;
 import util.PacketHandle;
-import util.ViewHandle;
-import util.nif.CNIF;
 
 import java.io.EOFException;
 import java.net.Inet4Address;

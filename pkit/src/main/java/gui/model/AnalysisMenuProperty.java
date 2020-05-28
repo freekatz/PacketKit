@@ -9,7 +9,7 @@ public class AnalysisMenuProperty implements Property{
     SimpleObjectProperty<LinkedHashMap<String, String>> traffic = new SimpleObjectProperty<>(this, "traffic");
     SimpleObjectProperty<LinkedHashMap<String, String>> communication = new SimpleObjectProperty<>(this, "communication");
     SimpleObjectProperty<LinkedHashMap<String, String>> relation = new SimpleObjectProperty<>(this, "relation");
-    SimpleObjectProperty<LinkedHashMap<String, String>> description = new SimpleObjectProperty<>(this, "description");
+//    SimpleObjectProperty<LinkedHashMap<String, String>> description = new SimpleObjectProperty<>(this, "description");
 
 
     public LinkedHashMap<String, String> getWelcome() {
@@ -24,17 +24,17 @@ public class AnalysisMenuProperty implements Property{
         this.welcome.set(welcome);
     }
 
-    public LinkedHashMap<String, String> getDescription() {
-        return description.get();
-    }
-
-    public SimpleObjectProperty<LinkedHashMap<String, String>> descriptionProperty() {
-        return description;
-    }
-
-    public void setDescription(LinkedHashMap<String, String> description) {
-        this.description.set(description);
-    }
+//    public LinkedHashMap<String, String> getDescription() {
+//        return description.get();
+//    }
+//
+//    public SimpleObjectProperty<LinkedHashMap<String, String>> descriptionProperty() {
+//        return description;
+//    }
+//
+//    public void setDescription(LinkedHashMap<String, String> description) {
+//        this.description.set(description);
+//    }
 
     public LinkedHashMap<String, String> getRelation() {
         return relation.get();

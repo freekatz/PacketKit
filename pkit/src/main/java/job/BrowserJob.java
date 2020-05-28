@@ -1,4 +1,4 @@
-package util.job;
+package job;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import gui.ctrl.IndexView;
 import gui.ctrl.SendView;
 import gui.ctrl.View;
-import gui.model.Property;
 import gui.model.browser.FieldProperty;
 import gui.model.browser.PacketDataProperty;
 import gui.model.browser.PacketHeaderProperty;

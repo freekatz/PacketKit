@@ -3,13 +3,13 @@ package gui.ctrl.browser;
 import gui.ctrl.IndexView;
 import gui.ctrl.SendView;
 import gui.ctrl.View;
-import gui.model.browser.PacketInfoProperty;
 import gui.model.Property;
+import gui.model.browser.PacketInfoProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
+import job.BrowserJob;
 import util.ViewHandle;
-import util.job.BrowserJob;
 
 public class PacketList {
     View view;

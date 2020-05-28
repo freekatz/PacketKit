@@ -1,8 +1,9 @@
-package util.nif;
+package nif;
 
+import gui.model.Property;
+import gui.model.SettingProperty;
 import gui.model.config.CaptureProperty;
 import javafx.scene.control.TableView;
-import gui.model.*;
 import org.pcap4j.core.*;
 
 public class CNIF implements NIF {
@@ -55,8 +56,7 @@ public class CNIF implements NIF {
 
         try {
             this.handle = this.builder.build();
-            // todo 路径错误，解决方案
-            this.dumper = this.handle.dumpOpen("res/temp/tmp.pcapng");
+            this.dumper = this.handle.dumpOpen(settingProperty.tempPcapFolder + "/tmp.pcapng");
         } catch (NotOpenException e) {
             e.printStackTrace();
         }

@@ -1,19 +1,15 @@
 package util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import gui.ctrl.View;
-import gui.model.browser.*;
+import gui.model.browser.PacketDataProperty;
+import gui.model.browser.PacketHeaderProperty;
+import gui.model.browser.PacketInfoProperty;
+import gui.model.browser.PacketProperty;
 import gui.model.packet.*;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableView;
 import org.pcap4j.core.PcapPacket;
 import org.pcap4j.packet.*;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.LinkedList;
 
 public class PacketHandle {

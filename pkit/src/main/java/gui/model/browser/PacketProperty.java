@@ -1,9 +1,6 @@
 package gui.model.browser;
 
 import gui.model.Property;
-import gui.model.browser.PacketDataProperty;
-import gui.model.browser.PacketHeaderProperty;
-import gui.model.browser.PacketInfoProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 

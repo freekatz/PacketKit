@@ -1,18 +1,17 @@
-package util.job;
+package job;
 
 import gui.ctrl.SendView;
 import gui.model.config.SendProperty;
-import org.pcap4j.core.*;
-import org.pcap4j.packet.EthernetPacket;
+import nif.SNIF;
+import org.pcap4j.core.NotOpenException;
+import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.packet.Packet;
-import org.pcap4j.util.MacAddress;
 import util.PacketHandle;
-import util.nif.SNIF;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-public class ForwardJob implements Runnable{
+public class SendJob implements Runnable {
 
     private final SNIF snif;
     private final SendProperty sendProperty;
@@ -23,29 +22,20 @@ public class ForwardJob implements Runnable{
 
     int retry;
 
-    public ForwardJob(SendView sendView, String opt, String target) {
+    public SendJob(SendView sendView, String opt) {
         this.sendView = sendView;
         this.opt = opt;
         this.snif = sendView.getSnif();
         this.sendProperty = sendView.getSendProperty();
-
-        System.out.println(target);
         try {
             this.snif.load();
-            PcapNetworkInterface nif = Pcaps.getDevByName(target);
-            if (opt.equals("one")) {
-                EthernetPacket.Builder builder = ((EthernetPacket)PacketHandle.Restore(sendView.getPacketProperty())).getBuilder();
-                builder.dstAddr((MacAddress) nif.getLinkLayerAddresses().get(0));
-                this.packet = builder.build();
-            }
+            if (opt.equals("one"))
+                this.packet = PacketHandle.Restore(sendView.getPacketProperty());
             else {
                 packetArrayList = new ArrayList<>(sendView.packetPropertyArrayList.size());
                 sendView.packetPropertyArrayList.forEach(pp -> {
                     try {
-                        EthernetPacket.Builder builder = ((EthernetPacket)PacketHandle.Restore(pp)).getBuilder();
-                        builder.dstAddr((MacAddress) nif.getLinkLayerAddresses().get(0));
-                        Packet packet = builder.build();
-                        packetArrayList.add(packet);
+                        packetArrayList.add(PacketHandle.Restore(pp));
                     } catch (UnknownHostException e) {
                         e.printStackTrace();
                     }
@@ -59,7 +49,6 @@ public class ForwardJob implements Runnable{
     @Override
     public void run() {
         retry = 0;
-        System.out.println(packet);
         if (opt.equals("one")) {
             SendOne(packet);
         } else SendMulti();
@@ -71,7 +60,6 @@ public class ForwardJob implements Runnable{
     }
 
     private void SendOne(Packet packet) {
-        System.out.println(packet);
         try {
             for (int i=0; i<sendProperty.getCount(); ++i) {
                 Thread.sleep(sendProperty.getTimeout());

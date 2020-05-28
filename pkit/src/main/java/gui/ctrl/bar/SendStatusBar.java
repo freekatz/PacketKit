@@ -1,12 +1,9 @@
 package gui.ctrl.bar;
 
-import gui.ctrl.IndexView;
 import gui.ctrl.SendView;
 import gui.ctrl.View;
-import gui.ctrl.config.CaptureConfigView;
 import gui.ctrl.config.SendConfigView;
 import gui.model.SettingProperty;
-import gui.model.config.CaptureProperty;
 import gui.model.config.SendProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

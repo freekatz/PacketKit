@@ -1,7 +1,6 @@
 package gui.model.browser;
 
 import gui.model.Property;
-import gui.model.config.SendProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 

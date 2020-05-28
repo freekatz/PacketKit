@@ -1,7 +1,8 @@
 package gui.ctrl;
 
-import com.sun.javafx.collections.ObservableSequentialListWrapper;
-import gui.ctrl.bar.*;
+import gui.ctrl.bar.SendMenuBar;
+import gui.ctrl.bar.SendStatusBar;
+import gui.ctrl.bar.SendToolBar;
 import gui.ctrl.browser.PacketData;
 import gui.ctrl.browser.PacketHeader;
 import gui.ctrl.browser.PacketList;
@@ -10,22 +11,20 @@ import gui.model.browser.PacketProperty;
 import gui.model.config.SendProperty;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.pcap4j.core.PcapNetworkInterface;
+import job.ExportJob;
+import job.ForwardJob;
+import job.OfflineJob;
+import job.SendJob;
+import nif.SNIF;
 import util.ViewHandle;
-import util.job.*;
-import util.nif.SNIF;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Objects;
 
 public class SendView implements View{
 

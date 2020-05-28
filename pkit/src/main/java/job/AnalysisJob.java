@@ -1,21 +1,18 @@
-package util.job;
+package job;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import gui.model.SettingProperty;
 import gui.model.analysis.*;
 import gui.model.browser.PacketInfoProperty;
 import gui.model.browser.PacketProperty;
-import org.pcap4j.core.NotOpenException;
-import org.pcap4j.core.PcapNativeException;
-import org.pcap4j.core.PcapPacket;
+import nif.CNIF;
+import org.pcap4j.core.*;
 import util.ChartHandle;
 import util.PacketHandle;
-import util.nif.CNIF;
 
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
 
@@ -23,6 +20,7 @@ public class AnalysisJob implements Runnable {
     SettingProperty settingProperty = new SettingProperty();
 
     CNIF cnif;
+    PcapStat pcapStat;
 
     long time = 0;
     long second = 0;
@@ -39,9 +37,28 @@ public class AnalysisJob implements Runnable {
     SankeyProperty o2sSankeyProperty = new SankeyProperty(); // sankey 3
     SankeyProperty networkProperty = new SankeyProperty();
 
+//    long bandwidth = 0;
+//    NifStatProperty nifStatProperty = new NifStatProperty();
 
-    public AnalysisJob (String pcapFile) {
+
+
+    public AnalysisJob (String pcapFile, PcapHandle handle) {
         cnif = new CNIF(pcapFile);
+//        if (handle != null) {
+//            try {
+//                pcapStat = handle.getStats();
+//                nifStatProperty.setName("nifStat");
+//                nifStatProperty.setSendPacketNumber(pcapStat.getNumPacketsCaptured() - pcapStat.getNumPacketsReceived());
+//                nifStatProperty.setReceivePacketNumber(pcapStat.getNumPacketsReceived());
+//                nifStatProperty.setCapturePacketNumber(pcapStat.getNumPacketsCaptured());
+//                nifStatProperty.setLossPacketNumber(pcapStat.getNumPacketsDropped() + pcapStat.getNumPacketsDroppedByIf());
+//                nifStatProperty.setLossRate((double) nifStatProperty.getLossPacketNumber() / nifStatProperty.getCapturePacketNumber());
+//            } catch (PcapNativeException | NotOpenException e) {
+//                nifStatProperty.Initialize();
+//            }
+//        } else {
+//            nifStatProperty.Initialize();
+//        }
     }
 
     private void save() {
@@ -55,6 +72,15 @@ public class AnalysisJob implements Runnable {
             mapper.writeValue(new File(settingProperty.s2sSankeyChartJson), s2sSankeyProperty);
             mapper.writeValue(new File(settingProperty.o2sSankeyChartJson), o2sSankeyProperty);
             mapper.writeValue(new File(settingProperty.networkChartJson), networkProperty);
+//            mapper.writeValue(new File(settingProperty.nifStatTableChartJson), nifStatProperty);
+//
+//            System.out.println(nifStatProperty.getName());
+//            System.out.println(nifStatProperty.getSendPacketNumber());
+//            System.out.println(nifStatProperty.getReceivePacketNumber());
+//            System.out.println(nifStatProperty.getCapturePacketNumber());
+//            System.out.println(nifStatProperty.getLossPacketNumber());
+//            System.out.println(nifStatProperty.getLossRate());
+//            System.out.println(nifStatProperty.getBandwidth());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -65,7 +91,11 @@ public class AnalysisJob implements Runnable {
         int num=0;
         while (true) {
             try {
+
                 PcapPacket packet = cnif.handle.getNextPacketEx();
+
+//                if (nifStatProperty.getCapturePacketNumber()>0)
+//                    bandwidth+=packet.getRawData().length;
 
                 PacketProperty packetProperty = PacketHandle.Pipeline(packet);
                 PacketInfoProperty packetInfoProperty = packetProperty.getInfo();
@@ -103,9 +133,7 @@ public class AnalysisJob implements Runnable {
                     protocolPieProperty.getData().put(packetInfoProperty.getProtocol(), n + 1);
                 }
 
-                //3. bar
                 if (packetInfoProperty.getSrc().contains(".")) {
-                    // todo 此处可以定义网段
                     // communicate
                     String[] s2oOpt = {"192.168.0.0", "255.255.0.0", "0.0.0.0", "0.0.0.0"};  // 源网段、目的网段
 
@@ -132,7 +160,7 @@ public class AnalysisJob implements Runnable {
 
                     }
 
-
+                    //3. bar
                     if (!ipv4StatBarProperty.getData().containsKey(srcIp))
                         ipv4StatBarProperty.getData().put(srcIp, ((double) packet.getOriginalLength()) / 1024);
                     else {
@@ -161,6 +189,8 @@ public class AnalysisJob implements Runnable {
 
                 ipv4StatBarProperty.setData(SortByValueDescending(ipv4StatBarProperty.getData()));
                 ipv6StatBarProperty.setData(SortByValueDescending(ipv6StatBarProperty.getData()));
+
+//                nifStatProperty.setBandwidth(bandwidth);
 
                 this.save();
                 break;

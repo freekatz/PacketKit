@@ -1,10 +1,10 @@
 package gui.ctrl.bar;
 
-import gui.ctrl.config.FilterConfigView;
 import gui.ctrl.IndexView;
 import gui.ctrl.View;
-import gui.model.config.FilterProperty;
+import gui.ctrl.config.FilterConfigView;
 import gui.model.SettingProperty;
+import gui.model.config.FilterProperty;
 import gui.model.history.FilterHistoryProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

@@ -2,12 +2,14 @@ package gui.ctrl.config;
 
 import gui.ctrl.View;
 import gui.ctrl.bar.FilterBar;
-import gui.model.config.FilterProperty;
 import gui.model.Property;
 import gui.model.SettingProperty;
+import gui.model.config.FilterProperty;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
