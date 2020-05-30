@@ -16,7 +16,7 @@ public class SendJob implements Runnable {
     private final SNIF snif;
     private final SendProperty sendProperty;
     private SendView sendView;
-    private String opt;
+    private final String opt;
     Packet packet;
     ArrayList<Packet> packetArrayList;
 

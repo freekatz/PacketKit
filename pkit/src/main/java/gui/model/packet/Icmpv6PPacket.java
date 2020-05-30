@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class Icmpv6PPacket implements PPacket {
-    private IcmpV6EchoRequestPacket.Builder builder = new IcmpV6EchoRequestPacket.Builder();
+    private final IcmpV6EchoRequestPacket.Builder builder = new IcmpV6EchoRequestPacket.Builder();
     private PcapHandle pcapHandle;
     private JsonMapper jsonMapper;
     private PcapDumper dumper;

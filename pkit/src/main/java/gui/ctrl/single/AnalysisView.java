@@ -3,7 +3,9 @@ package gui.ctrl.single;
 import gui.ctrl.IndexView;
 import gui.ctrl.View;
 import gui.model.AnalysisMenuProperty;
+import gui.model.JobMode;
 import gui.model.SettingProperty;
+import gui.model.ViewType;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -21,9 +23,8 @@ import java.net.URL;
 import java.util.LinkedHashMap;
 
 public class AnalysisView implements View {
-    SettingProperty settingProperty = new SettingProperty();
 
-    View view;
+    IndexView view;
     String path;
 
     WebView webView = new WebView();
@@ -35,8 +36,11 @@ public class AnalysisView implements View {
 
     @FXML
     AnchorPane chartPane;
+    private ViewType type;
 
-    public AnalysisView() {}
+    public AnalysisView() {
+        this.type = ViewType.AnalysisView;
+    }
 
     public void initialize() {
 
@@ -46,19 +50,19 @@ public class AnalysisView implements View {
         AnalysisMenuProperty menuProperty = new AnalysisMenuProperty();
         LinkedHashMap<String, String> traffic = new LinkedHashMap<>();
 //        traffic.put("NIF Statistic", settingProperty.nifStatTableChartPath);
-        traffic.put("IO LineChart", settingProperty.ioLineChartPath);
-        traffic.put("Protocol PieChart", settingProperty.protocolPieChartPath);
-        traffic.put("IPv4 Statistic", settingProperty.ipv4StatBarChartPath);
-        traffic.put("IPv6 Statistic", settingProperty.ipv6StatBarChartPath);
+        traffic.put("IO LineChart", SettingProperty.ioLineChartPath);
+        traffic.put("Protocol PieChart", SettingProperty.protocolPieChartPath);
+        traffic.put("IPv4 Statistic", SettingProperty.ipv4StatBarChartPath);
+        traffic.put("IPv6 Statistic", SettingProperty.ipv6StatBarChartPath);
 
         LinkedHashMap<String, String> communication = new LinkedHashMap<>();
-        communication.put("S2OSankeyChart", settingProperty.s2oSankeyChartPath);
-        communication.put("S2SankeyChart", settingProperty.s2sSankeyChartPath);
-        communication.put("O2SankeyChart", settingProperty.o2sSankeyChartPath);
+        communication.put("S2OSankeyChart", SettingProperty.s2oSankeyChartPath);
+        communication.put("S2SankeyChart", SettingProperty.s2sSankeyChartPath);
+        communication.put("O2SankeyChart", SettingProperty.o2sSankeyChartPath);
 
         LinkedHashMap<String, String> relation = new LinkedHashMap<>();
 
-        relation.put("Network", settingProperty.networkChartPath);
+        relation.put("Network", SettingProperty.networkChartPath);
 
 //        LinkedHashMap<String, String> description = new LinkedHashMap<>();
 
@@ -87,7 +91,7 @@ public class AnalysisView implements View {
         AnchorPane.setRightAnchor(webView, 0.0);
         AnchorPane.setBottomAnchor(webView, 0.0);
 
-        this.setPath(settingProperty.analysisWelcomePath);
+        this.setPath(SettingProperty.analysisWelcomePath);
 
         menuTree.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
@@ -130,19 +134,28 @@ public class AnalysisView implements View {
         return view;
     }
 
-    public void setView(View view) {
+    public void setView(IndexView view) {
         this.view = view;
-        IndexView indexView = (IndexView) view;
-        indexView.StartCapture("analysis");
+        view.JobScheduler(JobMode.AnalysisJob);
     }
 
     @Override
-    public String getType() {
-        return null;
+    public ViewType getType() {
+        return this.type;
     }
 
     @Override
-    public void setType(String type) {
+    public void setType(ViewType type) {
+        this.type = type;
+    }
+
+    @Override
+    public void JobScheduler(JobMode jobMode) {
+
+    }
+
+    @Override
+    public void JobStop() {
 
     }
 

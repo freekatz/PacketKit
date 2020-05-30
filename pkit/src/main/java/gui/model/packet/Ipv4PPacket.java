@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Ipv4PPacket implements PPacket{
-    private IpV4Packet.Builder builder = new IpV4Packet.Builder();
+    private final IpV4Packet.Builder builder = new IpV4Packet.Builder();
     private PcapHandle pcapHandle;
     private JsonMapper jsonMapper;
     private PcapDumper dumper;

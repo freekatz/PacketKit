@@ -17,7 +17,6 @@ import java.util.*;
 import java.util.concurrent.TimeoutException;
 
 public class AnalysisJob implements Runnable {
-    SettingProperty settingProperty = new SettingProperty();
 
     CNIF cnif;
     PcapStat pcapStat;
@@ -64,14 +63,14 @@ public class AnalysisJob implements Runnable {
     private void save() {
         JsonMapper mapper = new JsonMapper();
         try {
-            mapper.writeValue(new File(settingProperty.ioLineChartJson), ioLineProperty);
-            mapper.writeValue(new File(settingProperty.protocolPieChartJson), protocolPieProperty);
-            mapper.writeValue(new File(settingProperty.ipv4StatBarChartJson), ipv4StatBarProperty);
-            mapper.writeValue(new File(settingProperty.ipv6StatBarChartJson), ipv6StatBarProperty);
-            mapper.writeValue(new File(settingProperty.s2oSankeyChartJson), s2oSankeyProperty);
-            mapper.writeValue(new File(settingProperty.s2sSankeyChartJson), s2sSankeyProperty);
-            mapper.writeValue(new File(settingProperty.o2sSankeyChartJson), o2sSankeyProperty);
-            mapper.writeValue(new File(settingProperty.networkChartJson), networkProperty);
+            mapper.writeValue(new File(SettingProperty.ioLineChartJson), ioLineProperty);
+            mapper.writeValue(new File(SettingProperty.protocolPieChartJson), protocolPieProperty);
+            mapper.writeValue(new File(SettingProperty.ipv4StatBarChartJson), ipv4StatBarProperty);
+            mapper.writeValue(new File(SettingProperty.ipv6StatBarChartJson), ipv6StatBarProperty);
+            mapper.writeValue(new File(SettingProperty.s2oSankeyChartJson), s2oSankeyProperty);
+            mapper.writeValue(new File(SettingProperty.s2sSankeyChartJson), s2sSankeyProperty);
+            mapper.writeValue(new File(SettingProperty.o2sSankeyChartJson), o2sSankeyProperty);
+            mapper.writeValue(new File(SettingProperty.networkChartJson), networkProperty);
 //            mapper.writeValue(new File(settingProperty.nifStatTableChartJson), nifStatProperty);
 //
 //            System.out.println(nifStatProperty.getName());

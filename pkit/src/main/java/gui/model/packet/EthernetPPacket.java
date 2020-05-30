@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class EthernetPPacket implements PPacket{
-    private EthernetPacket.Builder builder = new EthernetPacket.Builder();
+    private final EthernetPacket.Builder builder = new EthernetPacket.Builder();
     private PcapHandle pcapHandle;
     private JsonMapper jsonMapper;
     private PcapDumper dumper;

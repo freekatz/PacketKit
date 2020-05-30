@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class Icmpv4PPacket implements PPacket{
-    private IcmpV4EchoPacket.Builder builder = new IcmpV4EchoPacket.Builder();  // test
+    private final IcmpV4EchoPacket.Builder builder = new IcmpV4EchoPacket.Builder();  // test
     private PcapHandle pcapHandle;
     private JsonMapper jsonMapper;
     private PcapDumper dumper;

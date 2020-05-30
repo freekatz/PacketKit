@@ -4,6 +4,7 @@ import gui.ctrl.IndexView;
 import gui.ctrl.SendView;
 import gui.ctrl.View;
 import gui.model.Property;
+import gui.model.ViewType;
 import gui.model.browser.PacketInfoProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableView;
@@ -32,15 +33,14 @@ public class PacketList {
         packetTable.getColumns().get(7).setPrefWidth(600);
 
         packetTable.addEventHandler(MouseEvent.MOUSE_CLICKED, (event)-> {
-            String type = view.getType();
             if (packetTable.getSelectionModel().getSelectedItem()!=null) {
                 int index = packetTable.getSelectionModel().getSelectedIndex();
-                if (type.equals("capture")) {
+                if (view.getType().equals(ViewType.CaptureView)) {
                     IndexView indexView = (IndexView) view;
                     BrowserJob job = new BrowserJob(indexView.packetPropertyArrayList.get(index), indexView);
                     Thread thread = new Thread(job);
                     thread.start();
-                } else if (type.equals("send")) {
+                } else if (view.getType().equals(ViewType.SendView)) {
                     SendView sendView = (SendView) view;
 
                     sendView.setPacketProperty(sendView.packetPropertyArrayList.get(index));
@@ -55,7 +55,7 @@ public class PacketList {
 
     public void setView(View view) {
         this.view = view;
-        if (view.getType().equals("send")) packetTable.getColumns().get(1).setVisible(false);
+        if (view.getType().equals(ViewType.SendView)) packetTable.getColumns().get(1).setVisible(false);
     }
 
     public TableView<Property> getPacketTable() {

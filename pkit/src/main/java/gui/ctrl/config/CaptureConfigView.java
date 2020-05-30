@@ -2,8 +2,10 @@ package gui.ctrl.config;
 
 import gui.ctrl.View;
 import gui.ctrl.bar.CaptureStatusBar;
+import gui.model.JobMode;
 import gui.model.Property;
 import gui.model.SettingProperty;
+import gui.model.ViewType;
 import gui.model.config.CaptureProperty;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -18,7 +20,6 @@ import util.FileHandle;
 import util.ViewHandle;
 
 public class CaptureConfigView implements View {
-    SettingProperty settingProperty = new SettingProperty();
 
     CaptureStatusBar captureStatusBar;
 
@@ -43,13 +44,17 @@ public class CaptureConfigView implements View {
     @FXML
     Button helpButton;
 
+    private ViewType type;
 
-    public CaptureConfigView() {}
+
+    public CaptureConfigView() {
+        this.type = ViewType.ConfigView;
+    }
 
     public void initialize() {
         ViewHandle.InitializeTable(new CaptureProperty(), configTable);
 
-        ViewHandle.UpdateConfigTable(settingProperty.captureConfig, new CaptureProperty(), configTable);
+        ViewHandle.UpdateConfigTable(SettingProperty.captureConfig, new CaptureProperty(), configTable);
         this.InitializeColumn();
     }
 
@@ -75,11 +80,11 @@ public class CaptureConfigView implements View {
                         CaptureProperty property = (t.getTableView().getItems().get(
                                 t.getTablePosition().getRow())
                         );
-                        FileHandle.DeleteConfig(settingProperty.captureConfig, property);
+                        FileHandle.DeleteConfig(SettingProperty.captureConfig, property);
                         if (t.getNewValue()!=null)
                             property.setName(t.getNewValue());
                         else property.setName("default");
-                        FileHandle.SaveConfig(settingProperty.captureConfig, property);
+                        FileHandle.SaveConfig(SettingProperty.captureConfig, property);
                     });
                     break;
                 case "comment":
@@ -90,7 +95,7 @@ public class CaptureConfigView implements View {
                         if (t.getNewValue()!=null)
                             property.setComment(t.getNewValue());
                         else property.setComment("");
-                        FileHandle.SaveConfig(settingProperty.captureConfig, property);
+                        FileHandle.SaveConfig(SettingProperty.captureConfig, property);
                     });
                     break;
                 case "count":
@@ -101,7 +106,7 @@ public class CaptureConfigView implements View {
                         if (t.getNewValue()!=null)
                             property.setCount(Integer.parseInt(t.getNewValue()));
                         else property.setCount(-1);
-                        FileHandle.SaveConfig(settingProperty.captureConfig, property);
+                        FileHandle.SaveConfig(SettingProperty.captureConfig, property);
                     });
                     break;
                 case "length":
@@ -112,7 +117,7 @@ public class CaptureConfigView implements View {
                         if (t.getNewValue()!=null)
                             property.setLength(Integer.parseInt(t.getNewValue()));
                         else property.setLength(262144);
-                        FileHandle.SaveConfig(settingProperty.captureConfig, property);
+                        FileHandle.SaveConfig(SettingProperty.captureConfig, property);
                     });
                     break;
                 case "timeout":
@@ -123,7 +128,7 @@ public class CaptureConfigView implements View {
                         if (t.getNewValue()!=null)
                             property.setTimeout(Integer.parseInt(t.getNewValue()));
                         else property.setTimeout(10000);
-                        FileHandle.SaveConfig(settingProperty.captureConfig, property);
+                        FileHandle.SaveConfig(SettingProperty.captureConfig, property);
                     });
                     break;
                 case "buffer":
@@ -134,7 +139,7 @@ public class CaptureConfigView implements View {
                         if (t.getNewValue()!=null)
                             property.setBuffer(Integer.parseInt(t.getNewValue()));
                         else property.setBuffer(1024*1024*20);
-                        FileHandle.SaveConfig(settingProperty.captureConfig, property);
+                        FileHandle.SaveConfig(SettingProperty.captureConfig, property);
                     });
                     break;
                     // 混杂、监控、立即等等模式完成
@@ -182,13 +187,13 @@ public class CaptureConfigView implements View {
         property.setTimeout(10000);
 
         configTable.getItems().add(property);
-        FileHandle.SaveConfig(settingProperty.captureConfig, property);
+        FileHandle.SaveConfig(SettingProperty.captureConfig, property);
     }
 
     @FXML
     private void DeleteButtonOnClicked() {
         CaptureProperty property = (CaptureProperty) configTable.getSelectionModel().getSelectedItem();
-        FileHandle.DeleteConfig(settingProperty.captureConfig, property);
+        FileHandle.DeleteConfig(SettingProperty.captureConfig, property);
         configTable.getItems().remove(configTable.getSelectionModel().getSelectedItem());
     }
 
@@ -199,7 +204,7 @@ public class CaptureConfigView implements View {
             CaptureProperty newProperty = (CaptureProperty) property.clone();
             newProperty.setName(property.getName()+"(copy)");
             configTable.getItems().add(newProperty);
-            FileHandle.SaveConfig(settingProperty.captureConfig, newProperty);
+            FileHandle.SaveConfig(SettingProperty.captureConfig, newProperty);
         }
     }
 
@@ -222,12 +227,22 @@ public class CaptureConfigView implements View {
     }
 
     @Override
-    public String getType() {
-        return null;
+    public ViewType getType() {
+        return this.type;
     }
 
     @Override
-    public void setType(String type) {
+    public void setType(ViewType type) {
+        this.type = type;
+    }
+
+    @Override
+    public void JobScheduler(JobMode jobMode) {
+
+    }
+
+    @Override
+    public void JobStop() {
 
     }
 

@@ -4,7 +4,9 @@ import gui.ctrl.IndexView;
 import gui.ctrl.SendView;
 import gui.ctrl.View;
 import gui.ctrl.single.AnalysisView;
+import gui.model.JobMode;
 import gui.model.SettingProperty;
+import gui.model.ViewType;
 import gui.model.browser.PacketProperty;
 import gui.model.history.CapturePcapFileHistoryProperty;
 import javafx.fxml.FXML;
@@ -30,9 +32,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class CaptureToolBar {
-    SettingProperty settingProperty = new SettingProperty();
-
-    View view;
+    IndexView view;
 
     @FXML
     ToolBar toolBar;
@@ -78,44 +78,44 @@ public class CaptureToolBar {
     }
 
     private void InitializeButton() {
-        Image startImage = new Image(getClass().getResourceAsStream(settingProperty.captureIconFolder + "/start.png"));
+        Image startImage = new Image(getClass().getResourceAsStream(SettingProperty.captureIconFolder + "/start.png"));
         startButton.setGraphic(new ImageView(startImage));
         startButton.setTooltip(new Tooltip("start capture"));
-        Image stopImage = new Image(getClass().getResourceAsStream(settingProperty.captureIconFolder + "/stop.png"));
+        Image stopImage = new Image(getClass().getResourceAsStream(SettingProperty.captureIconFolder + "/stop.png"));
         stopButton.setGraphic(new ImageView(stopImage));
         stopButton.setTooltip(new Tooltip("stop capture"));
-        Image restartImage = new Image(getClass().getResourceAsStream(settingProperty.captureIconFolder + "/restart.png"));
+        Image restartImage = new Image(getClass().getResourceAsStream(SettingProperty.captureIconFolder + "/restart.png"));
         restartButton.setGraphic(new ImageView(restartImage));
         restartButton.setTooltip(new Tooltip("restart the capture"));
-        Image returnImage = new Image(getClass().getResourceAsStream(settingProperty.captureIconFolder + "/return.png"));
+        Image returnImage = new Image(getClass().getResourceAsStream(SettingProperty.captureIconFolder + "/return.png"));
         returnButton.setGraphic(new ImageView(returnImage));
         returnButton.setTooltip(new Tooltip("return the index view"));
-        Image configImage = new Image(getClass().getResourceAsStream(settingProperty.captureIconFolder + "/config.png"));
+        Image configImage = new Image(getClass().getResourceAsStream(SettingProperty.captureIconFolder + "/config.png"));
         configButton.setGraphic(new ImageView(configImage));
         configButton.setTooltip(new Tooltip("manage the capture config"));
-        Image openImage = new Image(getClass().getResourceAsStream(settingProperty.captureIconFolder + "/open.png"));
+        Image openImage = new Image(getClass().getResourceAsStream(SettingProperty.captureIconFolder + "/open.png"));
         openButton.setGraphic(new ImageView(openImage));
         openButton.setTooltip(new Tooltip("open the pcap file"));
-        Image saveImage = new Image(getClass().getResourceAsStream(settingProperty.captureIconFolder + "/save.png"));
+        Image saveImage = new Image(getClass().getResourceAsStream(SettingProperty.captureIconFolder + "/save.png"));
         saveButton.setGraphic(new ImageView(saveImage));
         saveButton.setTooltip(new Tooltip("save current list"));
-        Image closeImage = new Image(getClass().getResourceAsStream(settingProperty.captureIconFolder + "/close.png"));
+        Image closeImage = new Image(getClass().getResourceAsStream(SettingProperty.captureIconFolder + "/close.png"));
         closeButton.setGraphic(new ImageView(closeImage));
         closeButton.setTooltip(new Tooltip("close the pcap file"));
-        Image reloadImage = new Image(getClass().getResourceAsStream(settingProperty.captureIconFolder + "/reload.png"));
+        Image reloadImage = new Image(getClass().getResourceAsStream(SettingProperty.captureIconFolder + "/reload.png"));
         reloadButton.setGraphic(new ImageView(reloadImage));
         reloadButton.setTooltip(new Tooltip("reload the pcap file"));
-        Image forwardImage = new Image(getClass().getResourceAsStream(settingProperty.captureIconFolder + "/send.png"));
+        Image forwardImage = new Image(getClass().getResourceAsStream(SettingProperty.captureIconFolder + "/send.png"));
         forwardButton.setGraphic(new ImageView(forwardImage));
         forwardButton.setTooltip(new Tooltip("forward the current packet and open the send view"));
-        Image analysisImage = new Image(getClass().getResourceAsStream(settingProperty.captureIconFolder + "/analysis.png"));
+        Image analysisImage = new Image(getClass().getResourceAsStream(SettingProperty.captureIconFolder + "/analysis.png"));
         analysisButton.setGraphic(new ImageView(analysisImage));
         analysisButton.setTooltip(new Tooltip("open the analysis view"));
 
         InitializeButtonStatus();
     }
 
-    public void setView(View view) {
+    public void setView(IndexView view) {
         this.view = view;
     }
 
@@ -140,13 +140,11 @@ public class CaptureToolBar {
         restartButton.setDisable(false);
         returnButton.setDisable(true);
 
-        IndexView indexView = (IndexView) view;
-
-        if (indexView.getType().equals("capture"))
-            indexView.clearBrowser();
-        else indexView.setType("capture");
-        ViewHandle.InitializeCaptureCenter(indexView);
-        indexView.StartCapture("online");
+        if (view.getType().equals(ViewType.CaptureView))
+            view.clearBrowser();
+        else view.setType(ViewType.CaptureView);
+        ViewHandle.InitializeCaptureCenter(view);
+        view.JobScheduler(JobMode.OnlineJob);
     }
 
     @FXML
@@ -157,11 +155,10 @@ public class CaptureToolBar {
         returnButton.setDisable(false);
         saveButton.setDisable(false);
 
-        IndexView indexView = (IndexView) view;
-        indexView.StopCapture();
-        if (indexView.getPacketListCtrl().getPacketTable().getItems().size()==0) {
-            indexView.setType("index");
-            ViewHandle.InitializeCaptureCenter(indexView);
+        view.JobStop();
+        if (view.getPacketListCtrl().getPacketTable().getItems().size()==0) {
+            view.setType(ViewType.IndexView);
+            ViewHandle.InitializeCaptureCenter(view);
             ReturnButtonOnClicked();
         }
     }
@@ -173,9 +170,8 @@ public class CaptureToolBar {
         restartButton.setDisable(false);
         returnButton.setDisable(true);
 
-        IndexView indexView = (IndexView) view;
-        indexView.clearBrowser();
-        indexView.StartCapture("online");
+        view.clearBrowser();
+        view.JobScheduler(JobMode.OnlineJob);
     }
 
 
@@ -183,22 +179,20 @@ public class CaptureToolBar {
     private void ReturnButtonOnClicked() {
         InitializeButtonStatus();
 
-
-        IndexView indexView = (IndexView) view;
-        indexView.clearBrowser();
-        indexView.setNifName(null);
-        indexView.setType("index");
-        ViewHandle.InitializeCaptureCenter(indexView);
+        view.clearBrowser();
+        view.setNifName(null);
+        view.setType(ViewType.IndexView);
+        ViewHandle.InitializeCaptureCenter(view);
 
         for (int i = 0; i < 5; i++)
-            indexView.getCaptureMenuBarCtrl().getFileMenu().getItems().get(i).setDisable(false);
+            view.getCaptureMenuBarCtrl().getFileMenu().getItems().get(i).setDisable(false);
     }
 
     @FXML
     private void ConfigButtonOnClicked() {
         try {
             FXMLLoader loader = new FXMLLoader();
-            AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream("view/config/CaptureConfigView.fxml"));
+            AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream(SettingProperty.captureConfigView));
             Stage stage = new Stage();
             stage.initStyle(StageStyle.DECORATED);
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -225,31 +219,29 @@ public class CaptureToolBar {
         );
         File file = fileChooser.showOpenDialog(stage);
         if (file==null) return;
-        FileHandle.AddHistory(settingProperty.capturePcapFileHistory, file.getAbsolutePath(), CapturePcapFileHistoryProperty.class);
-        String type = view.getType();
-        IndexView indexView = (IndexView) view;
-        ViewHandle.InitializePcapFileList(settingProperty.capturePcapFileHistory, indexView.getFileListCtrl().getFileList());
-        ViewHandle.InitializeCapturePcapFileMenu(settingProperty.capturePcapFileHistory, indexView.getCaptureMenuBarCtrl().getRecentMenu());
-        indexView.setPcapFile(file.getAbsolutePath());
-        indexView.setNifName(null);
-        for (int i = 2; i < indexView.getCaptureMenuBarCtrl().getRecentMenu().getItems().size(); i++) {
-            RadioMenuItem item = (RadioMenuItem) indexView.getCaptureMenuBarCtrl().getRecentMenu().getItems().get(i);
+        FileHandle.AddHistory(SettingProperty.capturePcapFileHistory, file.getAbsolutePath(), CapturePcapFileHistoryProperty.class);
+        ViewType type = view.getType();
+        ViewHandle.InitializePcapFileList(SettingProperty.capturePcapFileHistory, view.getFileListCtrl().getFileList());
+        ViewHandle.InitializeCapturePcapFileMenu(SettingProperty.capturePcapFileHistory, view.getCaptureMenuBarCtrl().getRecentMenu());
+        view.setPcapFile(file.getAbsolutePath());
+        view.setNifName(null);
+        for (int i = 2; i < view.getCaptureMenuBarCtrl().getRecentMenu().getItems().size(); i++) {
+            RadioMenuItem item = (RadioMenuItem) view.getCaptureMenuBarCtrl().getRecentMenu().getItems().get(i);
             if (item.getText().contains(file.getAbsolutePath()))
                 item.setSelected(true);
         }
-        if (type.equals("index")) {
-            indexView.setType("capture");
-            ViewHandle.InitializeCaptureCenter(indexView);
+        if (type.equals(ViewType.IndexView)) {
+            view.setType(ViewType.CaptureView);
+            ViewHandle.InitializeCaptureCenter(view);
         }
 
-        indexView.clearBrowser();
-        indexView.StartCapture("offline");
+        view.clearBrowser();
+        view.JobScheduler(JobMode.OfflineJob);
     }
 
     @FXML
     private void SaveButtonOnClicked() {
-        String type = view.getType();
-        if (type.equals("index"))
+        if (view.getType().equals(ViewType.IndexView))
             return;
         Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);
@@ -265,16 +257,15 @@ public class CaptureToolBar {
         File file = fileChooser.showSaveDialog(stage);
         if (file==null) return;
         indexView.setSavePath(file.getAbsolutePath());
-        indexView.StartCapture("save");
+        indexView.JobScheduler(JobMode.SaveJob);
     }
 
     @FXML
     private void CloseButtonOnClicked() {
-        IndexView indexView = (IndexView) view;
-        indexView.clearBrowser();
-        indexView.setPcapFile(null);
-        indexView.setType("index");
-        ViewHandle.InitializeCaptureCenter(indexView);
+        view.clearBrowser();
+        view.setPcapFile(null);
+        view.setType(ViewType.IndexView);
+        ViewHandle.InitializeCaptureCenter(view);
 
         InitializeButtonStatus();
 
@@ -284,22 +275,20 @@ public class CaptureToolBar {
     private void ReloadButtonOnClicked() {
         IndexView indexView = (IndexView) view;
         indexView.clearBrowser();
-        indexView.StartCapture("offline");
+        indexView.JobScheduler(JobMode.OfflineJob);
     }
 
 
     @FXML
     private void ForwardButtonOnClicked() {
-        IndexView indexView = (IndexView) view;
-
         String nifName;
-        if (indexView.getNifName()==null)
+        if (view.getNifName()==null)
             nifName = ((PcapNetworkInterface)ViewHandle.GetPcapNIFList().get(0)).getName();
-        else nifName = indexView.getNifName();
+        else nifName = view.getNifName();
 
         try {
             FXMLLoader loader = new FXMLLoader();
-            AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream("view/SendView.fxml"));
+            AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream(SettingProperty.sendView));
             Stage stage = new Stage();
             stage.initStyle(StageStyle.DECORATED);
             stage.initModality(Modality.WINDOW_MODAL);
@@ -308,9 +297,9 @@ public class CaptureToolBar {
             stage.setScene(scene);
 
             SendView sendView = loader.getController();
-            if (view.getType().equals("capture")) {
-                if (indexView.getPacketListCtrl().getPacketTable().getSelectionModel().getSelectedItem() != null) {
-                    PacketProperty packetProperty = indexView.packetPropertyArrayList.get(indexView.getPacketListCtrl().getPacketTable().getSelectionModel().getSelectedIndex());
+            if (view.getType().equals(ViewType.CaptureView)) {
+                if (view.getPacketListCtrl().getPacketTable().getSelectionModel().getSelectedItem() != null) {
+                    PacketProperty packetProperty = view.packetPropertyArrayList.get(view.getPacketListCtrl().getPacketTable().getSelectionModel().getSelectedIndex());
                     sendView.setPacketProperty(packetProperty);
                     sendView.packetPropertyArrayList.add(packetProperty);
                     sendView.getPacketListCtrl().getPacketTable().getItems().add(packetProperty.getInfo());
@@ -324,7 +313,7 @@ public class CaptureToolBar {
 
             sendView.setNifName(nifName);
 
-            sendView.setIndexView(indexView);
+            sendView.setIndexView(view);
 
             stage.show();
         } catch (IOException e) {
@@ -337,7 +326,7 @@ public class CaptureToolBar {
 
         try {
             FXMLLoader loader = new FXMLLoader();
-            AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream("view/single/AnalysisView.fxml"));
+            AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream(SettingProperty.analysisView));
             Stage stage = new Stage();
             stage.initStyle(StageStyle.DECORATED);
             stage.initModality(Modality.APPLICATION_MODAL);

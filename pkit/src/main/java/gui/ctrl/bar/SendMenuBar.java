@@ -3,6 +3,7 @@ package gui.ctrl.bar;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import gui.ctrl.SendView;
 import gui.ctrl.View;
+import gui.model.JobMode;
 import gui.model.SettingProperty;
 import gui.model.history.CapturePcapFileHistoryProperty;
 import javafx.event.ActionEvent;
@@ -22,8 +23,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class SendMenuBar {
-    SettingProperty settingProperty = new SettingProperty();
-    View view;
+    SendView view;
 
     @FXML
     public Menu fileMenu;
@@ -51,7 +51,7 @@ public class SendMenuBar {
         exportItem.setDisable(true);
 
         recentMenu.getItems().add(new SeparatorMenuItem());
-        ViewHandle.InitializeSendPcapFileMenu(settingProperty.sendPcapFileHistory, recentMenu);
+        ViewHandle.InitializeSendPcapFileMenu(SettingProperty.sendPcapFileHistory, recentMenu);
 
         for (int i = 2; i < recentMenu.getItems().size(); i++) {
             RadioMenuItem item = (RadioMenuItem) recentMenu.getItems().get(i);
@@ -63,7 +63,7 @@ public class SendMenuBar {
                         String pattern = "\\(.*?\\)";
                         sendView.setPcapFile(item.getText().replaceAll(pattern, ""));
                         sendView.clearBrowser();
-                        sendView.StartImport();
+                        sendView.JobScheduler(JobMode.ImportJob);
                     }
                 }
             });
@@ -83,12 +83,11 @@ public class SendMenuBar {
         );
         File file = fileChooser.showOpenDialog(stage);
         if (file==null) return;
-        FileHandle.AddHistory(settingProperty.sendPcapFileHistory, file.getAbsolutePath(), CapturePcapFileHistoryProperty.class);
-        SendView sendView = (SendView) view;
-        sendView.setPcapFile(file.getAbsolutePath());
+        FileHandle.AddHistory(SettingProperty.sendPcapFileHistory, file.getAbsolutePath(), CapturePcapFileHistoryProperty.class);
+        view.setPcapFile(file.getAbsolutePath());
 
 //        sendView.clearBrowser();
-        sendView.StartImport();
+        view.JobScheduler(JobMode.ImportJob);
     }
 
     @FXML
@@ -96,7 +95,7 @@ public class SendMenuBar {
         JsonMapper mapper = new JsonMapper();
         CapturePcapFileHistoryProperty property = new CapturePcapFileHistoryProperty();
         try {
-            mapper.writeValue(new File(settingProperty.sendPcapFileHistory), property);
+            mapper.writeValue(new File(SettingProperty.sendPcapFileHistory), property);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -106,11 +105,10 @@ public class SendMenuBar {
     @FXML
     private void ClearItemOnClicked() {
         // 清空所有
-        SendView sendView = (SendView) view;
-        sendView.clearBrowser();
-        sendView.setPcapFile(null);
+        view.clearBrowser();
+        view.setPcapFile(null);
 
-        sendView.getSendToolBarCtrl().InitializeButtonStatus();
+        view.getSendToolBarCtrl().InitializeButtonStatus();
     }
 
     @FXML
@@ -125,18 +123,17 @@ public class SendMenuBar {
                 new FileChooser.ExtensionFilter("PCAPNG files", "*.pcapng"),
                 new FileChooser.ExtensionFilter("CAP files", "*.cap")
         );
-        SendView sendView = (SendView) view;
         File file = fileChooser.showSaveDialog(stage);
         if (file==null) return;
-        sendView.setExportPath(file.getAbsolutePath());
-        sendView.StartExport();
+        view.setExportPath(file.getAbsolutePath());
+        view.JobScheduler(JobMode.ExportJob);
     }
 
     public View getView() {
         return view;
     }
 
-    public void setView(View view) {
+    public void setView(SendView view) {
         this.view = view;
     }
 }

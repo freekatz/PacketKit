@@ -23,10 +23,7 @@ import java.util.List;
 
 
 public class SendStatusBar {
-
-    SettingProperty settingProperty = new SettingProperty();
-
-    View view;
+    SendView view;
     int selectIndex;
 
     @FXML
@@ -55,7 +52,7 @@ public class SendStatusBar {
             public void handle(ActionEvent actionEvent) {
                 try {
                     FXMLLoader loader = new FXMLLoader();
-                    AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream("view/config/SendConfigView.fxml"));
+                    AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream(SettingProperty.sendConfigView));
                     Stage stage = new Stage();
                     stage.initStyle(StageStyle.DECORATED);
                     stage.initModality(Modality.APPLICATION_MODAL);
@@ -90,7 +87,7 @@ public class SendStatusBar {
         // 为每个菜单行为添加行为：读取配置
         configMenu.getItems().remove(2, configMenu.getItems().size());
         ToggleGroup group = new ToggleGroup();
-        List<SendProperty> list = FileHandle.ReadConfig(settingProperty.sendConfig, SendProperty.class);
+        List<SendProperty> list = FileHandle.ReadConfig(SettingProperty.sendConfig, SendProperty.class);
         assert list!=null;
         list.forEach(p -> {
             RadioMenuItem item = new RadioMenuItem(p.getName());
@@ -99,11 +96,10 @@ public class SendStatusBar {
             item.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-                    SendView sendView = (SendView) view;
                     if (item.isSelected()) {
                         for (SendProperty property : list) {
                             if (item.getText().equals(property.getName())) {
-                                sendView.setSendProperty(property);
+                                view.setSendProperty(property);
                                 break;
                             }
                         }
@@ -117,19 +113,18 @@ public class SendStatusBar {
 
     }
 
-    public void setView(View view) {
+    public void setView(SendView view) {
         this.view = view;
-        SendView sendView = (SendView) view;
-        if (sendView.getSendProperty() == null && configMenu.getItems().size() > 2) {
+        if (view.getSendProperty() == null && configMenu.getItems().size() > 2) {
             selectIndex = 2;
             RadioMenuItem item = (RadioMenuItem) configMenu.getItems().get(selectIndex);
             item.setSelected(true);
             configButton.setText(item.getText());
-            List<SendProperty> list = FileHandle.ReadConfig(settingProperty.sendConfig, SendProperty.class);
+            List<SendProperty> list = FileHandle.ReadConfig(SettingProperty.sendConfig, SendProperty.class);
             assert list != null;
             for (SendProperty property : list) {
                 if (item.getText().contains(property.getName())) {
-                    sendView.setSendProperty(property);
+                    view.setSendProperty(property);
                     break;
                 }
             }
@@ -143,7 +138,7 @@ public class SendStatusBar {
     }
 
 
-    public View getView() {
+    public SendView getView() {
         return this.view;
     }
 }

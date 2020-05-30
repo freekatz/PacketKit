@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import gui.ctrl.IndexView;
 import gui.ctrl.SendView;
 import gui.ctrl.View;
+import gui.model.ViewType;
 import gui.model.browser.FieldProperty;
 import gui.model.browser.PacketDataProperty;
 import gui.model.browser.PacketHeaderProperty;
@@ -29,11 +30,11 @@ public class BrowserJob extends Task<PacketProperty> {
         this.view = view;
         this.packetProperty = packetProperty;
 
-        if (view.getType().equals("capture")) {
+        if (view.getType().equals(ViewType.CaptureView)) {
             IndexView indexView = (IndexView) view;
             this.dataArea = indexView.getPacketDataCtrl().getDataArea();
             this.header = indexView.getPacketHeaderCtrl().getRoot();
-        } else if (view.getType().equals("send")) {
+        } else if (view.getType().equals(ViewType.SendView)) {
             SendView sendView = (SendView) view;
             this.header = sendView.getPacketHeaderCtrl().getRoot();
         }
@@ -44,10 +45,10 @@ public class BrowserJob extends Task<PacketProperty> {
     @Override
     protected void updateValue(PacketProperty packetProperty) {
         super.updateValue(packetProperty);
-        if (view.getType().equals("capture")) {
+        if (view.getType().equals(ViewType.CaptureView)) {
             this.InitializeHeaderTreeTable();
             this.InitializeDataArea();
-        } else if (view.getType().equals("send")) {
+        } else if (view.getType().equals(ViewType.SendView)) {
             this.InitializeHeaderTreeTable();
         }
         // else send

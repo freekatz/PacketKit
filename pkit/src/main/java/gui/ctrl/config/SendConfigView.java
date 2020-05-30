@@ -3,8 +3,10 @@ package gui.ctrl.config;
 import gui.ctrl.SendView;
 import gui.ctrl.View;
 import gui.ctrl.bar.SendStatusBar;
+import gui.model.JobMode;
 import gui.model.Property;
 import gui.model.SettingProperty;
+import gui.model.ViewType;
 import gui.model.config.SendProperty;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -19,13 +21,6 @@ import util.FileHandle;
 import util.ViewHandle;
 
 public class SendConfigView implements View {
-
-    SendView sendView;
-
-    SettingProperty settingProperty = new SettingProperty();
-
-    String type;
-
     SendStatusBar sendStatusBar;
 
     @FXML
@@ -49,13 +44,16 @@ public class SendConfigView implements View {
     @FXML
     Button helpButton;
 
+    private ViewType type;
 
-    public SendConfigView() {}
+    public SendConfigView() {
+        this.type = ViewType.ConfigView;
+    }
 
     public void initialize() {
         ViewHandle.InitializeTable(new SendProperty(), configTable);
 
-        ViewHandle.UpdateConfigTable(settingProperty.sendConfig, new SendProperty(), configTable);
+        ViewHandle.UpdateConfigTable(SettingProperty.sendConfig, new SendProperty(), configTable);
         this.InitializeColumn();
     }
 
@@ -81,11 +79,11 @@ public class SendConfigView implements View {
                         SendProperty property = (t.getTableView().getItems().get(
                                 t.getTablePosition().getRow())
                         );
-                        FileHandle.DeleteConfig(settingProperty.sendConfig, property);
+                        FileHandle.DeleteConfig(SettingProperty.sendConfig, property);
                         if (t.getNewValue()!=null)
                             property.setName(t.getNewValue());
                         else property.setName("default");
-                        FileHandle.SaveConfig(settingProperty.sendConfig, property);
+                        FileHandle.SaveConfig(SettingProperty.sendConfig, property);
                     });
                     break;
                 case "comment":
@@ -96,7 +94,7 @@ public class SendConfigView implements View {
                         if (t.getNewValue()!=null)
                             property.setComment(t.getNewValue());
                         else property.setComment("");
-                        FileHandle.SaveConfig(settingProperty.sendConfig, property);
+                        FileHandle.SaveConfig(SettingProperty.sendConfig, property);
                     });
                     break;
                 case "count":
@@ -107,7 +105,7 @@ public class SendConfigView implements View {
                         if (t.getNewValue()!=null)
                             property.setCount(Integer.parseInt(t.getNewValue()));
                         else property.setCount(-1);
-                        FileHandle.SaveConfig(settingProperty.sendConfig, property);
+                        FileHandle.SaveConfig(SettingProperty.sendConfig, property);
                     });
                     break;
                 case "retry":
@@ -118,7 +116,7 @@ public class SendConfigView implements View {
                         if (t.getNewValue()!=null)
                             property.setRetry(Integer.parseInt(t.getNewValue()));
                         else property.setRetry(1);
-                        FileHandle.SaveConfig(settingProperty.sendConfig, property);
+                        FileHandle.SaveConfig(SettingProperty.sendConfig, property);
                     });
                     break;
                 case "timeout":
@@ -129,7 +127,7 @@ public class SendConfigView implements View {
                         if (t.getNewValue()!=null)
                             property.setTimeout(Integer.parseInt(t.getNewValue()));
                         else property.setTimeout(10000);
-                        FileHandle.SaveConfig(settingProperty.sendConfig, property);
+                        FileHandle.SaveConfig(SettingProperty.sendConfig, property);
                     });
                     break;
             }
@@ -140,10 +138,6 @@ public class SendConfigView implements View {
 
     public void setSendStatusBar(SendStatusBar sendStatusBar) {
         this.sendStatusBar = sendStatusBar;
-    }
-
-    public void setSendView(SendView sendView) {
-        this.sendView = sendView;
     }
 
 
@@ -157,13 +151,13 @@ public class SendConfigView implements View {
         property.setTimeout(1000);
 
         configTable.getItems().add(property);
-        FileHandle.SaveConfig(settingProperty.sendConfig, property);
+        FileHandle.SaveConfig(SettingProperty.sendConfig, property);
     }
 
     @FXML
     private void DeleteButtonOnClicked() {
         SendProperty property = (SendProperty) configTable.getSelectionModel().getSelectedItem();
-        FileHandle.DeleteConfig(settingProperty.sendConfig, property);
+        FileHandle.DeleteConfig(SettingProperty.sendConfig, property);
         configTable.getItems().remove(configTable.getSelectionModel().getSelectedItem());
     }
 
@@ -174,7 +168,7 @@ public class SendConfigView implements View {
             SendProperty newProperty = (SendProperty) property.clone();
             newProperty.setName(property.getName()+"(copy)");
             configTable.getItems().add(newProperty);
-            FileHandle.SaveConfig(settingProperty.sendConfig, newProperty);
+            FileHandle.SaveConfig(SettingProperty.sendConfig, newProperty);
         }
     }
 
@@ -183,7 +177,6 @@ public class SendConfigView implements View {
         sendStatusBar.UpdateContextMenu();
         Stage stage = (Stage)((Button)(event).getSource()).getScene().getWindow();
         stage.close();
-        // apply 过滤器
     }
 
     @FXML
@@ -198,13 +191,23 @@ public class SendConfigView implements View {
 
 
     @Override
-    public String getType() {
+    public ViewType getType() {
         return type;
     }
 
     @Override
-    public void setType(String type) {
+    public void setType(ViewType type) {
         this.type = type;
+    }
+
+    @Override
+    public void JobScheduler(JobMode jobMode) {
+
+    }
+
+    @Override
+    public void JobStop() {
+
     }
 
     @Override

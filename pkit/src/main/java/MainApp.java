@@ -1,3 +1,4 @@
+import gui.model.SettingProperty;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -13,12 +14,13 @@ public class MainApp extends Application {
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
 
-        FXMLLoader loader = new FXMLLoader();	// 创建对象
+        FXMLLoader loader = new FXMLLoader();
 
         try {
-            AnchorPane pane = loader.load(loader.getClassLoader().getResourceAsStream("view/IndexView.fxml")); // 对象
+            //  启动主界面
+            AnchorPane pane = loader.load(loader.getClassLoader().getResourceAsStream(SettingProperty.indexView));
             Scene scene = new Scene(pane);
             stage.setScene(scene);
             stage.show();

@@ -6,7 +6,9 @@ import gui.ctrl.bar.SendToolBar;
 import gui.ctrl.browser.PacketData;
 import gui.ctrl.browser.PacketHeader;
 import gui.ctrl.browser.PacketList;
+import gui.model.JobMode;
 import gui.model.SettingProperty;
+import gui.model.ViewType;
 import gui.model.browser.PacketProperty;
 import gui.model.config.SendProperty;
 import javafx.event.Event;
@@ -17,23 +19,16 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import job.ExportJob;
-import job.ForwardJob;
-import job.OfflineJob;
-import job.SendJob;
+import job.*;
+import nif.CNIF;
 import nif.SNIF;
 import util.ViewHandle;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class SendView implements View{
-
-    SettingProperty settingProperty = new SettingProperty();
-    public ArrayList<PacketProperty> packetPropertyArrayList = new ArrayList<>();
     IndexView indexView;
-
-    SendProperty sendProperty;
-    PacketProperty packetProperty;
 
     private PacketList packetListCtrl;
     private PacketHeader packetHeaderCtrl;
@@ -43,17 +38,21 @@ public class SendView implements View{
     private SendToolBar sendToolBarCtrl;
     private SendStatusBar sendStatusBarCtrl;
 
-    String type;
+    SendProperty sendProperty;
+    PacketProperty packetProperty;
 
-    private String exportPath;
-
-    public Label status;
 
     String pcapFile;
     String nifName;
     String dstNifName;
 
+    private String exportPath;
+    public Label status;
+
+    ViewType type;
+
     SNIF snif;
+    public ArrayList<PacketProperty> packetPropertyArrayList = new ArrayList<>();
 
     @FXML
     BorderPane pane;
@@ -66,11 +65,10 @@ public class SendView implements View{
 
 
     public SendView() {
-
+        this.type = ViewType.SendView;
     }
 
     public void initialize() {
-        this.type = "send";
 
         ViewHandle.InitializeSendTop(this);
         ViewHandle.InitializeSendCenter(this);
@@ -81,90 +79,136 @@ public class SendView implements View{
         status.setText("ready");
     }
 
-    public void StartImport() {
-        // 读取文件
-        // 按钮，菜单变化
-
-        clearBrowser();
-        sendToolBarCtrl.removeButton.setDisable(false);
-        sendToolBarCtrl.exportButton.setDisable(false);
-        sendMenuBarCtrl.exportItem.setDisable(false);
-
-        status.setText("read");
-        OfflineJob offlineJob = new OfflineJob(this);
-        Thread thread = new Thread(offlineJob);
-        thread.start();
+    @Override
+    public ViewType getType() {
+        return type;
     }
 
-    public void StartExport() {
-        // save array list 的 json
-        // 也可导入 json
-        status.setText("export");
-        ExportJob exportJob = new ExportJob(this, settingProperty.packetTemplatePath , exportPath);
-        Thread thread = new Thread(exportJob);
-        thread.start();
+    @Override
+    public void setType(ViewType type) {
+        this.type = type;
     }
 
-    public void StartSend(String opt) {
+    @Override
+    public void JobScheduler(JobMode jobMode) {
+        if (jobMode.equals(JobMode.SendOneJob)||jobMode.equals(JobMode.ForwardOneJob)||jobMode.equals(JobMode.SendAllJob)||jobMode.equals(JobMode.ForwardAllJob)) {
+            status.setText("send");
+            sendToolBarCtrl.importButton.setDisable(true);
+            sendToolBarCtrl.addButton.setDisable(true);
+            sendToolBarCtrl.clearButton.setDisable(true);
+            sendToolBarCtrl.stopButton.setDisable(false);
+            sendToolBarCtrl.configButton.setDisable(true);
+            sendToolBarCtrl.sendButton.setDisable(true);
+            sendToolBarCtrl.sendAllButton.setDisable(true);
+            sendToolBarCtrl.forwardButton.setDisable(true);
+            sendToolBarCtrl.forwardAllButton.setDisable(true);
+            sendToolBarCtrl.nifBox.setDisable(true);
+        }
 
-        status.setText("send");
+        // capture ctrl
+        switch (jobMode) {
+            case SendOneJob: {
+                status.setText("send one");
 
-        sendToolBarCtrl.importButton.setDisable(true);
-        sendToolBarCtrl.addButton.setDisable(true);
-        sendToolBarCtrl.clearButton.setDisable(true);
-        sendToolBarCtrl.stopButton.setDisable(false);
-        sendToolBarCtrl.configButton.setDisable(true);
-        sendToolBarCtrl.sendButton.setDisable(true);
-        sendToolBarCtrl.sendAllButton.setDisable(true);
-        sendToolBarCtrl.forwardButton.setDisable(true);
-        sendToolBarCtrl.forwardAllButton.setDisable(true);
-        sendToolBarCtrl.nifBox.setDisable(true);
+                snif = new SNIF(nifName);
+                SendJob sendJob = new SendJob(this, "one");
+                Thread thread = new Thread(sendJob);
+                thread.start();
 
-        snif = new SNIF(nifName);
-        SendJob sendJob = new SendJob(this, opt);
-        Thread thread = new Thread(sendJob);
-        thread.start();
+                sendToolBarCtrl.InitializeButtonStatus();
+                sendToolBarCtrl.forwardAllButton.setDisable(false);
+                sendToolBarCtrl.forwardButton.setDisable(false);
+                sendToolBarCtrl.sendAllButton.setDisable(false);
+                sendToolBarCtrl.sendButton.setDisable(false);
+                sendToolBarCtrl.removeButton.setDisable(false);
+                sendToolBarCtrl.clearButton.setDisable(false);
 
-        sendToolBarCtrl.InitializeButtonStatus();
-        sendToolBarCtrl.forwardAllButton.setDisable(false);
-        sendToolBarCtrl.forwardButton.setDisable(false);
-        sendToolBarCtrl.sendAllButton.setDisable(false);
-        sendToolBarCtrl.sendButton.setDisable(false);
-        sendToolBarCtrl.removeButton.setDisable(false);
-        sendToolBarCtrl.clearButton.setDisable(false);
+                break;
+            }
+            case SendAllJob: {
+                status.setText("send all");
+
+                snif = new SNIF(nifName);
+                SendJob sendJob = new SendJob(this, "all");
+                Thread thread = new Thread(sendJob);
+                thread.start();
+
+                sendToolBarCtrl.InitializeButtonStatus();
+                sendToolBarCtrl.forwardAllButton.setDisable(false);
+                sendToolBarCtrl.forwardButton.setDisable(false);
+                sendToolBarCtrl.sendAllButton.setDisable(false);
+                sendToolBarCtrl.sendButton.setDisable(false);
+                sendToolBarCtrl.removeButton.setDisable(false);
+                sendToolBarCtrl.clearButton.setDisable(false);
+
+                break;
+            }
+            case ForwardOneJob: {
+                status.setText("forward one");
+
+                snif = new SNIF(nifName);
+                dstNifName = sendToolBarCtrl.nifBox.getValue();
+                ForwardJob forwardJob = new ForwardJob(this, "one", dstNifName);
+                Thread thread = new Thread(forwardJob);
+                thread.start();
+
+                sendToolBarCtrl.InitializeButtonStatus();
+                sendToolBarCtrl.forwardAllButton.setDisable(false);
+                sendToolBarCtrl.forwardButton.setDisable(false);
+                sendToolBarCtrl.sendAllButton.setDisable(false);
+                sendToolBarCtrl.sendButton.setDisable(false);
+                sendToolBarCtrl.removeButton.setDisable(false);
+                sendToolBarCtrl.clearButton.setDisable(false);
+
+                break;
+            }
+            case ForwardAllJob: {
+                status.setText("forward all");
+
+                snif = new SNIF(nifName);
+                dstNifName = sendToolBarCtrl.nifBox.getValue();
+                ForwardJob forwardJob = new ForwardJob(this, "all", dstNifName);
+                Thread thread = new Thread(forwardJob);
+                thread.start();
+
+                sendToolBarCtrl.InitializeButtonStatus();
+                sendToolBarCtrl.forwardAllButton.setDisable(false);
+                sendToolBarCtrl.forwardButton.setDisable(false);
+                sendToolBarCtrl.sendAllButton.setDisable(false);
+                sendToolBarCtrl.sendButton.setDisable(false);
+                sendToolBarCtrl.removeButton.setDisable(false);
+                sendToolBarCtrl.clearButton.setDisable(false);
+
+                break;
+            }
+            case ImportJob: {
+                status.setText("import");
+
+                clearBrowser();
+                sendToolBarCtrl.removeButton.setDisable(false);
+                sendToolBarCtrl.exportButton.setDisable(false);
+                sendMenuBarCtrl.exportItem.setDisable(false);
+
+                OfflineJob offlineJob = new OfflineJob(this);
+                Thread thread = new Thread(offlineJob);
+                thread.start();
+                break;
+            }
+            case ExportJob: {
+                status.setText("export");
+
+                ExportJob exportJob = new ExportJob(this, SettingProperty.packetTemplatePath , exportPath);
+                Thread thread = new Thread(exportJob);
+                thread.start();
+                break;
+            }
+            default:
+                break;
+        }
     }
 
-    public void StartForward(String opt) {
-
-        status.setText("forward");
-
-        sendToolBarCtrl.importButton.setDisable(true);
-        sendToolBarCtrl.addButton.setDisable(true);
-        sendToolBarCtrl.clearButton.setDisable(true);
-        sendToolBarCtrl.stopButton.setDisable(false);
-        sendToolBarCtrl.configButton.setDisable(true);
-        sendToolBarCtrl.sendButton.setDisable(true);
-        sendToolBarCtrl.sendAllButton.setDisable(true);
-        sendToolBarCtrl.forwardButton.setDisable(true);
-        sendToolBarCtrl.forwardAllButton.setDisable(true);
-        sendToolBarCtrl.nifBox.setDisable(true);
-
-        snif = new SNIF(nifName);
-        dstNifName = sendToolBarCtrl.nifBox.getValue();
-        ForwardJob forwardJob = new ForwardJob(this, opt, dstNifName);
-        Thread thread = new Thread(forwardJob);
-        thread.start();
-
-        sendToolBarCtrl.InitializeButtonStatus();
-        sendToolBarCtrl.forwardAllButton.setDisable(false);
-        sendToolBarCtrl.forwardButton.setDisable(false);
-        sendToolBarCtrl.sendAllButton.setDisable(false);
-        sendToolBarCtrl.sendButton.setDisable(false);
-        sendToolBarCtrl.removeButton.setDisable(false);
-        sendToolBarCtrl.clearButton.setDisable(false);
-    }
-
-    public void Stop() {
+    @Override
+    public void JobStop() {
 
         status.setText("stop");
 
@@ -178,8 +222,14 @@ public class SendView implements View{
 
 
         snif.handle.close();
-
     }
+
+    @Override
+    public void close(Event event) {
+        Stage stage = (Stage)((Button)(event).getSource()).getScene().getWindow();
+        stage.close();
+    }
+
 
     public void clearBrowser() {
 
@@ -201,14 +251,6 @@ public class SendView implements View{
         this.snif = snif;
     }
 
-    public SettingProperty getSettingProperty() {
-        return settingProperty;
-    }
-
-    public void setSettingProperty(SettingProperty settingProperty) {
-        this.settingProperty = settingProperty;
-    }
-
     public String getDstNifName() {
         return dstNifName;
     }
@@ -223,20 +265,6 @@ public class SendView implements View{
 
     public void setIndexView(IndexView indexView) {
         this.indexView = indexView;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    @Override
-    public void close(Event event) {
-        Stage stage = (Stage)((Button)(event).getSource()).getScene().getWindow();
-        stage.close();
     }
 
     public String getPcapFile() {

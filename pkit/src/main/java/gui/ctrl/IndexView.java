@@ -9,7 +9,9 @@ import gui.ctrl.browser.PacketHeader;
 import gui.ctrl.browser.PacketList;
 import gui.ctrl.list.FileList;
 import gui.ctrl.list.NIFList;
+import gui.model.JobMode;
 import gui.model.SettingProperty;
+import gui.model.ViewType;
 import gui.model.browser.PacketProperty;
 import gui.model.config.CaptureProperty;
 import gui.model.config.FilterProperty;
@@ -34,32 +36,45 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class IndexView implements View{
-    SettingProperty settingProperty = new SettingProperty();
 
-    private FilterProperty filterProperty;
-    private CaptureProperty captureProperty;
-    private String pcapFile;
-    private String nifName;
-    private String savePath;
-
+    //  主界面的两个列表视图的控制器: 离线文件历史列表及网卡列表
     private FileList fileListCtrl;
     private NIFList nifListCtrl;
 
+    //  捕获界面的包浏览器三个组件的控制器: 包信息列表, 包首部及包字节
     private PacketList packetListCtrl;
     private PacketHeader packetHeaderCtrl;
     private PacketData packetDataCtrl;
 
+    //  捕获界面的菜单栏, 工具栏, 过滤器栏及状态栏的控制器
     private CaptureMenuBar captureMenuBarCtrl;
     private CaptureToolBar captureToolBarCtrl;
     private FilterBar filterBarCtrl;
     private CaptureStatusBar captureStatusBarCtrl;
 
+    //  捕获和过滤器配置
+    private FilterProperty filterProperty;
+    private CaptureProperty captureProperty;
+
+    //  打开的离线文件, 只在离线模式下可用, 在线模式下为 null
+    private String pcapFile;
+
+    //  网卡的唯一标识, 只在在线模式下可用, 离线模式下为 null
+    private String nifName;
+
+    //  当前数据流的保存路径
+    private String savePath;
+
+    //  当前系统运行状态
     private Label status;
 
-    private String type;
+    //  当前界面的类型: index 及 capture
+    private ViewType type;
 
+    //  网卡对象, 根据 nifName 生成的是默认网卡, 其它需要用到网卡的作业使用临时对象, 故不在此声明
     private CNIF cnif;
 
+    // 当前的数据流, 保存的是解析之后的数据包结构信息
     public ArrayList<PacketProperty> packetPropertyArrayList = new ArrayList<>();
 
     @FXML
@@ -71,45 +86,50 @@ public class IndexView implements View{
     VBox centerBox;
     SplitPane browserPane;
 
-    public IndexView() {}
+    public IndexView() {
+
+        this.type = ViewType.IndexView;
+    }
 
     public void initialize() {
 
+        // 初始化 centre box
         centerBox = new VBox();
         browserPane = new SplitPane();
-        this.type = "index";
-        // init two config and set statusbar
         browserPane.setOrientation(Orientation.VERTICAL);
 
+        //  初始化 top box
         ViewHandle.InitializeCaptureTop(this);
         ViewHandle.InitializeCaptureCenter(this);
         ViewHandle.InitializeCaptureBottom(this);
 
+        // 初始化 bottom box
         status = captureStatusBarCtrl.statusLabel;
-
         status.setText("ready");
+
     }
 
-    public void StartCapture(String opt) {
-        // todo button 改为 item
+    @Override
+    public void JobScheduler(JobMode jobMode) {
         packetHeaderCtrl.setEdit(false);
-        if (opt.equals("online")||opt.equals("offline")) {
+        if (jobMode.equals(JobMode.OnlineJob)||jobMode.equals(JobMode.OfflineJob)) {
             packetPropertyArrayList.clear();
             packetHeaderCtrl.getRoot().getChildren().clear();
 
             captureToolBarCtrl.getToolBar().getItems().get(13).setDisable(false);
             captureMenuBarCtrl.getAnalysisItem().setDisable(false);
 
-            if (pcapFile != null) {
+            //  离线模式调度时更新工具栏及菜单栏按钮项目状态
+            if (jobMode.equals(JobMode.OfflineJob)) {
                 for (int i = 0; i < 5; i++)
                     captureToolBarCtrl.getToolBar().getItems().get(i).setDisable(true);
-                // TODO: 2020/5/4 不要忘记分割条也算一个 item
                 for (int i = 6; i < 10; i++)
                     captureToolBarCtrl.getToolBar().getItems().get(i).setDisable(false);
-
                 for (int i = 2; i < 4; i++)
                     captureMenuBarCtrl.getFileMenu().getItems().get(i).setDisable(false);
-            } else {
+            }
+            //  在线模式调度时更新工具栏及菜单栏按钮项目状态
+            else {
                 captureToolBarCtrl.getToolBar().getItems().get(0).setDisable(true);
                 captureToolBarCtrl.getToolBar().getItems().get(1).setDisable(false);
                 captureToolBarCtrl.getToolBar().getItems().get(2).setDisable(false);
@@ -118,59 +138,58 @@ public class IndexView implements View{
 
                 for (int i = 0; i < 5; i++)
                     captureMenuBarCtrl.getFileMenu().getItems().get(i).setDisable(true);
-
             }
         }
         // capture ctrl
-        switch (opt) {
-            case "online": {
-                status.setText("capture");
+        switch (jobMode) {
+            case OnlineJob: {
+                status.setText("capturing");
                 cnif = new CNIF(nifName, captureProperty);
                 OnlineJob onlineJob = new OnlineJob(this);
                 Thread thread = new Thread(onlineJob);
                 thread.start();
                 break;
             }
-            case "offline": {
-                status.setText("read");
+            case OfflineJob: {
+                status.setText("reading");
                 OfflineJob offlineJob = new OfflineJob(this);
                 Thread thread = new Thread(offlineJob);
                 thread.start();
                 break;
             }
-            case "analysis": {
+            case AnalysisJob: {
                 status.setText("analysis");
+
+                //  获取分析模板文件的路径
                 String path;
-                if (fileListCtrl.getFileList().getSelectionModel().getSelectedItem()==null && type.equals("index"))
+                if (fileListCtrl.getFileList().getSelectionModel().getSelectedItem()==null && type.equals(ViewType.IndexView))
                     return;
-                else if (fileListCtrl.getFileList().getSelectionModel().getSelectedItem()!=null && type.equals("index"))
+                else if (fileListCtrl.getFileList().getSelectionModel().getSelectedItem()!=null && type.equals(ViewType.IndexView))
                     path = fileListCtrl.getFileList().getSelectionModel().getSelectedItem().replaceAll("\\(.*?\\)", "");
                 else
-                    path = Objects.requireNonNullElseGet(pcapFile, () -> settingProperty.tempPcapFolder + "/tmp.pcapng");
+                    path = Objects.requireNonNullElseGet(pcapFile, () -> SettingProperty.tempPcapFolder + "/tmp.pcapng");
+
                 AnalysisJob analysisJob;
                 if (this.cnif == null)
                     analysisJob = new AnalysisJob(path, null);
                 else analysisJob = new AnalysisJob(path, this.cnif.handle);
+
                 Thread thread = new Thread(analysisJob);
                 thread.start();
                 break;
             }
-            case "apply": {
+            case ApplyJob: {
                 status.setText("apply");
                 String path;
-                if (pcapFile!=null)
-                    path = pcapFile;
-                else path = settingProperty.tempPcapFolder + "/tmp.pcapng";
+                path = Objects.requireNonNullElseGet(pcapFile, () -> SettingProperty.tempPcapFolder + "/tmp.pcapng");
                 OfflineJob offlineJob = new OfflineJob(this, path);
                 Thread thread = new Thread(offlineJob);
                 thread.start();
                 break;
             }
-            case "save": {
+            case SaveJob: {
                 String path;
-                if (pcapFile!=null)
-                    path = pcapFile;
-                else path = settingProperty.tempPcapFolder + "/tmp.pcapng";
+                path = Objects.requireNonNullElseGet(pcapFile, () -> SettingProperty.tempPcapFolder + "/tmp.pcapng");
                 SaveJob saveJob = new SaveJob(this, path, savePath, filterProperty.getExpression());
                 Thread thread = new Thread(saveJob);
                 thread.start();
@@ -180,7 +199,8 @@ public class IndexView implements View{
         }
     }
 
-    public void StopCapture() {
+    @Override
+    public void JobStop() {
         captureStatusBarCtrl.configButton.setDisable(false);
         cnif.handle.close();
         cnif.dumper.close();
@@ -331,15 +351,14 @@ public class IndexView implements View{
     }
 
     @Override
-    public String getType() {
+    public ViewType getType() {
         return type;
     }
 
     @Override
-    public void setType(String type) {
-        // TODO: 2020/5/3 将界面类型切换涉及的界面元素更改都放到这里
+    public void setType(ViewType type) {
         this.type = type;
-        if (type.equals("capture")) {
+        if (type.equals(ViewType.CaptureView)) {
             captureStatusBarCtrl.configButton.setDisable(true);
         }
         else {

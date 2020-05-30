@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class UdpPPacket implements PPacket {
-    private UdpPacket.Builder builder = new UdpPacket.Builder();;
+    private final UdpPacket.Builder builder = new UdpPacket.Builder();;
     private PcapHandle pcapHandle;
     private JsonMapper jsonMapper;
     private PcapDumper dumper;

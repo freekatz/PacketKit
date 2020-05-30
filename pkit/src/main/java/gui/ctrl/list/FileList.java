@@ -2,7 +2,9 @@ package gui.ctrl.list;
 
 import gui.ctrl.IndexView;
 import gui.ctrl.View;
+import gui.model.JobMode;
 import gui.model.SettingProperty;
+import gui.model.ViewType;
 import gui.model.history.CapturePcapFileHistoryProperty;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -22,9 +24,8 @@ import java.io.File;
 
 
 public class FileList {
-    SettingProperty settingProperty = new SettingProperty();
 
-    View view;
+    IndexView view;
 
     @FXML
     Button openButton;
@@ -37,7 +38,7 @@ public class FileList {
     public void initialize() {
         openButton.setTooltip(new Tooltip("open the pcap file"));
 
-        ViewHandle.InitializePcapFileList(settingProperty.capturePcapFileHistory, fileList);
+        ViewHandle.InitializePcapFileList(SettingProperty.capturePcapFileHistory, fileList);
 
         fileList.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -52,16 +53,11 @@ public class FileList {
         });
     }
 
-    public void setView(View view) {
+    public void setView(IndexView view) {
         this.view = view;
-        String type = view.getType();
-        if (type.equals("index")) {
-            IndexView indexView = (IndexView) view;
-            if (indexView.getNifName() == null && fileList.getItems().size() > 0)
-                indexView.setPcapFile(fileList.getItems().get(0));
-
-        }
-
+        if (view.getType().equals(ViewType.IndexView))
+            if(view.getNifName() == null && fileList.getItems().size() > 0)
+                view.setPcapFile(fileList.getItems().get(0));
     }
 
     public ListView<String> getFileList() {
@@ -73,20 +69,17 @@ public class FileList {
     }
 
     private void StartCapture(String pcapFile) {
-        String type = view.getType();
-        IndexView indexView = (IndexView) view;
-        for (int i = 2; i < indexView.getCaptureMenuBarCtrl().getRecentMenu().getItems().size(); i++) {
-            RadioMenuItem item = (RadioMenuItem) indexView.getCaptureMenuBarCtrl().getRecentMenu().getItems().get(i);
+        for (int i = 2; i < view.getCaptureMenuBarCtrl().getRecentMenu().getItems().size(); i++) {
+            RadioMenuItem item = (RadioMenuItem) view.getCaptureMenuBarCtrl().getRecentMenu().getItems().get(i);
             if (item.getText().contains(pcapFile))
                 item.setSelected(true);
         }
-        if (type.equals("index")) {
-            indexView.setType("capture");
-            indexView.setNifName(null);
-            indexView.setPcapFile(pcapFile);
-            ViewHandle.InitializeCaptureCenter(indexView);
-        }
-        indexView.StartCapture("offline");
+        view.setType(ViewType.CaptureView);
+        view.setNifName(null);
+        view.setPcapFile(pcapFile);
+        ViewHandle.InitializeCaptureCenter(view);
+
+        view.JobScheduler(JobMode.OfflineJob);
 
     }
 
@@ -103,10 +96,9 @@ public class FileList {
         );
         File file = fileChooser.showOpenDialog(stage);
         if (file==null) return;
-        FileHandle.AddHistory(settingProperty.capturePcapFileHistory, file.getAbsolutePath(), CapturePcapFileHistoryProperty.class);
-        IndexView indexView = (IndexView) view;
-        ViewHandle.InitializePcapFileList(settingProperty.capturePcapFileHistory, indexView.getFileListCtrl().getFileList());
-        ViewHandle.InitializeCapturePcapFileMenu(settingProperty.capturePcapFileHistory, indexView.getCaptureMenuBarCtrl().getRecentMenu());
+        FileHandle.AddHistory(SettingProperty.capturePcapFileHistory, file.getAbsolutePath(), CapturePcapFileHistoryProperty.class);
+        ViewHandle.InitializePcapFileList(SettingProperty.capturePcapFileHistory, view.getFileListCtrl().getFileList());
+        ViewHandle.InitializeCapturePcapFileMenu(SettingProperty.capturePcapFileHistory, view.getCaptureMenuBarCtrl().getRecentMenu());
         StartCapture(file.getAbsolutePath());
     }
 }

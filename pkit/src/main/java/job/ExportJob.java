@@ -3,6 +3,7 @@ package job;
 import gui.ctrl.IndexView;
 import gui.ctrl.SendView;
 import gui.ctrl.View;
+import gui.model.ViewType;
 import gui.model.browser.PacketProperty;
 import nif.CNIF;
 import org.pcap4j.core.NotOpenException;
@@ -39,9 +40,9 @@ public class ExportJob implements Runnable {
     @Override
     public void run() {
         ArrayList<PacketProperty> propertyArrayList;
-        if (view.getType().equals("capture"))
+        if (view.getType().equals(ViewType.CaptureView))
             propertyArrayList = ((IndexView)view).packetPropertyArrayList;
-        else if (view.getType().equals("send"))
+        else if (view.getType().equals(ViewType.SendView))
             propertyArrayList = ((SendView) view).packetPropertyArrayList;
         else return;
 

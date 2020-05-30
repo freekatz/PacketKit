@@ -2,8 +2,10 @@ package gui.ctrl.config;
 
 import gui.ctrl.View;
 import gui.ctrl.bar.FilterBar;
+import gui.model.JobMode;
 import gui.model.Property;
 import gui.model.SettingProperty;
+import gui.model.ViewType;
 import gui.model.config.FilterProperty;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -18,7 +20,6 @@ import util.FileHandle;
 import util.ViewHandle;
 
 public class FilterConfigView implements View {
-    SettingProperty settingProperty = new SettingProperty();
 
     FilterBar filterBar;
 
@@ -43,12 +44,16 @@ public class FilterConfigView implements View {
     @FXML
     Button helpButton;
 
+    private ViewType type;
 
-    public FilterConfigView() {}
+
+    public FilterConfigView() {
+        this.type = ViewType.ConfigView;
+    }
 
     public void initialize() {
         ViewHandle.InitializeTable(new FilterProperty(), configTable);
-        ViewHandle.UpdateConfigTable(settingProperty.filterConfig, new FilterProperty(), configTable);
+        ViewHandle.UpdateConfigTable(SettingProperty.filterConfig, new FilterProperty(), configTable);
         this.InitializeColumn();
     }
 
@@ -74,11 +79,11 @@ public class FilterConfigView implements View {
                         FilterProperty property = (t.getTableView().getItems().get(
                                 t.getTablePosition().getRow())
                         );
-                        FileHandle.DeleteConfig(settingProperty.filterConfig, property);
+                        FileHandle.DeleteConfig(SettingProperty.filterConfig, property);
                         if (t.getNewValue()!=null)
                             property.setName(t.getNewValue());
                         else property.setName("default");
-                        FileHandle.SaveConfig(settingProperty.filterConfig, property);
+                        FileHandle.SaveConfig(SettingProperty.filterConfig, property);
                     });
                     break;
                 case "expression":
@@ -89,7 +94,7 @@ public class FilterConfigView implements View {
                         if (t.getNewValue()!=null)
                             property.setExpression(t.getNewValue());
                         else property.setExpression("");
-                        FileHandle.SaveConfig(settingProperty.filterConfig, property);
+                        FileHandle.SaveConfig(SettingProperty.filterConfig, property);
                     });
                     break;
                 case "comment":
@@ -100,7 +105,7 @@ public class FilterConfigView implements View {
                         if (t.getNewValue()!=null)
                             property.setComment(t.getNewValue());
                         else property.setComment("");
-                        FileHandle.SaveConfig(settingProperty.filterConfig, property);
+                        FileHandle.SaveConfig(SettingProperty.filterConfig, property);
                     });
                     break;
             }
@@ -121,13 +126,13 @@ public class FilterConfigView implements View {
         property.setComment("new config");
 
         configTable.getItems().add(property);
-        FileHandle.SaveConfig(settingProperty.filterConfig, property);
+        FileHandle.SaveConfig(SettingProperty.filterConfig, property);
     }
 
     @FXML
     private void DeleteButtonOnClicked() {
         FilterProperty property = (FilterProperty) configTable.getSelectionModel().getSelectedItem();
-        FileHandle.DeleteConfig(settingProperty.filterConfig, property);
+        FileHandle.DeleteConfig(SettingProperty.filterConfig, property);
         configTable.getItems().remove(configTable.getSelectionModel().getSelectedItem());
     }
 
@@ -138,7 +143,7 @@ public class FilterConfigView implements View {
             FilterProperty newProperty = (FilterProperty) property.clone();
             newProperty.setName(property.getName()+"(copy)");
             configTable.getItems().add(newProperty);
-            FileHandle.SaveConfig(settingProperty.filterConfig, newProperty);
+            FileHandle.SaveConfig(SettingProperty.filterConfig, newProperty);
         }
     }
 
@@ -162,12 +167,22 @@ public class FilterConfigView implements View {
     }
 
     @Override
-    public String getType() {
-        return null;
+    public ViewType getType() {
+        return this.type;
     }
 
     @Override
-    public void setType(String type) {
+    public void setType(ViewType type) {
+        this.type = type;
+    }
+
+    @Override
+    public void JobScheduler(JobMode jobMode) {
+
+    }
+
+    @Override
+    public void JobStop() {
 
     }
 

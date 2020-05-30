@@ -13,6 +13,7 @@ import gui.ctrl.list.FileList;
 import gui.ctrl.list.NIFList;
 import gui.model.Property;
 import gui.model.SettingProperty;
+import gui.model.ViewType;
 import gui.model.browser.FieldProperty;
 import gui.model.history.CapturePcapFileHistoryProperty;
 import gui.model.history.FilterHistoryProperty;
@@ -38,27 +39,26 @@ import java.util.List;
 
 public class ViewHandle {
 
-    public static void InitializeCaptureTop(View view) {
-        IndexView indexView = (IndexView) view;
+    public static void InitializeCaptureTop(IndexView indexView) {
         VBox box = indexView.getTopBox();
         try {
             FXMLLoader menuBarLoader = new FXMLLoader();
-            AnchorPane menuBarPane = menuBarLoader.load(menuBarLoader.getClassLoader().getResourceAsStream("view/bar/CaptureMenuBar.fxml"));
+            AnchorPane menuBarPane = menuBarLoader.load(menuBarLoader.getClassLoader().getResourceAsStream(SettingProperty.captureMenuBar));
             menuBarPane.setMaxWidth(Double.MAX_VALUE);
             CaptureMenuBar captureMenuBar = menuBarLoader.getController();
-            captureMenuBar.setView(view);
+            captureMenuBar.setView(indexView);
             indexView.setCaptureMenuBarCtrl(captureMenuBar);
             FXMLLoader toolBarLoader = new FXMLLoader();
-            AnchorPane toolBarPane = toolBarLoader.load(toolBarLoader.getClassLoader().getResourceAsStream("view/bar/CaptureToolBar.fxml"));
+            AnchorPane toolBarPane = toolBarLoader.load(toolBarLoader.getClassLoader().getResourceAsStream(SettingProperty.captureToolBar));
             toolBarPane.setMaxWidth(Double.MAX_VALUE);
             CaptureToolBar captureToolBar = toolBarLoader.getController();
-            captureToolBar.setView(view);
+            captureToolBar.setView(indexView);
             indexView.setCaptureToolBarCtrl(captureToolBar);
             FXMLLoader filterBarLoader = new FXMLLoader();
-            AnchorPane filterBarPane = filterBarLoader.load(filterBarLoader.getClassLoader().getResourceAsStream("view/bar/FilterBar.fxml"));
+            AnchorPane filterBarPane = filterBarLoader.load(filterBarLoader.getClassLoader().getResourceAsStream(SettingProperty.filterBar));
             filterBarPane.setMaxWidth(Double.MAX_VALUE);
             FilterBar filterBar = filterBarLoader.getController();
-            filterBar.setView(view);
+            filterBar.setView(indexView);
             indexView.setFilterBarCtrl(filterBar);
             box.getChildren().addAll(menuBarPane, toolBarPane, filterBarPane);
             box.setSpacing(0);
@@ -67,27 +67,25 @@ public class ViewHandle {
         }
     }
 
-    public static void InitializeCaptureCenter(View view) {
-        IndexView indexView = (IndexView) view;
-        String type = indexView.getType();
-        if (type.equals("index")) {
+    public static void InitializeCaptureCenter(IndexView view) {
+        if (view.getType().equals(ViewType.IndexView)) {
             try {
-                VBox centerBox = ((IndexView) view).getCenterBox();
-                indexView.getPane().setCenter(centerBox);
+                VBox centerBox = view.getCenterBox();
+                view.getPane().setCenter(centerBox);
                 if (centerBox.getChildren().size()>0)
                     return;
                 FXMLLoader nifListLoader = new FXMLLoader();
-                AnchorPane nifListPane = nifListLoader.load(nifListLoader.getClassLoader().getResourceAsStream("view/list/NIFList.fxml"));
+                AnchorPane nifListPane = nifListLoader.load(nifListLoader.getClassLoader().getResourceAsStream(SettingProperty.nifList));
                 nifListPane.setMaxWidth(Double.MAX_VALUE);
                 NIFList nifList = nifListLoader.getController();
                 nifList.setView(view);
-                indexView.setNifListCtrl(nifList);
+                view.setNifListCtrl(nifList);
                 FXMLLoader fileListLoader = new FXMLLoader();
-                AnchorPane fileListPane = fileListLoader.load(fileListLoader.getClassLoader().getResourceAsStream("view/list/FileList.fxml"));
+                AnchorPane fileListPane = fileListLoader.load(fileListLoader.getClassLoader().getResourceAsStream(SettingProperty.fileList));
                 fileListPane.setMaxWidth(Double.MAX_VALUE);
                 FileList fileList = fileListLoader.getController();
                 fileList.setView(view);
-                indexView.setFileListCtrl(fileList);
+                view.setFileListCtrl(fileList);
                 centerBox.getChildren().addAll(fileListPane, nifListPane);
                 centerBox.setSpacing(10);
             } catch (IOException e) {
@@ -95,8 +93,8 @@ public class ViewHandle {
             }
         } else {
             try {
-                SplitPane browserPane = indexView.getBrowserPane();
-                indexView.getPane().setCenter(browserPane);
+                SplitPane browserPane = view.getBrowserPane();
+                view.getPane().setCenter(browserPane);
                 if (browserPane.getItems().size()>0)
                     return;
 
@@ -104,28 +102,28 @@ public class ViewHandle {
                 detailPane.setOrientation(Orientation.HORIZONTAL);
 
                 FXMLLoader packetListLoader = new FXMLLoader();
-                AnchorPane packetListPane = packetListLoader.load(packetListLoader.getClassLoader().getResourceAsStream("view/browser/PacketList.fxml"));
+                AnchorPane packetListPane = packetListLoader.load(packetListLoader.getClassLoader().getResourceAsStream(SettingProperty.packetList));
                 packetListPane.setMaxWidth(Double.MAX_VALUE);
                 PacketList packetList = packetListLoader.getController();
                 packetList.setView(view);
-                indexView.setPacketListCtrl(packetList);
+                view.setPacketListCtrl(packetList);
                 FXMLLoader packetHeaderLoader = new FXMLLoader();
-                AnchorPane packetHeaderPane = packetHeaderLoader.load(packetHeaderLoader.getClassLoader().getResourceAsStream("view/browser/PacketHeader.fxml"));
+                AnchorPane packetHeaderPane = packetHeaderLoader.load(packetHeaderLoader.getClassLoader().getResourceAsStream(SettingProperty.packetHeader));
                 packetHeaderPane.setMaxWidth(Double.MAX_VALUE);
                 PacketHeader packetHeader = packetHeaderLoader.getController();
                 packetHeader.setView(view);
-                indexView.setPacketHeaderCtrl(packetHeader);
+                view.setPacketHeaderCtrl(packetHeader);
 
                 TreeItem<FieldProperty> root = packetHeader.getRoot();
                 packetHeader.getHeaderTreeTable().setRoot(root);
                 packetHeader.getHeaderTreeTable().setShowRoot(false);
 
                 FXMLLoader packetDataLoader = new FXMLLoader();
-                AnchorPane packetDataPane = packetDataLoader.load(packetDataLoader.getClassLoader().getResourceAsStream("view/browser/PacketData.fxml"));
+                AnchorPane packetDataPane = packetDataLoader.load(packetDataLoader.getClassLoader().getResourceAsStream(SettingProperty.packetData));
                 packetDataPane.setMaxWidth(Double.MAX_VALUE);
                 PacketData packetData = packetDataLoader.getController();
                 packetData.setView(view);
-                indexView.setPacketDataCtrl(packetData);
+                view.setPacketDataCtrl(packetData);
 
                 detailPane.getItems().addAll(packetHeaderPane, packetDataPane);
                 detailPane.setDividerPositions(0.45, 0.55);
@@ -142,39 +140,37 @@ public class ViewHandle {
         }
     }
 
-    public static void InitializeCaptureBottom(View view) {
-        IndexView indexView = (IndexView) view;
-        BorderPane pane = indexView.getPane();
+    public static void InitializeCaptureBottom(IndexView view) {
+        BorderPane pane = view.getPane();
         try {
             FXMLLoader statusBarLoader = new FXMLLoader();
-            AnchorPane statusBatPane = statusBarLoader.load(statusBarLoader.getClassLoader().getResourceAsStream("view/bar/CaptureStatusBar.fxml"));
+            AnchorPane statusBatPane = statusBarLoader.load(statusBarLoader.getClassLoader().getResourceAsStream(SettingProperty.captureStatusBar));
             statusBatPane.setMaxWidth(Double.MAX_VALUE);
             CaptureStatusBar captureStatusBar = statusBarLoader.getController();
             captureStatusBar.setView(view);
             pane.setBottom(statusBatPane);
             pane.getBottom().setLayoutX(0);
-            indexView.setCaptureStatusBarCtrl(captureStatusBar);
+            view.setCaptureStatusBarCtrl(captureStatusBar);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void InitializeSendTop(View view) {
-        SendView sendView = (SendView) view;
-        VBox box = sendView.getTopBox();
+    public static void InitializeSendTop(SendView view) {
+        VBox box = view.getTopBox();
         try {
             FXMLLoader menuBarLoader = new FXMLLoader();
-            AnchorPane menuBarPane = menuBarLoader.load(menuBarLoader.getClassLoader().getResourceAsStream("view/bar/SendMenuBar.fxml"));
+            AnchorPane menuBarPane = menuBarLoader.load(menuBarLoader.getClassLoader().getResourceAsStream(SettingProperty.sendMenuBar));
             menuBarPane.setMaxWidth(Double.MAX_VALUE);
             SendMenuBar sendMenuBar = menuBarLoader.getController();
             sendMenuBar.setView(view);
-            sendView.setSendMenuBarCtrl(sendMenuBar);
+            view.setSendMenuBarCtrl(sendMenuBar);
             FXMLLoader toolBarLoader = new FXMLLoader();
-            AnchorPane toolBarPane = toolBarLoader.load(toolBarLoader.getClassLoader().getResourceAsStream("view/bar/SendToolBar.fxml"));
+            AnchorPane toolBarPane = toolBarLoader.load(toolBarLoader.getClassLoader().getResourceAsStream(SettingProperty.sendToolBar));
             toolBarPane.setMaxWidth(Double.MAX_VALUE);
             SendToolBar sendToolBar = toolBarLoader.getController();
             sendToolBar.setView(view);
-            sendView.setSendToolBarCtrl(sendToolBar);
+            view.setSendToolBarCtrl(sendToolBar);
             box.getChildren().addAll(menuBarPane, toolBarPane);
             box.setSpacing(0);
         } catch (IOException e) {
@@ -182,25 +178,24 @@ public class ViewHandle {
         }
     }
 
-    public static void InitializeSendCenter(View view) {
-        SendView sendView = (SendView) view;
+    public static void InitializeSendCenter(SendView view) {
         try {
-            SplitPane browserPane = sendView.getBrowserPane();
+            SplitPane browserPane = view.getBrowserPane();
             if (browserPane.getItems().size()>0)
                 return;
 
             FXMLLoader packetListLoader = new FXMLLoader();
-            AnchorPane packetListPane = packetListLoader.load(packetListLoader.getClassLoader().getResourceAsStream("view/browser/PacketList.fxml"));
+            AnchorPane packetListPane = packetListLoader.load(packetListLoader.getClassLoader().getResourceAsStream(SettingProperty.packetList));
             packetListPane.setMaxWidth(Double.MAX_VALUE);
             PacketList packetList = packetListLoader.getController();
             packetList.setView(view);
-            sendView.setPacketListCtrl(packetList);
+            view.setPacketListCtrl(packetList);
             FXMLLoader packetHeaderLoader = new FXMLLoader();
-            AnchorPane packetHeaderPane = packetHeaderLoader.load(packetHeaderLoader.getClassLoader().getResourceAsStream("view/browser/PacketHeader.fxml"));
+            AnchorPane packetHeaderPane = packetHeaderLoader.load(packetHeaderLoader.getClassLoader().getResourceAsStream(SettingProperty.packetHeader));
             packetHeaderPane.setMaxWidth(Double.MAX_VALUE);
             PacketHeader packetHeader = packetHeaderLoader.getController();
             packetHeader.setView(view);
-            sendView.setPacketHeaderCtrl(packetHeader);
+            view.setPacketHeaderCtrl(packetHeader);
 
             TreeItem<FieldProperty> root = packetHeader.getRoot();
             packetHeader.getHeaderTreeTable().setRoot(root);
@@ -215,18 +210,17 @@ public class ViewHandle {
         }
     }
 
-    public static void InitializeSendBottom(View view) {
-        SendView sendView = (SendView) view;
-        BorderPane pane = sendView.getPane();
+    public static void InitializeSendBottom(SendView view) {
+        BorderPane pane = view.getPane();
         try {
             FXMLLoader statusBarLoader = new FXMLLoader();
-            AnchorPane statusBatPane = statusBarLoader.load(statusBarLoader.getClassLoader().getResourceAsStream("view/bar/SendStatusBar.fxml"));
+            AnchorPane statusBatPane = statusBarLoader.load(statusBarLoader.getClassLoader().getResourceAsStream(SettingProperty.sendStatusBar));
             statusBatPane.setMaxWidth(Double.MAX_VALUE);
             SendStatusBar sendStatusBar = statusBarLoader.getController();
             sendStatusBar.setView(view);
             pane.setBottom(statusBatPane);
             pane.getBottom().setLayoutX(0);
-            sendView.setSendStatusBarCtrl(sendStatusBar);
+            view.setSendStatusBarCtrl(sendStatusBar);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -22,9 +22,8 @@ import java.io.IOException;
 import java.util.List;
 
 public class CaptureStatusBar {
-    SettingProperty settingProperty = new SettingProperty();
 
-    View view;
+    IndexView view;
     int selectIndex;
 
     @FXML
@@ -53,7 +52,7 @@ public class CaptureStatusBar {
             public void handle(ActionEvent actionEvent) {
                 try {
                     FXMLLoader loader = new FXMLLoader();
-                    AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream("view/config/CaptureConfigView.fxml"));
+                    AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream(SettingProperty.captureConfigView));
                     Stage stage = new Stage();
                     stage.initStyle(StageStyle.DECORATED);
                     stage.initModality(Modality.APPLICATION_MODAL);
@@ -88,7 +87,7 @@ public class CaptureStatusBar {
         // 为每个菜单行为添加行为：读取配置
         configMenu.getItems().remove(2, configMenu.getItems().size());
         ToggleGroup group = new ToggleGroup();
-        List<CaptureProperty> list = FileHandle.ReadConfig(settingProperty.captureConfig, CaptureProperty.class);
+        List<CaptureProperty> list = FileHandle.ReadConfig(SettingProperty.captureConfig, CaptureProperty.class);
         assert list!=null;
         list.forEach(p -> {
             RadioMenuItem item = new RadioMenuItem(p.getName());
@@ -97,11 +96,10 @@ public class CaptureStatusBar {
             item.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-                    IndexView indexView = (IndexView) view;
                     if (item.isSelected()) {
                         for (CaptureProperty property : list) {
                             if (item.getText().equals(property.getName())) {
-                                indexView.setCaptureProperty(property);
+                                view.setCaptureProperty(property);
                                 break;
                             }
                         }
@@ -115,19 +113,18 @@ public class CaptureStatusBar {
 
     }
 
-    public void setView(View view) {
+    public void setView(IndexView view) {
         this.view = view;
-        IndexView indexView = (IndexView) view;
-        if (indexView.getCaptureProperty() == null && configMenu.getItems().size() > 2) {
+        if (view.getCaptureProperty() == null && configMenu.getItems().size() > 2) {
             selectIndex = 2;
             RadioMenuItem item = (RadioMenuItem) configMenu.getItems().get(selectIndex);
             item.setSelected(true);
             configButton.setText(item.getText());
-            List<CaptureProperty> list = FileHandle.ReadConfig(settingProperty.captureConfig, CaptureProperty.class);
+            List<CaptureProperty> list = FileHandle.ReadConfig(SettingProperty.captureConfig, CaptureProperty.class);
             assert list != null;
             for (CaptureProperty property : list) {
                 if (item.getText().contains(property.getName())) {
-                    indexView.setCaptureProperty(property);
+                    view.setCaptureProperty(property);
                     break;
                 }
             }

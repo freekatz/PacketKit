@@ -2,6 +2,8 @@ package gui.ctrl.list;
 
 import gui.ctrl.IndexView;
 import gui.ctrl.View;
+import gui.model.JobMode;
+import gui.model.ViewType;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -17,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NIFList {
-    View view;
+    IndexView view;
     List<PcapNetworkInterface> pcapNifList;
 
     @FXML
@@ -85,10 +87,9 @@ public class NIFList {
         nifList.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                IndexView indexView = (IndexView) view;
                 if(event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 1) {
                     Label item = (Label) nifList.getSelectionModel().getSelectedItem();
-                    indexView.setNifName(item.getId());
+                    view.setNifName(item.getId());
                 }
                 if(event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
                     Label item = (Label) nifList.getSelectionModel().getSelectedItem();
@@ -100,32 +101,26 @@ public class NIFList {
         nifList.getSelectionModel().select(0);
     }
 
-    public void setView(View view) {
+    public void setView(IndexView view) {
         this.view = view;
-        String type = view.getType();
-        if (type.equals("index")) {
-            IndexView indexView = (IndexView) view;
-            if (indexView.getNifName()==null && nifList.getItems().size()>0)
-                indexView.setNifName(nifList.getItems().get(0).getId());
-        }
-
+        if (view.getType().equals(ViewType.IndexView))
+            if (view.getNifName()==null && nifList.getItems().size()>0)
+                view.setNifName(nifList.getItems().get(0).getId());
     }
 
     private void StartCapture(String name) {
-        String type = view.getType();
-        IndexView indexView = (IndexView) view;
-        if (type.equals("index")) {
-            indexView.setType("capture");
-            indexView.setPcapFile(null);
+        if (view.getType().equals(ViewType.IndexView)) {
+            view.setType(ViewType.CaptureView);
+            view.setPcapFile(null);
             PcapNetworkInterface nif=null;
             for (int i = 0; i < nifList.getItems().size(); i++) {
                 Label label = (Label) nifList.getItems().get(i);
                 if (label.getText().equals(name))
-                    indexView.setNifName(label.getId());
+                    view.setNifName(label.getId());
             }
-            ViewHandle.InitializeCaptureCenter(indexView);
+            ViewHandle.InitializeCaptureCenter(view);
         }
-        indexView.StartCapture("online");
+        view.JobScheduler(JobMode.OnlineJob);
     }
 
     private void UpdateNIFList() {

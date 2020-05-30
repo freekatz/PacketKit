@@ -13,7 +13,7 @@ import java.io.IOException;
 
 // todo 改正 DNS
 public class DnsPPacket implements PPacket{
-    private DnsPacket.Builder builder = new DnsPacket.Builder();
+    private final DnsPacket.Builder builder = new DnsPacket.Builder();
     private PcapHandle pcapHandle;
     private JsonMapper jsonMapper;
     private PcapDumper dumper;

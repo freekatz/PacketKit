@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TcpPPacket implements PPacket{
-    private TcpPacket.Builder builder = new TcpPacket.Builder();
+    private final TcpPacket.Builder builder = new TcpPacket.Builder();
     private PcapHandle pcapHandle;
     private JsonMapper jsonMapper;
     private PcapDumper dumper;

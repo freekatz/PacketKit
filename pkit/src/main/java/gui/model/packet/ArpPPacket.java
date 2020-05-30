@@ -16,7 +16,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class ArpPPacket implements PPacket{
-    private ArpPacket.Builder builder = new ArpPacket.Builder();
+    private final ArpPacket.Builder builder = new ArpPacket.Builder();
     private PcapHandle pcapHandle;
     private JsonMapper jsonMapper;
     private PcapDumper dumper;

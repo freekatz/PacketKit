@@ -3,6 +3,7 @@ package gui.ctrl.bar;
 import gui.ctrl.SendView;
 import gui.ctrl.View;
 import gui.ctrl.config.SendConfigView;
+import gui.model.JobMode;
 import gui.model.SettingProperty;
 import gui.model.history.CapturePcapFileHistoryProperty;
 import javafx.event.ActionEvent;
@@ -28,12 +29,9 @@ import java.io.File;
 import java.io.IOException;
 
 public class SendToolBar {
-    SettingProperty settingProperty = new SettingProperty();
-
     // save 时是保存 packet json
 
-    View view;
-
+    SendView view;
 
     @FXML
     public ToolBar captureToolBar;
@@ -86,37 +84,37 @@ public class SendToolBar {
 
         nifBox.setTooltip(new Tooltip("select the froward target nif"));
 
-        Image importImage = new Image(getClass().getResourceAsStream(settingProperty.sendIconFolder + "/import.png"));
+        Image importImage = new Image(getClass().getResourceAsStream(SettingProperty.sendIconFolder + "/import.png"));
         importButton.setGraphic(new ImageView(importImage));
         importButton.setTooltip(new Tooltip("import pcap file"));
-        Image addImage = new Image(getClass().getResourceAsStream(settingProperty.sendIconFolder + "/add.png"));
+        Image addImage = new Image(getClass().getResourceAsStream(SettingProperty.sendIconFolder + "/add.png"));
         addButton.setGraphic(new ImageView(addImage));
         addButton.setTooltip(new Tooltip("add packet template"));
-        Image clearImage = new Image(getClass().getResourceAsStream(settingProperty.sendIconFolder + "/clear.png"));
+        Image clearImage = new Image(getClass().getResourceAsStream(SettingProperty.sendIconFolder + "/clear.png"));
         clearButton.setGraphic(new ImageView(clearImage));
         clearButton.setTooltip(new Tooltip("warning: clear packet list"));
-        Image removeImage = new Image(getClass().getResourceAsStream(settingProperty.sendIconFolder + "/remove.png"));
+        Image removeImage = new Image(getClass().getResourceAsStream(SettingProperty.sendIconFolder + "/remove.png"));
         removeButton.setGraphic(new ImageView(removeImage));
         removeButton.setTooltip(new Tooltip("warning: remove current packet"));
-        Image exportImage = new Image(getClass().getResourceAsStream(settingProperty.sendIconFolder + "/export.png"));
+        Image exportImage = new Image(getClass().getResourceAsStream(SettingProperty.sendIconFolder + "/export.png"));
         exportButton.setGraphic(new ImageView(exportImage));
         exportButton.setTooltip(new Tooltip("export current list"));
-        Image stopImage = new Image(getClass().getResourceAsStream(settingProperty.sendIconFolder + "/stop.png"));
+        Image stopImage = new Image(getClass().getResourceAsStream(SettingProperty.sendIconFolder + "/stop.png"));
         stopButton.setGraphic(new ImageView(stopImage));
         stopButton.setTooltip(new Tooltip("stop send or forward"));
-        Image configImage = new Image(getClass().getResourceAsStream(settingProperty.sendIconFolder + "/config.png"));
+        Image configImage = new Image(getClass().getResourceAsStream(SettingProperty.sendIconFolder + "/config.png"));
         configButton.setGraphic(new ImageView(configImage));
         configButton.setTooltip(new Tooltip("manage the send config"));
-        Image sendImage = new Image(getClass().getResourceAsStream(settingProperty.sendIconFolder + "/send.png"));
+        Image sendImage = new Image(getClass().getResourceAsStream(SettingProperty.sendIconFolder + "/send.png"));
         sendButton.setGraphic(new ImageView(sendImage));
         sendButton.setTooltip(new Tooltip("send current packet"));
-        Image sendAllImage = new Image(getClass().getResourceAsStream(settingProperty.sendIconFolder + "/sendAll.png"));
+        Image sendAllImage = new Image(getClass().getResourceAsStream(SettingProperty.sendIconFolder + "/sendAll.png"));
         sendAllButton.setGraphic(new ImageView(sendAllImage));
         sendAllButton.setTooltip(new Tooltip("send all packet"));
-        Image forwardImage = new Image(getClass().getResourceAsStream(settingProperty.sendIconFolder + "/forward.png"));
+        Image forwardImage = new Image(getClass().getResourceAsStream(SettingProperty.sendIconFolder + "/forward.png"));
         forwardButton.setGraphic(new ImageView(forwardImage));
         forwardButton.setTooltip(new Tooltip("forward current packet to target nif"));
-        Image forwardAllImage = new Image(getClass().getResourceAsStream(settingProperty.sendIconFolder + "/forwardAll.png"));
+        Image forwardAllImage = new Image(getClass().getResourceAsStream(SettingProperty.sendIconFolder + "/forwardAll.png"));
         forwardAllButton.setGraphic(new ImageView(forwardAllImage));
         forwardAllButton.setTooltip(new Tooltip("forward all packet to target nif"));
 
@@ -153,30 +151,24 @@ public class SendToolBar {
         File file = fileChooser.showOpenDialog(stage);
         if (file==null) return;
 
-        FileHandle.AddHistory(settingProperty.sendPcapFileHistory, file.getAbsolutePath(), CapturePcapFileHistoryProperty.class);
-        SendView sendView = (SendView) view;
-        sendView.setPcapFile(file.getAbsolutePath());
-        ViewHandle.InitializeSendPcapFileMenu(settingProperty.sendPcapFileHistory, sendView.getSendMenuBarCtrl().recentMenu);
-        sendView.StartImport();
+        FileHandle.AddHistory(SettingProperty.sendPcapFileHistory, file.getAbsolutePath(), CapturePcapFileHistoryProperty.class);
+        view.setPcapFile(file.getAbsolutePath());
+        ViewHandle.InitializeSendPcapFileMenu(SettingProperty.sendPcapFileHistory, view.getSendMenuBarCtrl().recentMenu);
+        view.JobScheduler(JobMode.ImportJob);
     }
 
     @FXML
     private void AddButtonOnClicked(ActionEvent actionEvent) {
-        // todo 添加默认数据包到包浏览器中，再自行修改
 
-        SendView sendView = (SendView) view;
+        view.getSendToolBarCtrl().removeButton.setDisable(false);
+        view.getSendToolBarCtrl().exportButton.setDisable(false);
 
-        sendView.getSendToolBarCtrl().removeButton.setDisable(false);
-        sendView.getSendToolBarCtrl().exportButton.setDisable(false);
+        view.getSendToolBarCtrl().sendButton.setDisable(false);
+        view.getSendToolBarCtrl().sendAllButton.setDisable(false);
+        view.getSendToolBarCtrl().forwardButton.setDisable(false);
+        view.getSendToolBarCtrl().forwardAllButton.setDisable(false);
 
-        sendView.getSendToolBarCtrl().sendButton.setDisable(false);
-        sendView.getSendToolBarCtrl().sendAllButton.setDisable(false);
-        sendView.getSendToolBarCtrl().forwardButton.setDisable(false);
-        sendView.getSendToolBarCtrl().forwardAllButton.setDisable(false);
-
-        sendView.status.setText("read");
-
-        OfflineJob offlineJob = new OfflineJob(sendView, settingProperty.packetTemplatePath);
+        OfflineJob offlineJob = new OfflineJob(view, SettingProperty.packetTemplatePath);
         Thread thread = new Thread(offlineJob);
         thread.start();
     }
@@ -184,25 +176,22 @@ public class SendToolBar {
     @FXML
     private void ClearButtonOnClicked(ActionEvent actionEvent) {
         // 清空所有
-        SendView sendView = (SendView) view;
-        sendView.clearBrowser();
-        sendView.setPcapFile(null);
+        view.clearBrowser();
+        view.setPcapFile(null);
 
     }
 
     @FXML
     private void RemoveButtonOnClicked(ActionEvent actionEvent) {
         // 删除选中的
-        SendView sendView = (SendView) view;
+        int index = view.getPacketListCtrl().getPacketTable().getSelectionModel().getSelectedIndex();
 
-        int index = sendView.getPacketListCtrl().getPacketTable().getSelectionModel().getSelectedIndex();
+        view.getPacketListCtrl().getPacketTable().getItems().remove(index);
+        view.packetPropertyArrayList.remove(index);
+        view.getPacketHeaderCtrl().getRoot().getChildren().clear();
 
-        sendView.getPacketListCtrl().getPacketTable().getItems().remove(index);
-        sendView.packetPropertyArrayList.remove(index);
-        sendView.getPacketHeaderCtrl().getRoot().getChildren().clear();
-
-        if (sendView.getPacketListCtrl().getPacketTable().getItems().size()==0) {
-            sendView.clearBrowser();
+        if (view.getPacketListCtrl().getPacketTable().getItems().size()==0) {
+            view.clearBrowser();
         }
 
     }
@@ -222,25 +211,23 @@ public class SendToolBar {
         );
         File file = fileChooser.showSaveDialog(stage);
         if (file==null) return;
-        SendView sendView = (SendView) view;
 
-        sendView.setExportPath(file.getAbsolutePath());
-        sendView.StartExport();
+        view.setExportPath(file.getAbsolutePath());
+        view.JobScheduler(JobMode.ExportJob);
 
     }
 
     @FXML
     private void StopButtonOnClicked(ActionEvent actionEvent) {
-        SendView sendView = (SendView) view;
-        sendView.Stop();
+        view.JobStop();
     }
 
     @FXML
     private void ConfigButtonOnClicked(ActionEvent actionEvent) {
-        SendView sendView = (SendView) view;
+
         try {
             FXMLLoader loader = new FXMLLoader();
-            AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream("view/config/SendConfigView.fxml"));
+            AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream(SettingProperty.sendConfigView));
             Stage stage = new Stage();
             stage.initStyle(StageStyle.DECORATED);
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -249,61 +236,50 @@ public class SendToolBar {
             stage.setScene(scene);
 
             SendConfigView sendConfigView = loader.getController();
-            sendConfigView.setSendStatusBar(sendView.getSendStatusBarCtrl());
+            sendConfigView.setSendStatusBar(view.getSendStatusBarCtrl());
 
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        sendView.getSendStatusBarCtrl().UpdateContextMenu();
+        view.getSendStatusBarCtrl().UpdateContextMenu();
     }
 
     @FXML
     private void SendButtonOnClicked(ActionEvent actionEvent) {
-        SendView sendView = (SendView) view;
-
-        sendView.StartSend("one");
+        view.JobScheduler(JobMode.SendOneJob);
     }
 
     @FXML
     private void SendAllButtonOnClicked(ActionEvent actionEvent) {
-        SendView sendView = (SendView) view;
-
-        sendView.StartSend("all");
+        view.JobScheduler(JobMode.SendAllJob);
     }
 
     @FXML
     private void ForwardButtonOnClicked(ActionEvent actionEvent) {
-
-        SendView sendView = (SendView) view;
-
-        sendView.StartForward("one");
+        view.JobScheduler(JobMode.ForwardAllJob);
     }
 
     @FXML
     private void ForwardAllButtonOnClicked(ActionEvent actionEvent) {
-
-        SendView sendView = (SendView) view;
-
-        sendView.StartForward("all");
+        view.JobScheduler(JobMode.ForwardAllJob);
     }
 
     @FXML
     private void NifBoxOnSelected() {
-        SendView sendView = (SendView) view;
-        if (sendView.packetPropertyArrayList.size()>0) {
+        if (view.packetPropertyArrayList.size()>0) {
             forwardButton.setDisable(false);
             forwardAllButton.setDisable(false);
         }
-        sendView.setDstNifName(nifBox.getValue());
+        view.setDstNifName(nifBox.getValue());
     }
 
-    public View getView() {
+    public SendView getView() {
         return view;
     }
 
-    public void setView(View view) {
+    public void setView(SendView view) {
         this.view = view;
     }
 

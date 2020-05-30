@@ -16,7 +16,7 @@ import java.net.Inet6Address;
 import java.net.UnknownHostException;
 
 public class Ipv6PPacket implements PPacket{
-    private IpV6Packet.Builder builder = new IpV6Packet.Builder();
+    private final IpV6Packet.Builder builder = new IpV6Packet.Builder();
     private PcapHandle pcapHandle;
     private JsonMapper jsonMapper;
     private PcapDumper dumper;

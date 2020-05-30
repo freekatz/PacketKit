@@ -3,7 +3,9 @@ package gui.ctrl.bar;
 import gui.ctrl.IndexView;
 import gui.ctrl.View;
 import gui.ctrl.config.FilterConfigView;
+import gui.model.JobMode;
 import gui.model.SettingProperty;
+import gui.model.ViewType;
 import gui.model.config.FilterProperty;
 import gui.model.history.FilterHistoryProperty;
 import javafx.event.ActionEvent;
@@ -28,9 +30,8 @@ import java.io.IOException;
 import java.util.List;
 
 public class FilterBar {
-    SettingProperty settingProperty = new SettingProperty();
 
-    View view;
+    IndexView view;
     private int selectIndex;
 
     @FXML
@@ -57,12 +58,12 @@ public class FilterBar {
         applyButton.setTooltip(new Tooltip("apply the filter expression"));
         filterBox.setTooltip(new Tooltip("view the filter history"));
 
-        ViewHandle.InitializeFilterComboBox(settingProperty.filterHistory, filterBox);
-        Image clearImage = new Image(getClass().getResourceAsStream(settingProperty.filterIconFolder + "/clear.png"));
+        ViewHandle.InitializeFilterComboBox(SettingProperty.filterHistory, filterBox);
+        Image clearImage = new Image(getClass().getResourceAsStream(SettingProperty.filterIconFolder + "/clear.png"));
         clearButton.setGraphic(new ImageView(clearImage));
-        Image applyImage = new Image(getClass().getResourceAsStream(settingProperty.filterIconFolder + "/apply.png"));
+        Image applyImage = new Image(getClass().getResourceAsStream(SettingProperty.filterIconFolder + "/apply.png"));
         applyButton.setGraphic(new ImageView(applyImage));
-        Image configImage = new Image(getClass().getResourceAsStream(settingProperty.filterIconFolder + "/config.png"));
+        Image configImage = new Image(getClass().getResourceAsStream(SettingProperty.filterIconFolder + "/config.png"));
         configButton.setGraphic(new ImageView(configImage));
 
         configMenu = new ContextMenu();
@@ -73,20 +74,18 @@ public class FilterBar {
             @Override
             public void handle(KeyEvent keyEvent) {
                 if (keyEvent.getCode()==KeyCode.ENTER) {
-                    String type = view.getType();
-                    IndexView indexView = (IndexView) view;
                     // 添加历史记录
                     if (filterBox.getValue()==null)
                         filterBox.setValue("");
-                    if (filterBox.getValue().equals(indexView.getFilterProperty().getExpression()))
+                    if (filterBox.getValue().equals(view.getFilterProperty().getExpression()))
                         return;
                     if (!filterBox.getValue().equals(""))
-                        FileHandle.AddHistory(settingProperty.filterHistory, filterBox.getValue(), FilterHistoryProperty.class);
-                    ViewHandle.InitializeFilterComboBox(settingProperty.filterHistory, filterBox);
-                    indexView.getFilterProperty().setExpression(filterBox.getValue());
-                    if (type.equals("capture")) {
-                        indexView.clearBrowser();
-                        indexView.StartCapture("apply");
+                        FileHandle.AddHistory(SettingProperty.filterHistory, filterBox.getValue(), FilterHistoryProperty.class);
+                    ViewHandle.InitializeFilterComboBox(SettingProperty.filterHistory, filterBox);
+                    view.getFilterProperty().setExpression(filterBox.getValue());
+                    if (view.getType().equals(ViewType.CaptureView)) {
+                        view.clearBrowser();
+                        view.JobScheduler(JobMode.ApplyJob);
                     }
 
                     filterBox.getEditor().requestFocus();
@@ -105,7 +104,7 @@ public class FilterBar {
             public void handle(ActionEvent actionEvent) {
                 try {
                     FXMLLoader loader = new FXMLLoader();
-                    AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream("view/config/FilterConfigView.fxml"));
+                    AnchorPane managerPane = loader.load(loader.getClassLoader().getResourceAsStream(SettingProperty.filterConfigView));
                     Stage stage = new Stage();
                     stage.initStyle(StageStyle.DECORATED);
                     stage.initModality(Modality.APPLICATION_MODAL);
@@ -137,7 +136,7 @@ public class FilterBar {
     public void UpdateContextMenu() {
         configMenu.getItems().remove(2, configMenu.getItems().size());
         ToggleGroup group = new ToggleGroup();
-        List<FilterProperty> list = FileHandle.ReadConfig(settingProperty.filterConfig, FilterProperty.class);
+        List<FilterProperty> list = FileHandle.ReadConfig(SettingProperty.filterConfig, FilterProperty.class);
         assert list != null;
         list.forEach(p -> {
             RadioMenuItem item = new RadioMenuItem(p.getName()
@@ -147,12 +146,11 @@ public class FilterBar {
             item.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-                    IndexView indexView = (IndexView) view;
                     if (item.isSelected()) {
                         for (FilterProperty property : list) {
                             if (item.getText().equals(property.getName())) {
                                 filterBox.setValue(property.getExpression());
-                                indexView.setFilterProperty(property);
+                                view.setFilterProperty(property);
                                 break;
                             }
                         }
@@ -166,18 +164,17 @@ public class FilterBar {
 
     }
 
-    public void setView(View view) {
+    public void setView(IndexView view) {
         this.view = view;
-        IndexView indexView = (IndexView) view;
-        if (indexView.getFilterProperty()==null && configMenu.getItems().size()>2){
+        if (view.getFilterProperty()==null && configMenu.getItems().size()>2){
             selectIndex = 2;
             RadioMenuItem item = (RadioMenuItem) configMenu.getItems().get(selectIndex);
             item.setSelected(true);
-            List<FilterProperty> list = FileHandle.ReadConfig(settingProperty.filterConfig, FilterProperty.class);
+            List<FilterProperty> list = FileHandle.ReadConfig(SettingProperty.filterConfig, FilterProperty.class);
             assert list != null;
             for (FilterProperty property : list) {
                 if (item.getText().contains(property.getName())) {
-                    indexView.setFilterProperty(property);
+                    view.setFilterProperty(property);
                     break;
                 }
             }
@@ -195,34 +192,30 @@ public class FilterBar {
             filterBox.setValue("");
         if (filterBox.getValue().equals(""))
             return;
-        String type = view.getType();
-        IndexView indexView = (IndexView) view;
-        if (filterBox.getValue().equals(indexView.getFilterProperty().getExpression()))
-            indexView.getFilterProperty().setExpression("");
+        if (filterBox.getValue().equals(view.getFilterProperty().getExpression()))
+            view.getFilterProperty().setExpression("");
         filterBox.setValue("");
-        if (type.equals("capture")) {
-            indexView.getPacketListCtrl().getPacketTable().getItems().clear();
-            indexView.getFilterProperty().setExpression("");
-            indexView.StartCapture("apply");
+        if (view.getType().equals(ViewType.CaptureView)) {
+            view.getPacketListCtrl().getPacketTable().getItems().clear();
+            view.getFilterProperty().setExpression("");
+            view.JobScheduler(JobMode.ApplyJob);
         }
     }
 
     @FXML
     private void ApplyButtonOnClicked() {
-        String type = view.getType();
-        IndexView indexView = (IndexView) view;
         // 添加历史记录
         if (filterBox.getValue()==null)
             filterBox.setValue("");
-        if (filterBox.getValue().equals(indexView.getFilterProperty().getExpression()))
+        if (filterBox.getValue().equals(view.getFilterProperty().getExpression()))
             return;
         if (!filterBox.getValue().equals(""))
-            FileHandle.AddHistory(settingProperty.filterHistory, filterBox.getValue(), FilterHistoryProperty.class);
-        ViewHandle.InitializeFilterComboBox(settingProperty.filterHistory, filterBox);
-        indexView.getFilterProperty().setExpression(filterBox.getValue());
-        if (type.equals("capture")) {
-            indexView.clearBrowser();
-            indexView.StartCapture("apply");
+            FileHandle.AddHistory(SettingProperty.filterHistory, filterBox.getValue(), FilterHistoryProperty.class);
+        ViewHandle.InitializeFilterComboBox(SettingProperty.filterHistory, filterBox);
+        view.getFilterProperty().setExpression(filterBox.getValue());
+        if (view.getType().equals(ViewType.CaptureView)) {
+            view.clearBrowser();
+            view.JobScheduler(JobMode.ApplyJob);
         }
     }
 }

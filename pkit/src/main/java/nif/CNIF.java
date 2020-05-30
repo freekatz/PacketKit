@@ -7,9 +7,8 @@ import javafx.scene.control.TableView;
 import org.pcap4j.core.*;
 
 public class CNIF implements NIF {
-    SettingProperty settingProperty = new SettingProperty();
-    private PcapHandle.Builder builder;  // 网卡构建对象, 通过 builder 设置网卡操作相关的字段
-    private String pcapPath;
+    private final PcapHandle.Builder builder;  // 网卡构建对象, 通过 builder 设置网卡操作相关的字段
+    private final String pcapPath;
     private TableView<Property> table;
     public PcapHandle handle;  // handle, 默认捕获全部数据包
     public PcapDumper dumper;  // 用于存储到默认缓冲区
@@ -56,7 +55,7 @@ public class CNIF implements NIF {
 
         try {
             this.handle = this.builder.build();
-            this.dumper = this.handle.dumpOpen(settingProperty.tempPcapFolder + "/tmp.pcapng");
+            this.dumper = this.handle.dumpOpen(SettingProperty.tempPcapFolder + "/tmp.pcapng");
         } catch (NotOpenException e) {
             e.printStackTrace();
         }
