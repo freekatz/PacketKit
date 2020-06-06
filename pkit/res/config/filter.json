@@ -1,1 +1,1 @@
-[{"name":"default","expression":"","comment":"default config"}]
+[{"name":"default","expression":"","comment":"default config"},{"name":"ip dst loopback addr","expression":"ip dst 127.0.0.1","comment":"dst loopback addr"}]

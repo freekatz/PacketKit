@@ -37,6 +37,7 @@ public class CaptureMenuBar {
 
     IndexView view;
 
+    //  文件菜单项目
     @FXML
     Menu fileMenu;
 
@@ -67,16 +68,14 @@ public class CaptureMenuBar {
     @FXML
     MenuItem quitItem;
 
-    /*
-    Tool
-     */
-
+    //  工具菜单项目
     @FXML
     MenuItem sendItem;
 
     @FXML
     MenuItem analysisItem;
 
+    //  关于菜单项目
     @FXML
     MenuItem websiteItem;
 
@@ -102,6 +101,7 @@ public class CaptureMenuBar {
         recentMenu.getItems().add(new SeparatorMenuItem());
         ViewHandle.InitializeCapturePcapFileMenu(SettingProperty.capturePcapFileHistory, recentMenu);
 
+        //  初始化历史记录菜单的列表
         for (int i = 2; i < recentMenu.getItems().size(); i++) {
             RadioMenuItem item = (RadioMenuItem) recentMenu.getItems().get(i);
             item.setOnAction(new EventHandler<ActionEvent>() {

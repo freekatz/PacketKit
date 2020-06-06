@@ -39,65 +39,85 @@ import java.util.List;
 
 public class ViewHandle {
 
-    public static void InitializeCaptureTop(IndexView indexView) {
-        VBox box = indexView.getTopBox();
+    /*
+    传入首页视图控制器
+    初始化首页顶部
+     */
+    public static void InitializeCaptureTop(IndexView view) {
+        VBox box = view.getTopBox();
+        if (box.getChildren().size()>0) return;
         try {
             FXMLLoader menuBarLoader = new FXMLLoader();
             AnchorPane menuBarPane = menuBarLoader.load(menuBarLoader.getClassLoader().getResourceAsStream(SettingProperty.captureMenuBar));
             menuBarPane.setMaxWidth(Double.MAX_VALUE);
             CaptureMenuBar captureMenuBar = menuBarLoader.getController();
-            captureMenuBar.setView(indexView);
-            indexView.setCaptureMenuBarCtrl(captureMenuBar);
+            captureMenuBar.setView(view);
+            view.setCaptureMenuBarCtrl(captureMenuBar);
+
             FXMLLoader toolBarLoader = new FXMLLoader();
             AnchorPane toolBarPane = toolBarLoader.load(toolBarLoader.getClassLoader().getResourceAsStream(SettingProperty.captureToolBar));
             toolBarPane.setMaxWidth(Double.MAX_VALUE);
             CaptureToolBar captureToolBar = toolBarLoader.getController();
-            captureToolBar.setView(indexView);
-            indexView.setCaptureToolBarCtrl(captureToolBar);
+            captureToolBar.setView(view);
+            view.setCaptureToolBarCtrl(captureToolBar);
+
             FXMLLoader filterBarLoader = new FXMLLoader();
             AnchorPane filterBarPane = filterBarLoader.load(filterBarLoader.getClassLoader().getResourceAsStream(SettingProperty.filterBar));
             filterBarPane.setMaxWidth(Double.MAX_VALUE);
             FilterBar filterBar = filterBarLoader.getController();
-            filterBar.setView(indexView);
-            indexView.setFilterBarCtrl(filterBar);
+            filterBar.setView(view);
+            view.setFilterBarCtrl(filterBar);
+
             box.getChildren().addAll(menuBarPane, toolBarPane, filterBarPane);
             box.setSpacing(0);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    /*
+    传入首页视图控制器
+    初始化首页中部
+     */
     public static void InitializeCaptureCenter(IndexView view) {
+        //  如果界面类型为首页, 初始化文件和网卡列表
         if (view.getType().equals(ViewType.IndexView)) {
             try {
                 VBox centerBox = view.getCenterBox();
                 view.getPane().setCenter(centerBox);
-                if (centerBox.getChildren().size()>0)
-                    return;
+                //  当中部已初始化时直接返回
+                if (centerBox.getChildren().size()>0) return;
+
                 FXMLLoader nifListLoader = new FXMLLoader();
                 AnchorPane nifListPane = nifListLoader.load(nifListLoader.getClassLoader().getResourceAsStream(SettingProperty.nifList));
                 nifListPane.setMaxWidth(Double.MAX_VALUE);
                 NIFList nifList = nifListLoader.getController();
                 nifList.setView(view);
                 view.setNifListCtrl(nifList);
+
                 FXMLLoader fileListLoader = new FXMLLoader();
                 AnchorPane fileListPane = fileListLoader.load(fileListLoader.getClassLoader().getResourceAsStream(SettingProperty.fileList));
                 fileListPane.setMaxWidth(Double.MAX_VALUE);
                 FileList fileList = fileListLoader.getController();
                 fileList.setView(view);
                 view.setFileListCtrl(fileList);
+
                 centerBox.getChildren().addAll(fileListPane, nifListPane);
                 centerBox.setSpacing(10);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else {
+        }
+        //  如果界面类型为捕获页, 初始化包浏览器
+        else {
             try {
                 SplitPane browserPane = view.getBrowserPane();
                 view.getPane().setCenter(browserPane);
                 if (browserPane.getItems().size()>0)
                     return;
 
+                //  detail 面板显示一个数据包的详情
                 SplitPane detailPane = new SplitPane();
                 detailPane.setOrientation(Orientation.HORIZONTAL);
 
@@ -107,6 +127,7 @@ public class ViewHandle {
                 PacketList packetList = packetListLoader.getController();
                 packetList.setView(view);
                 view.setPacketListCtrl(packetList);
+
                 FXMLLoader packetHeaderLoader = new FXMLLoader();
                 AnchorPane packetHeaderPane = packetHeaderLoader.load(packetHeaderLoader.getClassLoader().getResourceAsStream(SettingProperty.packetHeader));
                 packetHeaderPane.setMaxWidth(Double.MAX_VALUE);
@@ -114,6 +135,7 @@ public class ViewHandle {
                 packetHeader.setView(view);
                 view.setPacketHeaderCtrl(packetHeader);
 
+                //  包首部是一个树形表格, 存放 field 数据模型
                 TreeItem<FieldProperty> root = packetHeader.getRoot();
                 packetHeader.getHeaderTreeTable().setRoot(root);
                 packetHeader.getHeaderTreeTable().setShowRoot(false);
@@ -130,7 +152,7 @@ public class ViewHandle {
 
                 browserPane.getItems().addAll(packetListPane, detailPane);
 
-
+                //  设置分割面板的比例
                 for (int i = 0; i < browserPane.getDividers().size(); i++) {
                     browserPane.getDividers().get(i).setPosition((i + 1.0) / browserPane.getItems().size());
                 }
@@ -140,6 +162,10 @@ public class ViewHandle {
         }
     }
 
+    /*
+    传入首页视图控制器
+    初始化首页底部
+     */
     public static void InitializeCaptureBottom(IndexView view) {
         BorderPane pane = view.getPane();
         try {
@@ -226,19 +252,24 @@ public class ViewHandle {
         }
     }
 
+    /*
+    初始化离线文件打开记录列表
+     */
     public static void InitializePcapFileList(String path, ListView<String> list) {
 
-        SettingProperty settingProperty = new SettingProperty();
         JsonMapper mapper = new JsonMapper();
         try {
             CapturePcapFileHistoryProperty property = mapper.readValue(new File(path), CapturePcapFileHistoryProperty.class);
+
+            //  使用 hashset 保证历史记录不重复
             HashSet<String> hashSet;
             hashSet = property.getHistory();
 
+            //  向 list view 添加记录
             ObservableList<String> ob = FXCollections.observableArrayList();
             int num = 0;
             for (String f : hashSet) {
-                if (num < settingProperty.maxPcapFileHistory) {
+                if (num < SettingProperty.maxPcapFileHistory) {
                     File file1 = new File(f);
                     FileInputStream fis1 = new FileInputStream(file1);
                     String item;
@@ -255,9 +286,10 @@ public class ViewHandle {
         }
     }
 
+    /*
+    初始化离线文件打开记录菜单
+     */
     public static void InitializeCapturePcapFileMenu(String path, Menu menu) {
-
-        SettingProperty settingProperty = new SettingProperty();
         menu.getItems().remove(2,menu.getItems().size());
         JsonMapper mapper = new JsonMapper();
         try {
@@ -268,7 +300,7 @@ public class ViewHandle {
             int num = 0;
             ToggleGroup group = new ToggleGroup();
             for (String f : hashSet) {
-                if (num < settingProperty.maxPcapFileHistory) {
+                if (num < SettingProperty.maxPcapFileHistory) {
                     File file1 = new File(f);
                     if (!file1.exists()) FileHandle.RemoveHistory(path, f, CapturePcapFileHistoryProperty.class);
                     FileInputStream fis1 = new FileInputStream(file1);
@@ -288,9 +320,10 @@ public class ViewHandle {
         }
     }
 
+    /*
+    初始化离线文件打开记录列表
+     */
     public static void InitializeSendPcapFileMenu(String path, Menu menu) {
-
-        SettingProperty settingProperty = new SettingProperty();
         menu.getItems().remove(2,menu.getItems().size());
         JsonMapper mapper = new JsonMapper();
         try {
@@ -301,7 +334,7 @@ public class ViewHandle {
             int num = 0;
             ToggleGroup group = new ToggleGroup();
             for (String f : hashSet) {
-                if (num < settingProperty.maxPcapFileHistory) {
+                if (num < SettingProperty.maxPcapFileHistory) {
                     File file1 = new File(f);
                     if (!file1.exists()) FileHandle.RemoveHistory(path, f, SendPcapFileHistoryProperty.class);
                     FileInputStream fis1 = new FileInputStream(file1);
@@ -321,6 +354,9 @@ public class ViewHandle {
         }
     }
 
+    /*
+    初始化发送界面目标网卡选择框
+     */
     public static void InitializeNifComboBox(ComboBox<String> box) {
         List pcapNifList = ViewHandle.GetPcapNIFList();
 
@@ -332,11 +368,13 @@ public class ViewHandle {
         box.setValue("");
     }
 
+    /*
+    初始化过滤器历史记录选择框
+     */
     public static void InitializeFilterComboBox(String path, ComboBox<String> box) {
 
         String s = box.getValue();
         if (box.getItems().size()==0) {
-            SettingProperty settingProperty = new SettingProperty();
             JsonMapper mapper = new JsonMapper();
             try {
                 FilterHistoryProperty property = mapper.readValue(new File(path), FilterHistoryProperty.class);
@@ -346,7 +384,7 @@ public class ViewHandle {
                 ObservableList<String> ob = FXCollections.observableArrayList();
                 int num = 0;
                 for (String f : hashSet) {
-                    if (num < settingProperty.maxFilterHistory) {
+                    if (num < SettingProperty.maxFilterHistory) {
                         ob.add(f);
                         num++;
                     }
@@ -363,6 +401,9 @@ public class ViewHandle {
         box.setValue(s);
     }
 
+    /*
+    获取 pcap 网卡列表
+     */
     public static List GetPcapNIFList() {
         List pcapNifList = null;
         try {
@@ -374,6 +415,9 @@ public class ViewHandle {
         return pcapNifList;
     }
 
+    /*
+    初始化传入的 table view 的 columns
+     */
     public static void InitializeTable(Property property, TableView<Property> table) {
         JsonMapper mapper = new JsonMapper();
         try {
@@ -393,6 +437,9 @@ public class ViewHandle {
         }
     }
 
+    /*
+    更新传入的配置 table view
+     */
     public static void UpdateConfigTable(String configPath, Property property, TableView<Property> table) {
         List<Property> list = FileHandle.ReadConfig(configPath, property.getClass());
 
@@ -402,6 +449,9 @@ public class ViewHandle {
             });
     }
 
+    /*
+    初始化树形菜单
+     */
     public static TreeView<String> InitializeMenuTree(Property property) {
         JsonMapper mapper = new JsonMapper();
         try {

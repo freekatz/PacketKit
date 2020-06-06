@@ -151,6 +151,7 @@ public class FilterBar {
                             if (item.getText().equals(property.getName())) {
                                 filterBox.setValue(property.getExpression());
                                 view.setFilterProperty(property);
+                                // TODO: 2020/6/1 点击选择配置，应用过滤器
                                 break;
                             }
                         }
