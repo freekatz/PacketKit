@@ -18,8 +18,8 @@ public class SettingProperty {
     public static String filterConfigView = viewFolder + "config/FilterConfigView.fxml";
 
     //  component view
-    public static String fileList = viewFolder + "list/fileList.fxml";
-    public static String nifList = viewFolder + "list/nifList.fxml";
+    public static String fileList = viewFolder + "list/FileList.fxml";
+    public static String nifList = viewFolder + "list/NifList.fxml";
 
     public static String packetData = viewFolder + "browser/PacketData.fxml";
     public static String packetHeader = viewFolder + "browser/PacketHeader.fxml";
