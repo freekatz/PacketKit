@@ -1,6 +1,7 @@
 deploy/
 target/
 bak/
+
 .cz-config.js
 .commitlintrc.js
 
