@@ -1,12 +1,11 @@
 {
   "name": "pkit",
-  "version": "1.0.0",
+  "version": "v0.0.2-alpha-last",
   "description": "Packet Kit: 一个强大的跨平台底层数据包工具箱:sunny:",
   "main": ".commitlintrc.js",
   "directories": {
     "doc": "doc",
-    "lib": "lib",
-    "test": "tests"
+    "pkit": "pkit"
   },
   "dependencies": {
     "standard-version": "^7.1.0"
@@ -22,7 +21,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "commit": "git-cz",
+    "commit": "git -cz",
     "release": "standard-version"
   },
   "config": {
@@ -37,12 +36,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/1uvu/PKit.git"
+    "url": "git+https://github.com/1uvu/PacketKit.git"
   },
   "author": "Luv U",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/1uvu/PKit/issues"
+    "url": "https://github.com/1uvu/PacketKit/issues"
   },
-  "homepage": "https://github.com/1uvu/PKit#readme"
+  "homepage": "https://github.com/1uvu/PacketKit#readme"
 }
