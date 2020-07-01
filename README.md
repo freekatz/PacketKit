@@ -113,7 +113,7 @@ Packet Kit 已在以下平台进行过严格测试：
 **禁止任何形式的搬运、分享、二次修改，未经允许不得用于个人的课题答辩等用处，仅作交流之用，抄袭必究。**
 
 - [项目介绍](doc/project-introduce.pptx)
-- [项目结构](doc/project-structure.md)
+- [项目结构](doc/project-structure.txt)
 - [软件工程](doc/xml)
 - [代码规范](doc/code-structure.md)
 - [使用文档](wiki)
