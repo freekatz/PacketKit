@@ -6,6 +6,7 @@ bak/
 .commitlintrc.js
 
 tmp/
+*.pcapng
 *.pcap
 *.tps
 *.tp
