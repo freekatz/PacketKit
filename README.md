@@ -132,17 +132,17 @@ Packet Kit 已在以下平台进行过严格测试：
 
 ## 致谢
 
-[@TCPDump.ORG](tcpdump.org)
+[@TCPDump.ORG](https://tcpdump.org)
 
-[@WinPcap.ORG](winpcap.org)
+[@WinPcap.ORG](https://winpcap.org)
 
-[@Namp.ORG](namp.org)
+[@Namp.ORG](https://namp.org)
 
-[@Wireshark.ORG](wireshark.org)
+[@Wireshark.ORG](https://wireshark.org)
 
-[@Pcap4J.ORG](pcap4j.org)
+[@Pcap4J.ORG](https://pcap4j.org)
 
-[@OpenJFX.IO](openjfx.io)
+[@OpenJFX.IO](https://openjfx.io)
 
 [@HighCharts](https://www.highcharts.com.cn/)
 
