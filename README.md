@@ -146,7 +146,7 @@ Packet Kit 已在以下平台进行过严格测试：
 
 ## 版权许可
 
-[MIT License](LICENSE.md)
+[GPLv3 License](LICENSE.md)
 
 禁止任何盈利使用和二次修改，转发务必带着本仓库的 [Entry](https://github.com/1uvu/PacketKit)
 
